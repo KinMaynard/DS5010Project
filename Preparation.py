@@ -20,6 +20,7 @@ This is a module for:
 
 import soundfile as sf
 import numpy as np
+import sys
 
 def import_array(file):
 	'''
@@ -36,12 +37,24 @@ def import_array(file):
 	data, sample_rate = sf.read(file)
 	return name, data, subtype, sample_rate
 
-def first_nonzero(array, axis, invalid_val=-1):
+def mask(array):
+	'''
+	calculates a boolean mask of non zeros (values greater than positive epsilon smaller
+	than negative epsilon)
+	array: numpy array of audio data
+	returns boolean mask of nonzeros (values greater than epsilon) in array
+	'''
+	epsilon = sys.float_info.epsilon
+	mask = abs(array) > epsilon
+	return mask
+
+def first_nonzero(array, axis, invalid_val=-1, mask):
 	'''
 	Helper function for trim function that gets the index of the first non_zero element in an array
 	array: 1d or 2d numpy array of audio data
 	axis: generic axis specifier along which to access elements 
 	invalid_value: marker for dimensions of only zeros
+	mask: boolean array of non zeros (non epsilon) values in array
 	returns: index of first non zero value in array
 	
 	argmax returns indicies of first matches (True values) in cases where max occurs multiple times, 
@@ -51,15 +64,15 @@ def first_nonzero(array, axis, invalid_val=-1):
 	Column major order access.
 	'''
 	# boolean array of True where element of original array is nonzero false otherwise (if zero)
-	mask = array != 0
 	return np.where(mask.any(axis=axis), mask.argmax(axis=axis), invalid_val)
 
-def last_nonzero(array, axis, invalid_val=-1):
+def last_nonzero(array, axis, invalid_val=-1, mask):
 	'''
 	Helper function for trim function that gets the index of the last non_zero element in an array
 	array: 1d or 2d numpy array of audio data
 	axis: generic axis specifier axis along which to access elements
 	invalid_value: marker for dimensions of only zeros, default argument is -1
+	mask: boolean array of non zeros (non epsilon) values in array
 	returns: index of last non zero value in array
 
 	Similar behavior to first_nonzero however we flip along the axis to access and use argmax again
@@ -69,7 +82,6 @@ def last_nonzero(array, axis, invalid_val=-1):
 	Accessing the array here in column major order.
 	'''
 	# boolean array of True where element of original array is nonzero false otherwise (if zero)
-	mask = array !=0
 	dex_last_occur = array.shape[axis] - np.flip(mask, axis=axis).argmax(axis=axis) - 1
 	return np.where(mask.any(axis=axis), dex_last_occur, invalid_val)
 
