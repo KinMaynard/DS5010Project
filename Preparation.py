@@ -21,6 +21,8 @@ This is a module for:
 import soundfile as sf
 import numpy as np
 import sys
+import matplotlib
+import matplotlib.pyplot as plt
 
 def import_array(file):
 	'''
@@ -31,11 +33,12 @@ def import_array(file):
 	# extracting the filename and subtype from soundfile's info object
 	info = str(sf.info(file))
 	name = info[:info.find('\n')]
+	channels = info[info.find('channels:') + 10:info.find('channels:') + 11]
 	subtype = info[info.find('subtype:') + 9:]
 	subtype = subtype[subtype.find('['):]
 	# reading the audio file as a soundfile numpy array
 	data, sample_rate = sf.read(file)
-	return name, data, subtype, sample_rate
+	return name, channels, data, subtype, sample_rate
 
 def mask(array):
 	'''
@@ -48,7 +51,7 @@ def mask(array):
 	mask = abs(array) > epsilon
 	return mask
 
-def first_nonzero(array, axis, invalid_val=-1, mask):
+def first_nonzero(array, axis, mask, invalid_val=-1):
 	'''
 	Helper function for trim function that gets the index of the first non_zero element in an array
 	array: 1d or 2d numpy array of audio data
@@ -66,7 +69,7 @@ def first_nonzero(array, axis, invalid_val=-1, mask):
 	# boolean array of True where element of original array is nonzero false otherwise (if zero)
 	return np.where(mask.any(axis=axis), mask.argmax(axis=axis), invalid_val)
 
-def last_nonzero(array, axis, invalid_val=-1, mask):
+def last_nonzero(array, axis, mask, invalid_val=-1):
 	'''
 	Helper function for trim function that gets the index of the last non_zero element in an array
 	array: 1d or 2d numpy array of audio data
@@ -120,10 +123,24 @@ def export_array(name, array, sample_rate, subtype):
 	sf.write(name, array, sample_rate, subtype)
 	return None
 
-def spectrogram(array):
+def spectrogram(array, channels, sample_rate):
 	'''
 	Creates a spectrogram given an array of audio data
-	returns a spectrogram   
+	array: 1 or 2d numpy array of audio data
+	channels: 1 mono or 2 stereo, number of channels in audio array
+	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
+	# Stereo subplots fasceted
+	if channels == '2':
+		array_list = np.hsplit(array, 2)
+		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
+		return plt.specgram(left, Fs=sample_rate, cmap='magma', scale='dB'), plt.specgram(right, Fs=sample_rate, cmap='magma', scale='dB')
+	# Mono
+	elif channels == '1':
+		return plt.specgram(array, Fs= sample_rate, cmap='magma', scale='dB')
+	else:
+		return ('invalid array')
 
 if __name__ == '__main__':
+	name, channels, data, subtype, sample_rate = import_array('test_audio.wav')
+	spectrogram(data, channels, sample_rate)
