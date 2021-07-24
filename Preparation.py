@@ -134,7 +134,8 @@ def spectrogram(array, channels, sample_rate):
 	if channels == '2':
 		array_list = np.hsplit(array, 2)
 		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
-		return plt.specgram(left, Fs=sample_rate, cmap='magma', scale='dB'), plt.specgram(right, Fs=sample_rate, cmap='magma', scale='dB')
+		return plt.specgram(left, Fs=sample_rate, cmap='magma', scale='dB'), 
+		plt.specgram(right, Fs=sample_rate, cmap='magma', scale='dB')
 	# Mono
 	elif channels == '1':
 		return plt.specgram(array, Fs= sample_rate, cmap='magma', scale='dB')
