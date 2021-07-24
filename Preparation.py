@@ -130,12 +130,15 @@ def spectrogram(array, channels, sample_rate):
 	channels: 1 mono or 2 stereo, number of channels in audio array
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
+	fig, axs = plt.subplots(2, 1)
 	# Stereo subplots fasceted
 	if channels == '2':
 		array_list = np.hsplit(array, 2)
 		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
-		return plt.specgram(left, Fs=sample_rate, cmap='magma', scale='dB'), 
-		plt.specgram(right, Fs=sample_rate, cmap='magma', scale='dB')
+		# FAILS need a way to make fasceted spectrograms
+		axs[1, 1].specgram(left, Fs=sample_rate, cmap='magma', scale='dB')
+		axs[2, 1].specgram(right, Fs=sample_rate, cmap='magma', scale='dB')
+		return plt.show()
 	# Mono
 	elif channels == '1':
 		return plt.specgram(array, Fs= sample_rate, cmap='magma', scale='dB')
