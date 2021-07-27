@@ -16,6 +16,12 @@ This is a module for:
 	Key/Note
 		fundemental frequency/pitch detection
 		Detect all pitches in sample
+
+To Do:
+export_array: convert float64 array data to int data if subtype is int
+mask: test
+spectrogram:
+	pick a good colormap to represent sound well (darker for silences)
 '''
 
 import soundfile as sf
@@ -32,6 +38,7 @@ def import_array(file):
 	'''
 	# extracting the filename and subtype from soundfile's info object
 	info = str(sf.info(file))
+	# includes file path
 	name = info[:info.find('\n')]
 	channels = info[info.find('channels:') + 10:info.find('channels:') + 11]
 	subtype = info[info.find('subtype:') + 9:]
@@ -123,28 +130,36 @@ def export_array(name, array, sample_rate, subtype):
 	sf.write(name, array, sample_rate, subtype)
 	return None
 
-def spectrogram(array, channels, sample_rate):
+def spectrogram(array, channels, sample_rate, name):
 	'''
 	Creates a spectrogram given an array of audio data
 	array: 1 or 2d numpy array of audio data
 	channels: 1 mono or 2 stereo, number of channels in audio array
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
-	fig, axs = plt.subplots(2, 1)
 	# Stereo subplots fasceted
 	if channels == '2':
 		array_list = np.hsplit(array, 2)
 		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
-		# FAILS need a way to make fasceted spectrograms
-		axs[1, 1].specgram(left, Fs=sample_rate, cmap='magma', scale='dB')
-		axs[2, 1].specgram(right, Fs=sample_rate, cmap='magma', scale='dB')
+		fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex=True)
+		ax2.set_xlabel('Time (seconds)')
+		ax1.set_ylabel('Frequency Hz (dB scale)')
+		ax2.set_ylabel('Frequency Hz (dB scale)')
+		ax1.set_title('%s Spectrogram' % name)
+		ax1.specgram(left, Fs=sample_rate, cmap='magma', scale='dB')
+		ax2.specgram(right, Fs=sample_rate, cmap='magma', scale='dB')
 		return plt.show()
 	# Mono
 	elif channels == '1':
-		return plt.specgram(array, Fs= sample_rate, cmap='magma', scale='dB')
+		fig, ax = plt.subplots()
+		ax.set_xlabel('Time (seconds)')
+		ax.set_ylabel('Frequency (dB scale)')
+		ax.set_title('%s Spectrogram' % name)
+		plt.specgram(array, Fs= sample_rate, cmap='magma', scale='dB')
+		return plt.show()
 	else:
 		return ('invalid array')
 
 if __name__ == '__main__':
-	name, channels, data, subtype, sample_rate = import_array('test_audio.wav')
-	spectrogram(data, channels, sample_rate)
+	name, channels, data, subtype, sample_rate = import_array('../binaries/test_audio.wav')
+	spectrogram(data, channels, sample_rate, name)
