@@ -18,7 +18,9 @@ This is a module for:
 		Detect all pitches in sample
 
 To Do:
-export_array: convert float64 array data to int data if subtype is int
+export_array: 
+	convert float64 array data to int data if subtype is int
+	figure out which subtypes are int and which are float?
 mask: test
 spectrogram:
 	pick a good colormap to represent sound well (darker for silences)
@@ -161,5 +163,5 @@ def spectrogram(array, channels, sample_rate, name):
 		return ('invalid array')
 
 if __name__ == '__main__':
-	name, channels, data, subtype, sample_rate = import_array('../binaries/test_audio.wav')
+	name, channels, data, subtype, sample_rate = import_array('../binaries/test.wav')
 	spectrogram(data, channels, sample_rate, name)
