@@ -163,5 +163,5 @@ def spectrogram(array, channels, sample_rate, name):
 		return ('invalid array')
 
 if __name__ == '__main__':
-	name, channels, data, subtype, sample_rate = import_array('../binaries/test.wav')
+	name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
 	spectrogram(data, channels, sample_rate, name)
