@@ -17,16 +17,19 @@ This is a module for:
 		fundemental frequency/pitch detection
 		Detect all pitches in sample
 
+Exceptions:
+	Spectrogram
+		divide by 0 error, happens when converting FFT to dBFS
+			run trim on data before to fix this for trailing and leading 0's
+			untested on zeros inside nonzero data
+
 To Do:
 export_array: 
 	convert float64 array data to int data if subtype is int
 	figure out which subtypes are int and which are float?
-mask: test
 spectrogram:
 	reconcile stereo plot top/bottom y axis
-	divide by 0 error ?
 	smaller colorbar for mono plot
-	more ticks on colorbar
 '''
 
 import soundfile as sf
@@ -112,9 +115,11 @@ def trim(array):
 
 	future features: definable noise floor to choose what to truncate as silence
 	'''
+	# mask of absolute value of values > epsilon
+	mask1 = mask(array)
 	# return a copy of array sliced from first nonzero element to last nonzero element
 	# adds 1 to compensate for indexing from zero
-	return array[np.amin(first_nonzero(array, 0)):np.amax(last_nonzero(array, 0)) + 1,:].copy()
+	return array[np.amin(first_nonzero(array, 0, mask1)):np.amax(last_nonzero(array, 0, mask1)) + 1].copy()
 
 def normalize(array):
 	'''
@@ -174,8 +179,11 @@ def spectrogram(array, channels, sample_rate, name):
 		fig.subplots_adjust(right=0.84, hspace=0)
 		
 		# colorbar
+		cbar_max = 0
+		cbar_min = -120
+		cbar_step = 5
 		cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77])
-		plt.colorbar(iml, cax=cbar_ax).set_label('Amplitude (dB)')
+		plt.colorbar(iml, ticks=np.arange(cbar_min, cbar_max+cbar_step, cbar_step), cax=cbar_ax).set_label('Amplitude (dB)')
 		
 		# limit y axes to human hearing range
 		ax1.set_ylim([0, 20000])
@@ -204,7 +212,10 @@ def spectrogram(array, channels, sample_rate, name):
 		
 		# colorbar
 		# smaller colorbar for mono plot
-		plt.colorbar(im).set_label('Amplitude (dB)')
+		cbar_max = 0
+		cbar_min = -120
+		cbar_step = 5
+		plt.colorbar(im, ticks=np.arange(cbar_min, cbar_max+cbar_step, cbar_step)).set_label('Amplitude (dB)')
 		
 		# limit y axis to human hearing range
 		plt.ylim([0, 20000])
@@ -222,8 +233,10 @@ def spectrogram(array, channels, sample_rate, name):
 if __name__ == '__main__':
 	# spectrogram test case mono file
 	name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+	data = trim(data)
 	spectrogram(data, channels, sample_rate, name)
 
 	# spectrogram test case stereo file
 	name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+	data = trim(data)
 	spectrogram(data, channels, sample_rate, name)
