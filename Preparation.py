@@ -23,13 +23,16 @@ export_array:
 	figure out which subtypes are int and which are float?
 mask: test
 spectrogram:
-	pick a good colormap to represent sound well (darker for silences)
+	reconcile stereo plot top/bottom y axis
+	divide by 0 error ?
+	smaller colorbar for mono plot
+	more ticks on colorbar
 '''
 
 import soundfile as sf
 import numpy as np
 import sys
-import matplotlib
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 def import_array(file):
@@ -40,11 +43,13 @@ def import_array(file):
 	'''
 	# extracting the filename and subtype from soundfile's info object
 	info = str(sf.info(file))
+
 	# includes file path
 	name = info[:info.find('\n')]
 	channels = info[info.find('channels:') + 10:info.find('channels:') + 11]
 	subtype = info[info.find('subtype:') + 9:]
 	subtype = subtype[subtype.find('['):]
+
 	# reading the audio file as a soundfile numpy array
 	data, sample_rate = sf.read(file)
 	return name, channels, data, subtype, sample_rate
@@ -139,29 +144,86 @@ def spectrogram(array, channels, sample_rate, name):
 	channels: 1 mono or 2 stereo, number of channels in audio array
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
+	# global fontsize change
+	plt.rcParams.update({'font.size': 8})
+
 	# Stereo subplots fasceted
 	if channels == '2':
+		# divide array into stereo components
 		array_list = np.hsplit(array, 2)
 		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
-		fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex=True)
-		ax2.set_xlabel('Time (seconds)')
-		ax1.set_ylabel('Frequency Hz (dB scale)')
-		ax2.set_ylabel('Frequency Hz (dB scale)')
+		
+		# dark background white text, initilize figure and axes
+		plt.style.use('dark_background')
+		fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+		
+		# labeling axes & title
+		ax2.set_xlabel('Time (s)')
+		ax1.set_ylabel('Left Frequency (kHz)')
+		ax2.set_ylabel('Right Frequency (kHz)')
 		ax1.set_title('%s Spectrogram' % name)
-		ax1.specgram(left, Fs=sample_rate, cmap='magma', scale='dB')
-		ax2.specgram(right, Fs=sample_rate, cmap='magma', scale='dB')
+		
+		# x axis on top
+		ax1.xaxis.tick_top()
+		
+		# plot spectrograms
+		specl, fql, tl, iml = ax1.specgram(left, Fs=sample_rate, cmap='magma', scale='dB', vmin=-120, vmax=0)
+		specr, fqr, tr, imr = ax2.specgram(right, Fs=sample_rate, cmap='magma', scale='dB', vmin=-120, vmax=0)
+		
+		# make space for colorbar & stack plots snug
+		fig.subplots_adjust(right=0.84, hspace=0)
+		
+		# colorbar
+		cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77])
+		plt.colorbar(iml, cax=cbar_ax).set_label('Amplitude (dB)')
+		
+		# limit y axes to human hearing range
+		ax1.set_ylim([0, 20000])
+		ax2.set_ylim([0, 20000])
+
+		# fq in kHz
+		scale = 1e3
+		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/scale))
+		ax1.yaxis.set_major_formatter(ticks)
+		ax2.yaxis.set_major_formatter(ticks)
 		return plt.show()
-	# Mono
+
+	# Mono case
 	elif channels == '1':
+		# dark background white text, initilize figure and axes
+		plt.style.use('dark_background')
 		fig, ax = plt.subplots()
-		ax.set_xlabel('Time (seconds)')
-		ax.set_ylabel('Frequency (dB scale)')
+
+		# labeling axes & title
+		ax.set_xlabel('Time (s)')
+		ax.set_ylabel('Frequency (kHz)')
 		ax.set_title('%s Spectrogram' % name)
-		plt.specgram(array, Fs= sample_rate, cmap='magma', scale='dB')
+		
+		# plot spectrogram
+		spec, fq, t, im = plt.specgram(array, Fs= sample_rate, cmap='magma', scale='dB', vmin=-120, vmax=0)
+		
+		# colorbar
+		# smaller colorbar for mono plot
+		plt.colorbar(im).set_label('Amplitude (dB)')
+		
+		# limit y axis to human hearing range
+		plt.ylim([0, 20000])
+
+		# fq in kHz
+		scale = 1e3
+		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/scale))
+		ax.yaxis.set_major_formatter(ticks)
 		return plt.show()
+
+	# wrong array case
 	else:
 		return ('invalid array')
 
 if __name__ == '__main__':
+	# spectrogram test case mono file
+	name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+	spectrogram(data, channels, sample_rate, name)
+
+	# spectrogram test case stereo file
 	name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
 	spectrogram(data, channels, sample_rate, name)
