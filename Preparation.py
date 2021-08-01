@@ -27,9 +27,14 @@ To Do:
 export_array: 
 	convert float64 array data to int data if subtype is int
 	figure out which subtypes are int and which are float?
+
 spectrogram:
-	reconcile stereo plot top/bottom y axis
-	smaller colorbar for mono plot
+	NFFT values to use?
+		powers of 2 efficient
+		scalloping loss?
+	Windows?
+	Window overlap?
+	Should probably take Window, NFFT & overlap as arguments
 '''
 
 import soundfile as sf
@@ -145,13 +150,14 @@ def export_array(name, array, sample_rate, subtype):
 def spectrogram(array, channels, sample_rate, name):
 	'''
 	Creates a spectrogram given an array of audio data
+
+	Higher FFT sizes give you more detail in frequencies, referred to as frequency resolution, 
+	while lower FFT sizes give you more detail in time, referred to as time resolution.
+
 	array: 1 or 2d numpy array of audio data
 	channels: 1 mono or 2 stereo, number of channels in audio array
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
-	# global fontsize change
-	plt.rcParams.update({'font.size': 8})
-
 	# Stereo subplots fasceted
 	if channels == '2':
 		# divide array into stereo components
@@ -163,35 +169,36 @@ def spectrogram(array, channels, sample_rate, name):
 		fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
 		
 		# labeling axes & title
-		ax2.set_xlabel('Time (s)')
-		ax1.set_ylabel('Left Frequency (kHz)')
-		ax2.set_ylabel('Right Frequency (kHz)')
-		ax1.set_title('%s Spectrogram' % name)
-		
+		ax2.set_xlabel('Time (s)', fontsize='x-small')
+		ax1.set_ylabel('Left Frequency (kHz)', fontsize='x-small')
+		ax2.set_ylabel('Right Frequency (kHz)', fontsize='x-small')
+		ax1.set_title('%s Spectrogram' % name, fontsize='medium')
+		ax1.tick_params(axis='both', which='major', labelsize=6)
+		ax2.tick_params(axis='both', which='major', labelsize=6)
+		ax1.grid(True, axis='y', ls=':')
+		ax2.grid(True, axis='y', ls=':')
+
 		# x axis on top
 		ax1.xaxis.tick_top()
 		
 		# plot spectrograms
-		specl, fql, tl, iml = ax1.specgram(left, Fs=sample_rate, cmap='magma', scale='dB', vmin=-120, vmax=0)
-		specr, fqr, tr, imr = ax2.specgram(right, Fs=sample_rate, cmap='magma', scale='dB', vmin=-120, vmax=0)
+		specl, fql, tl, iml = ax1.specgram(left, Fs=sample_rate, cmap='magma', vmin=-120, vmax=0)
+		specr, fqr, tr, imr = ax2.specgram(right, Fs=sample_rate, cmap='magma', vmin=-120, vmax=0)
 		
 		# make space for colorbar & stack plots snug
 		fig.subplots_adjust(right=0.84, hspace=0)
 		
 		# colorbar
-		cbar_max = 0
-		cbar_min = -120
-		cbar_step = 5
-		cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77])
-		plt.colorbar(iml, ticks=np.arange(cbar_min, cbar_max+cbar_step, cbar_step), cax=cbar_ax).set_label('Amplitude (dB)')
+		cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77]) # left, bottom, width, height
+		fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', fontsize='x-small')
+		cbar_ax.tick_params(labelsize=6)
 		
 		# limit y axes to human hearing range
 		ax1.set_ylim([0, 20000])
 		ax2.set_ylim([0, 20000])
 
 		# fq in kHz
-		scale = 1e3
-		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/scale))
+		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/1000))
 		ax1.yaxis.set_major_formatter(ticks)
 		ax2.yaxis.set_major_formatter(ticks)
 		return plt.show()
@@ -203,26 +210,28 @@ def spectrogram(array, channels, sample_rate, name):
 		fig, ax = plt.subplots()
 
 		# labeling axes & title
-		ax.set_xlabel('Time (s)')
-		ax.set_ylabel('Frequency (kHz)')
-		ax.set_title('%s Spectrogram' % name)
+		ax.set_xlabel('Time (s)', fontsize='x-small')
+		ax.set_ylabel('Frequency (kHz)', fontsize='x-small')
+		ax.set_title('%s Spectrogram' % name, fontsize='medium')
+		ax.tick_params(axis='both', which='major', labelsize=6)
+		ax.grid(True, axis='y', ls=':')
 		
 		# plot spectrogram
-		spec, fq, t, im = plt.specgram(array, Fs= sample_rate, cmap='magma', scale='dB', vmin=-120, vmax=0)
+		spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma', vmin=-120, vmax=0)
 		
+		# make space for colorbar
+		fig.subplots_adjust(right=0.84)
+
 		# colorbar
-		# smaller colorbar for mono plot
-		cbar_max = 0
-		cbar_min = -120
-		cbar_step = 5
-		plt.colorbar(im, ticks=np.arange(cbar_min, cbar_max+cbar_step, cbar_step)).set_label('Amplitude (dB)')
+		cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768])	# left, bottom, width, height
+		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', fontsize='x-small')
+		cbar_ax.tick_params(labelsize=5)
 		
 		# limit y axis to human hearing range
-		plt.ylim([0, 20000])
+		ax.set_ylim([0, 20000])
 
 		# fq in kHz
-		scale = 1e3
-		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/scale))
+		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/1000))
 		ax.yaxis.set_major_formatter(ticks)
 		return plt.show()
 
