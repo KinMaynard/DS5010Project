@@ -24,17 +24,13 @@ Exceptions:
 			untested on zeros inside nonzero data
 
 To Do:
-export_array: 
-	convert float64 array data to int data if subtype is int
-	figure out which subtypes are int and which are float?
-
+big plot with all other plots inside:
+	sliders for zoom
+	radio buttons for L R Both (log magnitude)
 spectrogram:
-	NFFT values to use?
-		powers of 2 efficient
-		scalloping loss?
-	Windows?
-	Window overlap?
-	Should probably take Window, NFFT & overlap as arguments
+	NFFT
+	noverlap
+	window
 '''
 
 import soundfile as sf
@@ -42,12 +38,13 @@ import numpy as np
 import sys
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib.ticker import AutoMinorLocator
 
 def import_array(file):
 	'''
 	Import audio file as 64 bit float array
 	file: audio file
-	returns: a filename, data (a 64 bit float numpy array of audio data), subtype: the files subtype (list of possible under sf.available_subtypes)
+	returns: a filename, number of channels, data (a 64 bit float numpy array of audio data), subtype: the files subtype, sample rate
 	'''
 	# extracting the filename and subtype from soundfile's info object
 	info = str(sf.info(file))
@@ -132,34 +129,170 @@ def normalize(array):
 	array: array of audio data 64 bit floating point
 	returns: normalized version of array
 	'''
-	# factors an array of audio data by the difference between 0 dbfs and the peak signal
-	return (1 / np.amax(np.abs(array))) * array
+	peak = np.amax(np.abs(array))
+	#int64
+	if peak in range(-2.0**31, 2.0**31-1.0):
+		return ((2.0**31-1.0) / peak) * array
+	# int32
+	elif peak in range(-2.0**15, 2.0**15-1.0):
+		return ((2.0**15-1.0) / peak) * array
+	# float
+	elif peak in range(-1.0, 1.0):
+		# factors an array of audio data by the difference between 0 dbfs and the peak signal
+		return (1 / peak) * array
 
-def export_array(name, array, sample_rate, subtype):
+def waveform(array, name, channels, sample_rate):
 	'''
-	Export numpy array as audio file
-	array: soundfile object, numpy array of audio data as 64 bit float
-	name: file to write to (truncates & overwrites if file exists) (str, int or file like object)
-	sample_rate: sample rate of the audio data
-	subtype: subtype of the audio data
-	returns: none
+	array: numpy array of audio data
+	name: file name
+	channels: mono (1) or stereo (2) file
+	sample_rate: sampling rate of audio file
+	returns: waveform plot of intensity/time
 	'''
-	sf.write(name, array, sample_rate, subtype)
-	return None
+	# mono
+	if channels == '1':
+		# dark background white text, initilize figure and axes
+		plt.style.use('dark_background')
+		fig, ax = plt.subplots()
 
-def spectrogram(array, channels, sample_rate, name):
+		# labeling axes & title
+		ax.set_title('%s Waveform' % name, fontsize='medium')
+		ax.set_xlabel('Time (s)', fontsize='x-small')
+		ax.set_ylabel('Amplitude', fontsize='x-small')
+		ax.tick_params(axis='both', which='major', labelsize=6)
+		ax.margins(0.001)
+
+		# plot signal amplitude/time
+		time = array.size / sample_rate # seconds in file
+		ax.plot(np.arange(0.0, time, time / array.size), array, color='indigo')
+
+		return plt.show()
+
+	# stereo
+	elif channels == '2':
+		# divide array into stereo components
+		array_list = np.hsplit(array, 2)
+		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
+
+		# dark background white text, initilize figure and axes
+		plt.style.use('dark_background')
+		fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+
+		# labeling axes & title
+		ax1.set_title('%s Waveform' % name, fontsize='medium')
+		ax2.set_xlabel('Time (s)', fontsize='x-small')
+		ax1.set_ylabel('Amplitude Left', fontsize='x-small')
+		ax2.set_ylabel('Amplitude Right', fontsize='x-small')
+		ax1.tick_params(axis='both', which='major', labelsize=6)
+		ax2.tick_params(axis='both', which='major', labelsize=6)
+		ax1.margins(0.001)
+		ax2.margins(0.001)
+		fig.subplots_adjust(hspace=0)
+
+		# x axis on top
+		ax1.xaxis.tick_top()
+
+		# plot signal amplitude/time
+		time = array.size / sample_rate
+		ax1.plot(np.arange(0.0, time, time / left.size), left, color='indigo')
+		ax2.plot(np.arange(0.0, time, time / right.size), right, color='indigo')
+
+		return plt.show()
+
+def magnitude(array, name, channels, sample_rate, side=None, scale=None):
+	'''
+	plots the log magnitude spectrum of an audio signal magnitude dB/frequency
+	array: array of audio data
+	name: audio file name
+	channels: 1 mono or 2 stereo
+	sample_rate: sampling rate of audio file
+	side: l, r or both (l returns plot of left side, r returns right side, both sums sides and returns result) default None
+	scale: scaling of values in the spectrum, 'dB' (amplitude (20 * log10)) or 'linear'
+	returns: a plot of the log magnitude spectrum of an audio array
+	'''
+	# mono
+	if channels == '1':
+		# dark background white text, initilize figure and axes
+		plt.style.use('dark_background')
+		fig, ax = plt.subplots()
+
+		# labeling axes & title
+		title = '%s Magnitude Spectrum' % name
+		if scale == 'dB':
+			title = '%s Log Magnitude Spectrum' % name
+		ax.set_title(title, fontsize='medium')
+		ax.set_xlabel('Frequency (hz)', fontsize='x-small')
+		ax.set_ylabel('Magnitude (dB)', fontsize='x-small')
+		ax.tick_params(axis='both', which='major', labelsize=6)
+
+		# plotting log magnitude spectrum
+		ax.magnitude_spectrum(array, Fs=sample_rate, scale=scale, color='indigo')
+
+		return plt.show()
+
+	# stereo
+	if channels == '2':
+		# divide array into stereo components
+		array_list = np.hsplit(array, 2)
+		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
+
+		# left
+		if side == 'l':
+			magnitude(left, name + ' Left', '1', sample_rate, scale=scale)
+		
+		# right
+		elif side == 'r':
+			magnitude(right, name + ' Right', '1', sample_rate, scale=scale)
+		
+		# sum
+		elif side == 'both':
+			# sum stereo channels
+			sumsig = np.sum(array, axis=1)
+			magnitude(sumsig, name + ' Sum', '1', sample_rate, scale=scale)
+
+def spectrogram(array, name, channels, sample_rate):
 	'''
 	Creates a spectrogram given an array of audio data
-
-	Higher FFT sizes give you more detail in frequencies, referred to as frequency resolution, 
-	while lower FFT sizes give you more detail in time, referred to as time resolution.
-
 	array: 1 or 2d numpy array of audio data
 	channels: 1 mono or 2 stereo, number of channels in audio array
+	name: name of the audio file
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
+	# Mono case
+	if channels == '1':
+		# dark background white text, initilize figure and axes
+		plt.style.use('dark_background')
+		fig, ax = plt.subplots()
+
+		# labeling axes & title
+		ax.set_xlabel('Time (s)', fontsize='x-small')
+		ax.set_ylabel('Frequency (kHz)', fontsize='x-small')
+		ax.set_title('%s Spectrogram' % name, fontsize='medium')
+		ax.tick_params(axis='both', which='major', labelsize=6)
+		ax.grid(True, axis='y', ls=':')
+		
+		# plot spectrogram
+		spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma', vmin=-120, vmax=0)
+		
+		# make space for colorbar
+		fig.subplots_adjust(right=0.84)
+
+		# colorbar
+		cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768])	# left, bottom, width, height
+		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', fontsize='x-small')
+		cbar_ax.tick_params(labelsize=5)
+		
+		# limit y axis to human hearing range
+		ax.set_ylim([0, 20000])
+
+		# fq in kHz
+		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/1000))
+		ax.yaxis.set_major_formatter(ticks)
+
+		return plt.show()
+
 	# Stereo subplots fasceted
-	if channels == '2':
+	elif channels == '2':
 		# divide array into stereo components
 		array_list = np.hsplit(array, 2)
 		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
@@ -201,43 +334,20 @@ def spectrogram(array, channels, sample_rate, name):
 		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/1000))
 		ax1.yaxis.set_major_formatter(ticks)
 		ax2.yaxis.set_major_formatter(ticks)
+
 		return plt.show()
 
-	# Mono case
-	elif channels == '1':
-		# dark background white text, initilize figure and axes
-		plt.style.use('dark_background')
-		fig, ax = plt.subplots()
-
-		# labeling axes & title
-		ax.set_xlabel('Time (s)', fontsize='x-small')
-		ax.set_ylabel('Frequency (kHz)', fontsize='x-small')
-		ax.set_title('%s Spectrogram' % name, fontsize='medium')
-		ax.tick_params(axis='both', which='major', labelsize=6)
-		ax.grid(True, axis='y', ls=':')
-		
-		# plot spectrogram
-		spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma', vmin=-120, vmax=0)
-		
-		# make space for colorbar
-		fig.subplots_adjust(right=0.84)
-
-		# colorbar
-		cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768])	# left, bottom, width, height
-		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', fontsize='x-small')
-		cbar_ax.tick_params(labelsize=5)
-		
-		# limit y axis to human hearing range
-		ax.set_ylim([0, 20000])
-
-		# fq in kHz
-		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/1000))
-		ax.yaxis.set_major_formatter(ticks)
-		return plt.show()
-
-	# wrong array case
-	else:
-		return ('invalid array')
+def export_array(name, array, sample_rate, subtype):
+	'''
+	Export numpy array as audio file
+	name: file to write to (truncates & overwrites if file exists) (str, int or file like object)
+	array: soundfile object, numpy array of audio data as 64 bit float
+	sample_rate: sample rate of the audio data
+	subtype: subtype of the audio data
+	returns: none
+	'''
+	sf.write(name, array, sample_rate, subtype)
+	return None
 
 if __name__ == '__main__':
 	# spectrogram test case mono file
@@ -249,3 +359,27 @@ if __name__ == '__main__':
 	name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
 	data = trim(data)
 	spectrogram(data, channels, sample_rate, name)
+
+	# # Waveform plot test case mono file
+	# name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+	# waveform(data, name, channels, sample_rate)
+
+	# # Waveform plot test case stereo file
+	# name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+	# waveform(data, name, channels, sample_rate)
+
+	# # magnitude test mono file
+	# name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+	# magnitude(data, name, channels, sample_rate)
+
+	# # magnitude test stereo file
+	# name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+	# magnitude(data, name, channels, sample_rate, side='l', scale='linear')
+	# magnitude(data, name, channels, sample_rate, side='r', scale='linear')
+	# magnitude(data, name, channels, sample_rate, side='both', scale='linear')
+	# magnitude(data, name, channels, sample_rate, side='l', scale='dB')
+	# magnitude(data, name, channels, sample_rate, side='r', scale='dB')
+	# magnitude(data, name, channels, sample_rate, side='both', scale='dB')
+	# magnitude(data, name, channels, sample_rate, side='l')
+	# magnitude(data, name, channels, sample_rate, side='r')
+	# magnitude(data, name, channels, sample_rate, side='both')
