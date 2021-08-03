@@ -31,14 +31,24 @@ spectrogram:
 	NFFT
 	noverlap
 	window
+vectorscope:
+	test cases
+		panned hard L
+			not showing anything in plot?
+		panned hard R
 '''
 
 import soundfile as sf
 import numpy as np
 import sys
+import pdb
+import inquirer
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.ticker import AutoMinorLocator
+from matplotlib.widgets import MultiCursor
+from matplotlib.widgets import RadioButtons
+
+debug = False
 
 def import_array(file):
 	'''
@@ -123,6 +133,23 @@ def trim(array):
 	# adds 1 to compensate for indexing from zero
 	return array[np.amin(first_nonzero(array, 0, mask1)):np.amax(last_nonzero(array, 0, mask1)) + 1].copy()
 
+def split(array, channels, name):
+	'''
+	splits 2d array of audio data into Left and Right or Mid and Side channels
+	array: 2d numpy array of audio data
+	channels: # of channels in signal, must be 2
+	name: audio filename
+	returns: Left and Right channels (or M/S)
+	'''
+	# mono case
+	if channels == '1':
+		return ('%s is mono, import 2 channel audio array for splitting.' % name)
+	else:
+		# divide array into stereo components
+		array_list = np.hsplit(array, 2)
+		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
+		return left, right
+
 def normalize(array):
 	'''
 	Performs peak normalization on array of audio data
@@ -141,6 +168,83 @@ def normalize(array):
 		# factors an array of audio data by the difference between 0 dbfs and the peak signal
 		return (1 / peak) * array
 
+def midside(array, channels, name, code=True):
+	'''
+	Encodes a stereo array of L/R audio data as mid/side data or mid/side data as L/R
+
+	sum and difference matrix:
+	mid: (L+R)-3dB or 1/2(L+R)
+	side: (L-R)-3dB or 1/2(L-R)
+	L: (M+S)-3dB or L = M + S = 1/2(L+R) + 1/2(L-R) = 1/2 * L + 1/2 * L
+	R: (M-S)-3dB or R = M - S = 1/2(L+R) - 1/2(L-R) = 1/2 * R + 1/2 * R
+	-3db accounts for the +6dB change to the output of a double encoding
+
+	array: 2d numpy array of audio data (L/R, or M/S)
+	channels: # of channels in audio signal (must be 2)
+	name: name of audio signal
+	code: True when encoding Mid/Side, False when decoding Mid/Side (default True)
+	returns: given L/R: a 2d array of audio data encoded as mid/side, given M/S: a 2d array of audio data encoded as L/R
+	'''
+	# check for stereo or mid/side array
+	if channels == '1':
+		return print('%s is mono, import 2 channel audio array for mid side processing.' % name)
+	else:
+		# divide array into stereo components
+		left, right = split(array, channels, name)
+
+		if code:
+			# Mid/Side encoding
+			mid = 0.5 * (left + right)
+			side = 0.5 * (left - right)
+
+			encoded = np.stack((mid, side), axis=-1)
+
+			midside = True
+
+			return encoded, midside
+
+		else:
+			# Mid/Side decoding
+			newleft = left + right # mid + side
+			newright = left - right # mid - side
+
+			decoded = np.stack((newleft, newright), axis=-1)
+
+			midside = False
+
+			return decoded, midside
+
+def invert(array):
+	'''
+	Inverts the phase (polarity) of an array of audio data
+	array: a numpy array of audio data
+	returns: a version of array with the polarity inverted
+	'''
+	# inverts polarity of audio data
+	return array * -1
+
+def reverse(array):
+	'''
+	Reverses an array of audio data
+	array: a numpy array of audio data
+	returns: a reversed version of array
+	'''
+	return np.flip(array, 0)
+
+def export_array(name, array, sample_rate, subtype):
+	'''
+	Export numpy array as audio file
+	name: file to write to (truncates & overwrites if file exists) (str, int or file like object)
+	array: soundfile object, numpy array of audio data as 64 bit float
+	sample_rate: sample rate of the audio data
+	subtype: subtype of the audio data
+	returns: none
+	'''
+	sf.write(name, array, sample_rate, subtype)
+	return None
+
+# Visualizarion
+
 def waveform(array, name, channels, sample_rate):
 	'''
 	array: numpy array of audio data
@@ -149,6 +253,7 @@ def waveform(array, name, channels, sample_rate):
 	sample_rate: sampling rate of audio file
 	returns: waveform plot of intensity/time
 	'''
+	# Sliders for zoom
 	# mono
 	if channels == '1':
 		# dark background white text, initilize figure and axes
@@ -171,8 +276,7 @@ def waveform(array, name, channels, sample_rate):
 	# stereo
 	elif channels == '2':
 		# divide array into stereo components
-		array_list = np.hsplit(array, 2)
-		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
+		left, right = split(array, channels, name)
 
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')
@@ -197,6 +301,9 @@ def waveform(array, name, channels, sample_rate):
 		ax1.plot(np.arange(0.0, time, time / left.size), left, color='indigo')
 		ax2.plot(np.arange(0.0, time, time / right.size), right, color='indigo')
 
+		# Multicursor
+		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
+
 		return plt.show()
 
 def magnitude(array, name, channels, sample_rate, side=None, scale=None):
@@ -210,6 +317,9 @@ def magnitude(array, name, channels, sample_rate, side=None, scale=None):
 	scale: scaling of values in the spectrum, 'dB' (amplitude (20 * log10)) or 'linear'
 	returns: a plot of the log magnitude spectrum of an audio array
 	'''
+	# Radio button for Linear, Log
+	# Radio Button for L, R, Sum
+	# Radio Button for Mid, Side
 	# mono
 	if channels == '1':
 		# dark background white text, initilize figure and axes
@@ -233,8 +343,7 @@ def magnitude(array, name, channels, sample_rate, side=None, scale=None):
 	# stereo
 	if channels == '2':
 		# divide array into stereo components
-		array_list = np.hsplit(array, 2)
-		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
+		left, right = split(array, channels, name)
 
 		# left
 		if side == 'l':
@@ -258,6 +367,7 @@ def spectrogram(array, name, channels, sample_rate):
 	name: name of the audio file
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
+	# Sliders for zoom
 	# Mono case
 	if channels == '1':
 		# dark background white text, initilize figure and axes
@@ -269,7 +379,7 @@ def spectrogram(array, name, channels, sample_rate):
 		ax.set_ylabel('Frequency (kHz)', fontsize='x-small')
 		ax.set_title('%s Spectrogram' % name, fontsize='medium')
 		ax.tick_params(axis='both', which='major', labelsize=6)
-		ax.grid(True, axis='y', ls=':')
+		# ax.grid(True, axis='y', ls=':')
 		
 		# plot spectrogram
 		spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma', vmin=-120, vmax=0)
@@ -294,8 +404,7 @@ def spectrogram(array, name, channels, sample_rate):
 	# Stereo subplots fasceted
 	elif channels == '2':
 		# divide array into stereo components
-		array_list = np.hsplit(array, 2)
-		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
+		left, right = split(array, channels, name)
 		
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')
@@ -308,8 +417,8 @@ def spectrogram(array, name, channels, sample_rate):
 		ax1.set_title('%s Spectrogram' % name, fontsize='medium')
 		ax1.tick_params(axis='both', which='major', labelsize=6)
 		ax2.tick_params(axis='both', which='major', labelsize=6)
-		ax1.grid(True, axis='y', ls=':')
-		ax2.grid(True, axis='y', ls=':')
+		# ax1.grid(True, axis='y', ls=':')
+		# ax2.grid(True, axis='y', ls=':')
 
 		# x axis on top
 		ax1.xaxis.tick_top()
@@ -335,51 +444,117 @@ def spectrogram(array, name, channels, sample_rate):
 		ax1.yaxis.set_major_formatter(ticks)
 		ax2.yaxis.set_major_formatter(ticks)
 
+		# multicursor
+		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
+
 		return plt.show()
 
-def export_array(name, array, sample_rate, subtype):
+	else:
+		return ('Invalid Array')
+
+def vectorscope(array, name, code):
 	'''
-	Export numpy array as audio file
-	name: file to write to (truncates & overwrites if file exists) (str, int or file like object)
-	array: soundfile object, numpy array of audio data as 64 bit float
-	sample_rate: sample rate of the audio data
-	subtype: subtype of the audio data
-	returns: none
+	A stereo vectorscope polar sample plot of audio data
+	Side/Mid amplitudes as coordinates on X/Y 180 degree polar plot
+	array: array of audio data
+	name: audio datafile name
+	code: boolean True if array is encoded as mid/side, false if encoded as L/R
 	'''
-	sf.write(name, array, sample_rate, subtype)
-	return None
+	if code:
+		# dark background white text, initilize polar figure and axes
+		plt.style.use('dark_background')
+		fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+
+		# converting cartesian coordinates to polar
+		absarray = np.absolute(array)
+		r = np.sqrt(np.sum(np.square(array), axis=1))
+		theta = np.arctan2(absarray[:,0], array[:,1])
+		
+		# plotting
+		ax.scatter(theta, r, s=0.25, c='indigo')
+		ax.set_title('Polar Dot Per Sample Vectorscope of %s' % name)
+		ax.set_thetamax(180)
+		ax.set_yticklabels([])
+		ax.set_xticklabels([])
+		ax.grid(False, axis='y')
+		ax.set_thetagrids((135.0, 45.0))
+		return plt.show()
+
+	else:
+		# midside encoding
+		msarray, ms = midside(array, channels, name)
+		vectorscope(msarray, name, True)
 
 if __name__ == '__main__':
-	# spectrogram test case mono file
-	name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
-	data = trim(data)
-	spectrogram(data, channels, sample_rate, name)
+	questions = [inquirer.Checkbox('tests', message='Which tests to run?', choices=['Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 'Vectorscope'],),]
+	answers = inquirer.prompt(questions)
 
-	# spectrogram test case stereo file
-	name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
-	data = trim(data)
-	spectrogram(data, channels, sample_rate, name)
+	if 'Midside' in answers['tests']:
+		# midside encoding test mono
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		midside(data, channels, name)
 
-	# # Waveform plot test case mono file
-	# name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
-	# waveform(data, name, channels, sample_rate)
+		# midside encoding test stereo
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		encoded, ms = midside(data, channels, name)
+		print(encoded, ms)
 
-	# # Waveform plot test case stereo file
-	# name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
-	# waveform(data, name, channels, sample_rate)
+		# midside decoding test stereo
+		decoded, ms = midside(encoded, channels, name, code=False)
+		print(decoded, ms)
 
-	# # magnitude test mono file
-	# name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
-	# magnitude(data, name, channels, sample_rate)
+	if 'Invert' in answers['tests']:
+		# Polarity inversion test
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		print(data)
+		print(invert(data))
 
-	# # magnitude test stereo file
-	# name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
-	# magnitude(data, name, channels, sample_rate, side='l', scale='linear')
-	# magnitude(data, name, channels, sample_rate, side='r', scale='linear')
-	# magnitude(data, name, channels, sample_rate, side='both', scale='linear')
-	# magnitude(data, name, channels, sample_rate, side='l', scale='dB')
-	# magnitude(data, name, channels, sample_rate, side='r', scale='dB')
-	# magnitude(data, name, channels, sample_rate, side='both', scale='dB')
-	# magnitude(data, name, channels, sample_rate, side='l')
-	# magnitude(data, name, channels, sample_rate, side='r')
-	# magnitude(data, name, channels, sample_rate, side='both')
+	if 'Reverse' in answers['tests']:
+		# Polarity inversion test
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		print(data)
+		print(reverse(data))
+
+	if 'Waveform' in answers['tests']:
+		# Waveform plot test case mono file
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		waveform(data, name, channels, sample_rate)
+
+		# Waveform plot test case stereo file
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		waveform(data, name, channels, sample_rate)
+
+	if 'Magnitude' in answers['tests']:
+		# magnitude test mono file
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		magnitude(data, name, channels, sample_rate)
+
+		# magnitude test stereo file
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		magnitude(data, name, channels, sample_rate, side='both', scale='linear')
+
+		# log magnitude test stereo file
+		magnitude(data, name, channels, sample_rate, side='both', scale='dB')
+
+	if 'Spectrogram' in answers['tests']:
+		# spectrogram test case mono file
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		# prevents divide by zero runtime exception
+		data = trim(data)
+		spectrogram(data, name, channels, sample_rate)
+
+		# spectrogram test case stereo file
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		# prevents divide by zero runtime exception
+		data = trim(data)
+		spectrogram(data, name, channels, sample_rate)
+
+	if 'Vectorscope' in answers['tests']:
+		# vectorscope stereo test
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		vectorscope(data, name, False)
+
+		# Stereo test left channel only
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		data[:,1] = 0
+		vectorscope(data, name, False)
