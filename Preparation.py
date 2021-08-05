@@ -243,7 +243,7 @@ def export_array(name, array, sample_rate, subtype):
 	sf.write(name, array, sample_rate, subtype)
 	return None
 
-# Visualizarion
+# Visualization
 
 def waveform(array, name, channels, sample_rate):
 	'''
@@ -317,9 +317,17 @@ def magnitude(array, name, channels, sample_rate, side=None, scale=None):
 	scale: scaling of values in the spectrum, 'dB' (amplitude (20 * log10)) or 'linear'
 	returns: a plot of the log magnitude spectrum of an audio array
 	'''
-	# Radio button for Linear, Log
 	# Radio Button for L, R, Sum
+	# Radio button for Linear, Log
 	# Radio Button for Mid, Side
+
+	# adjust right side of plot to make room for button axis
+	# create button axis, and buttons
+	# create functions for buttons
+
+	# L, R, Sum button
+		# need a way to deal with mono
+
 	# mono
 	if channels == '1':
 		# dark background white text, initilize figure and axes

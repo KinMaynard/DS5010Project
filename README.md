@@ -29,4 +29,4 @@ Main:
 	Time Stetch
 
 Changes:
-split, midside, invert, reverse, vectorscope, improved testing, multicursor
+'split, midside, invert, reverse, vectorscope, improved testing, multicursor'
