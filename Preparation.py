@@ -328,44 +328,60 @@ def magnitude(array, name, channels, sample_rate, side=None, scale=None):
 	# L, R, Sum button
 		# need a way to deal with mono
 
-	# mono
-	if channels == '1':
-		# dark background white text, initilize figure and axes
-		plt.style.use('dark_background')
-		fig, ax = plt.subplots()
+	# divide array into stereo components
+	left, right = split(array, channels, name)
 
-		# labeling axes & title
-		title = '%s Magnitude Spectrum' % name
-		if scale == 'dB':
-			title = '%s Log Magnitude Spectrum' % name
-		ax.set_title(title, fontsize='medium')
-		ax.set_xlabel('Frequency (hz)', fontsize='x-small')
-		ax.set_ylabel('Magnitude (dB)', fontsize='x-small')
-		ax.tick_params(axis='both', which='major', labelsize=6)
+	# sum stereo channels
+	sumsig = np.sum(array, axis=1)
 
-		# plotting log magnitude spectrum
-		ax.magnitude_spectrum(array, Fs=sample_rate, scale=scale, color='indigo')
+	# dark background white text, initilize figure and axes
+	plt.style.use('dark_background')
+	fig, ax = plt.subplots()
 
-		return plt.show()
+	# plotting magnitude spectrum
+	spec, fq, line = ax.magnitude_spectrum(sumsig, Fs=sample_rate, scale=scale, color='indigo')
 
-	# stereo
-	if channels == '2':
-		# divide array into stereo components
-		left, right = split(array, channels, name)
+	# labeling axes & title
+	title = '%s Magnitude Spectrum' % name
+	if scale == 'dB':
+		title = '%s Log Magnitude Spectrum' % name
+	ax.set_title(title, fontsize='medium')
+	ax.set_xlabel('Frequency (hz)', fontsize='x-small')
+	ax.set_ylabel('Magnitude (dB)', fontsize='x-small')
+	ax.tick_params(axis='both', which='major', labelsize=6)
 
-		# left
-		if side == 'l':
-			magnitude(left, name + ' Left', '1', sample_rate, scale=scale)
-		
-		# right
-		elif side == 'r':
-			magnitude(right, name + ' Right', '1', sample_rate, scale=scale)
-		
-		# sum
-		elif side == 'both':
-			# sum stereo channels
-			sumsig = np.sum(array, axis=1)
-			magnitude(sumsig, name + ' Sum', '1', sample_rate, scale=scale)
+	# making room for button axis
+	plt.subplots_adjust(left=0.225)
+
+	# LRSUM button axis (left, bottom, width, height)
+	rax = plt.axes([0.05, 0.7, 0.08, 0.15])
+
+	# LRSUM button
+	lrsum = RadioButtons(rax, ('L', 'R', 'Sum'))
+
+	# Side function
+	def side(label):
+		sidedict = {'L': left, 'R': right, 'Sum': sumsig}
+		ydata = sidedict[label]
+		line.set_ydata(ydata)
+		plt.draw()
+	lrsum.on_clicked(side)
+
+	return plt.show()
+
+# Previously under channels == 2:
+
+	# # left
+	# if side == 'l':
+	# 	magnitude(left, name + ' Left', '1', sample_rate, scale=scale)
+	
+	# # right
+	# elif side == 'r':
+	# 	magnitude(right, name + ' Right', '1', sample_rate, scale=scale)
+	
+	# # sum
+	# elif side == 'both':
+	# 	magnitude(sumsig, name + ' Sum', '1', sample_rate, scale=scale)
 
 def spectrogram(array, name, channels, sample_rate):
 	'''
@@ -534,8 +550,8 @@ if __name__ == '__main__':
 
 	if 'Magnitude' in answers['tests']:
 		# magnitude test mono file
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
-		magnitude(data, name, channels, sample_rate)
+		# name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		# magnitude(data, name, channels, sample_rate)
 
 		# magnitude test stereo file
 		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
