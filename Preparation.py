@@ -26,7 +26,6 @@ Exceptions:
 To Do:
 big plot with all other plots inside:
 	sliders for zoom
-	radio buttons for L R Both (log magnitude)
 spectrogram:
 	NFFT
 	noverlap
@@ -45,10 +44,7 @@ import pdb
 import inquirer
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.widgets import MultiCursor
-from matplotlib.widgets import RadioButtons
-
-debug = False
+from matplotlib.widgets import MultiCursor, RadioButtons
 
 def import_array(file):
 	'''
@@ -306,82 +302,104 @@ def waveform(array, name, channels, sample_rate):
 
 		return plt.show()
 
-def magnitude(array, name, channels, sample_rate, side=None, scale=None):
+def magnitude(array, name, channels, sample_rate):
 	'''
 	plots the log magnitude spectrum of an audio signal magnitude dB/frequency
 	array: array of audio data
 	name: audio file name
 	channels: 1 mono or 2 stereo
 	sample_rate: sampling rate of audio file
-	side: l, r or both (l returns plot of left side, r returns right side, both sums sides and returns result) default None
-	scale: scaling of values in the spectrum, 'dB' (amplitude (20 * log10)) or 'linear'
-	returns: a plot of the log magnitude spectrum of an audio array
+	Radio buttons: 
+		L: plots left channel, R: plots right channel, Sum: plots L+R, Mid: plots mid channel, Side: plots side channel
+		Lin: plot with linear or or no scaling, dB: plot with dB scaling: amplitude (20 * log10)
+	returns: a plot of the log magnitude spectrum of an audio array with radio buttons for signal array & fq scale
 	'''
-	# Radio Button for L, R, Sum
-	# Radio button for Linear, Log
-	# Radio Button for Mid, Side
 
-	# adjust right side of plot to make room for button axis
-	# create button axis, and buttons
-	# create functions for buttons
-
-	# L, R, Sum button
-		# need a way to deal with mono
-
-	# divide array into stereo components
-	left, right = split(array, channels, name)
-
-	# sum stereo channels
-	sumsig = np.sum(array, axis=1)
+	# dictionary of state variables
+	state = {'Lin': 'linear', 'dB': 'dB', 'scale': 'linear'}
 
 	# dark background white text, initilize figure and axes
 	plt.style.use('dark_background')
 	fig, ax = plt.subplots()
 
-	# plotting magnitude spectrum
-	spec, fq, line = ax.magnitude_spectrum(sumsig, Fs=sample_rate, scale=scale, color='indigo')
-
 	# labeling axes & title
 	title = '%s Magnitude Spectrum' % name
-	if scale == 'dB':
-		title = '%s Log Magnitude Spectrum' % name
 	ax.set_title(title, fontsize='medium')
 	ax.set_xlabel('Frequency (hz)', fontsize='x-small')
 	ax.set_ylabel('Magnitude (dB)', fontsize='x-small')
 	ax.tick_params(axis='both', which='major', labelsize=6)
 
+	if channels == '1':
+		# initial axis
+		sig, fq, line = ax.magnitude_spectrum(array, Fs=sample_rate, color='indigo')
+
+		state['line'] = line
+
 	# making room for button axis
 	plt.subplots_adjust(left=0.225)
 
-	# LRSUM button axis (left, bottom, width, height)
-	rax = plt.axes([0.05, 0.7, 0.08, 0.15])
+	# adding line & axes state variables
+	state.update({'ax': ax, 'data': array})
+			
+	if channels == '2':
+		# divide array into stereo components
+		left, right = split(array, channels, name)
 
-	# LRSUM button
-	lrsum = RadioButtons(rax, ('L', 'R', 'Sum'))
+		# sum stereo channels
+		sumsig = np.sum(array, axis=1)
 
-	# Side function
-	def side(label):
-		sidedict = {'L': left, 'R': right, 'Sum': sumsig}
-		ydata = sidedict[label]
-		line.set_ydata(ydata)
-		plt.draw()
-	lrsum.on_clicked(side)
+		# encoding as midside
+		msarray, code = midside(array, channels, name)
+
+		# splitting midside array into mid and side components
+		mid, side = split(msarray, channels, name)
+
+		# initial axis
+		sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate, color='indigo')
+
+		state.update({'L': left, 'R': right, 'Sum': sumsig, 'Mid': mid, 'Side': side, 'data': left, 'line': line})
+
+		# LRSUM button axis (left, bottom, width, height)
+		rax = plt.axes([0.05, 0.7, 0.08, 0.2])
+
+		# LRSUM button
+		lrsums = RadioButtons(rax, ('L', 'R', 'Sum', 'Mid', 'Side'))
+
+		# Side callback function for lrsums buttons
+		def side(label):
+			# clear previous data
+			state['line'].remove()
+			# plot
+			sig, fq, line = ax.magnitude_spectrum(state[label], Fs=sample_rate, scale=state['scale'], color='indigo')
+			# recompute axis limits
+			ax.relim()
+			# update state variables to new line & data
+			state['line'] = line
+			state['data'] = state[label]
+			fig.canvas.draw_idle()
+		lrsums.on_clicked(side)
+
+	# Linear dB bustton axis (left, bottom, width, height)
+	rax = plt.axes([0.05, 0.4, 0.08, 0.15])
+
+	# Linear dB buttons
+	lindB = RadioButtons(rax, ('Lin', 'dB'))
+
+	# scale function
+	def scale(label):
+		# clear data
+		state['line'].remove()
+		# plot
+		sig, fq, line = ax.magnitude_spectrum(state['data'], Fs=sample_rate, scale=state[label], color='indigo')
+		# recompute axis limits
+		ax.relim()
+		# update state variables to new line & scale
+		state['line'] = line
+		state['scale'] = state[label]
+		fig.canvas.draw_idle()
+	lindB.on_clicked(scale)
 
 	return plt.show()
-
-# Previously under channels == 2:
-
-	# # left
-	# if side == 'l':
-	# 	magnitude(left, name + ' Left', '1', sample_rate, scale=scale)
-	
-	# # right
-	# elif side == 'r':
-	# 	magnitude(right, name + ' Right', '1', sample_rate, scale=scale)
-	
-	# # sum
-	# elif side == 'both':
-	# 	magnitude(sumsig, name + ' Sum', '1', sample_rate, scale=scale)
 
 def spectrogram(array, name, channels, sample_rate):
 	'''
@@ -550,15 +568,12 @@ if __name__ == '__main__':
 
 	if 'Magnitude' in answers['tests']:
 		# magnitude test mono file
-		# name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
-		# magnitude(data, name, channels, sample_rate)
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		magnitude(data, name, channels, sample_rate)
 
 		# magnitude test stereo file
 		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
-		magnitude(data, name, channels, sample_rate, side='both', scale='linear')
-
-		# log magnitude test stereo file
-		magnitude(data, name, channels, sample_rate, side='both', scale='dB')
+		magnitude(data, name, channels, sample_rate)
 
 	if 'Spectrogram' in answers['tests']:
 		# spectrogram test case mono file
