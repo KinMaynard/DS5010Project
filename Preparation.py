@@ -24,27 +24,42 @@ Exceptions:
 			untested on zeros inside nonzero data
 
 To Do:
-big plot with all other plots inside:
-	sliders for zoom
+normalize:
+	doesn't function
+
 spectrogram:
 	NFFT
 	noverlap
 	window
+
+magnitude:
+	Sliders for zoom
+
 vectorscope:
 	test cases
 		panned hard L
 			not showing anything in plot?
 		panned hard R
+
+visualizer:
+	Widgets
+		sliders for zoom
+		buttons too large
+		magnitude buttons nonfunctional
+		multicursor nonfunctional (doesn't even appear)
+		buttons decoupled from mag plot
+	Vectorscope larger
+	colorbar decoupled from spec plot
 '''
 
 import soundfile as sf
 import numpy as np
 import sys
-import pdb
 import inquirer
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.widgets import MultiCursor, RadioButtons
+import matplotlib.gridspec as gridspec
 
 def import_array(file):
 	'''
@@ -152,15 +167,16 @@ def normalize(array):
 	array: array of audio data 64 bit floating point
 	returns: normalized version of array
 	'''
+	# FAILS BECAUSE FLOATS CANNOT BE INTERPRETED AS AN INTEGER
 	peak = np.amax(np.abs(array))
 	#int64
-	if peak in range(-2.0**31, 2.0**31-1.0):
+	if -2**31 <= peak <= 2**31-1:
 		return ((2.0**31-1.0) / peak) * array
 	# int32
-	elif peak in range(-2.0**15, 2.0**15-1.0):
+	elif -2**15 <= peak <= 2**15-1:
 		return ((2.0**15-1.0) / peak) * array
 	# float
-	elif peak in range(-1.0, 1.0):
+	elif -1.0 <= peak <= 1.0:
 		# factors an array of audio data by the difference between 0 dbfs and the peak signal
 		return (1 / peak) * array
 
@@ -239,25 +255,35 @@ def export_array(name, array, sample_rate, subtype):
 	sf.write(name, array, sample_rate, subtype)
 	return None
 
-# Visualization
+#####################
+### Visualization ###
+#####################
 
-def waveform(array, name, channels, sample_rate):
+def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
 	array: numpy array of audio data
 	name: file name
 	channels: mono (1) or stereo (2) file
 	sample_rate: sampling rate of audio file
-	returns: waveform plot of intensity/time
+	fig: external figure to plot onto if provided, default = None
+	returns: waveform plot of intensity/time either alone or as part of provided fig
 	'''
-	# Sliders for zoom
 	# mono
 	if channels == '1':
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')
-		fig, ax = plt.subplots()
+		
+		if fig is None:
+			fig, ax = plt.subplots()
+
+		else:
+			fig.add_subplot(221)
 
 		# labeling axes & title
-		ax.set_title('%s Waveform' % name, fontsize='medium')
+		title = '%s Waveform' % name
+		if sub:
+			title = 'Waveform'
+		ax.set_title(title, fontsize='medium')
 		ax.set_xlabel('Time (s)', fontsize='x-small')
 		ax.set_ylabel('Amplitude', fontsize='x-small')
 		ax.tick_params(axis='both', which='major', labelsize=6)
@@ -267,7 +293,11 @@ def waveform(array, name, channels, sample_rate):
 		time = array.size / sample_rate # seconds in file
 		ax.plot(np.arange(0.0, time, time / array.size), array, color='indigo')
 
-		return plt.show()
+		# individual figure or as part of larger figure
+		if sub:
+			return fig
+		else:
+			return plt.show()
 
 	# stereo
 	elif channels == '2':
@@ -276,10 +306,19 @@ def waveform(array, name, channels, sample_rate):
 
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')
-		fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+		
+		if fig is None:
+			fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+
+		else:
+			ax1 = fig.add_subplot(gridspec[0, 0])
+			ax2 = fig.add_subplot(gridspec[1, 0])
 
 		# labeling axes & title
-		ax1.set_title('%s Waveform' % name, fontsize='medium')
+		title = '%s Waveform' % name
+		if sub:
+			title = 'Waveform'
+		ax1.set_title(title, fontsize='medium')
 		ax2.set_xlabel('Time (s)', fontsize='x-small')
 		ax1.set_ylabel('Amplitude Left', fontsize='x-small')
 		ax2.set_ylabel('Amplitude Right', fontsize='x-small')
@@ -287,7 +326,8 @@ def waveform(array, name, channels, sample_rate):
 		ax2.tick_params(axis='both', which='major', labelsize=6)
 		ax1.margins(0.001)
 		ax2.margins(0.001)
-		fig.subplots_adjust(hspace=0)
+		if not sub:
+			fig.subplots_adjust(hspace=0)
 
 		# x axis on top
 		ax1.xaxis.tick_top()
@@ -300,15 +340,20 @@ def waveform(array, name, channels, sample_rate):
 		# Multicursor
 		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
 
-		return plt.show()
+		# individual figure or as part of larger figure
+		if sub:
+			return fig
+		else:
+			return plt.show()
 
-def magnitude(array, name, channels, sample_rate):
+def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
 	plots the log magnitude spectrum of an audio signal magnitude dB/frequency
 	array: array of audio data
 	name: audio file name
 	channels: 1 mono or 2 stereo
 	sample_rate: sampling rate of audio file
+	fig: external figure to plot onto if provided, default = None
 	Radio buttons: 
 		L: plots left channel, R: plots right channel, Sum: plots L+R, Mid: plots mid channel, Side: plots side channel
 		Lin: plot with linear or or no scaling, dB: plot with dB scaling: amplitude (20 * log10)
@@ -320,10 +365,20 @@ def magnitude(array, name, channels, sample_rate):
 
 	# dark background white text, initilize figure and axes
 	plt.style.use('dark_background')
-	fig, ax = plt.subplots()
+
+	if fig is None:
+		fig, ax = plt.subplots()
+
+	else:
+		if channels == '1':
+			ax = fig.add_subplot(223)
+		else:
+			ax = fig.add_subplot(gridspec[0, 0])
 
 	# labeling axes & title
 	title = '%s Magnitude Spectrum' % name
+	if sub:
+		title = 'Magnitude Spectrum'
 	ax.set_title(title, fontsize='medium')
 	ax.set_xlabel('Frequency (hz)', fontsize='x-small')
 	ax.set_ylabel('Magnitude (dB)', fontsize='x-small')
@@ -399,14 +454,19 @@ def magnitude(array, name, channels, sample_rate):
 		fig.canvas.draw_idle()
 	lindB.on_clicked(scale)
 
-	return plt.show()
+	# individual figure or as part of larger figure
+	if sub:
+		return fig
+	else:
+		return plt.show()
 
-def spectrogram(array, name, channels, sample_rate):
+def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
 	Creates a spectrogram given an array of audio data
 	array: 1 or 2d numpy array of audio data
 	channels: 1 mono or 2 stereo, number of channels in audio array
 	name: name of the audio file
+	fig: external figure to plot onto if provided, default = None
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
 	# Sliders for zoom
@@ -414,12 +474,20 @@ def spectrogram(array, name, channels, sample_rate):
 	if channels == '1':
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')
-		fig, ax = plt.subplots()
+		
+		if fig is None:
+			fig, ax = plt.subplots()
+
+		else:
+			fig.add_subplot(ax = fig.add_subplot(222))
 
 		# labeling axes & title
+		title = '%s Spectrogram' % name
+		if sub:
+			title = 'Spectrogram'
 		ax.set_xlabel('Time (s)', fontsize='x-small')
 		ax.set_ylabel('Frequency (kHz)', fontsize='x-small')
-		ax.set_title('%s Spectrogram' % name, fontsize='medium')
+		ax.set_title(title, fontsize='medium')
 		ax.tick_params(axis='both', which='major', labelsize=6)
 		# ax.grid(True, axis='y', ls=':')
 		
@@ -441,7 +509,11 @@ def spectrogram(array, name, channels, sample_rate):
 		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/1000))
 		ax.yaxis.set_major_formatter(ticks)
 
-		return plt.show()
+		# individual figure or as part of larger figure
+		if sub:
+			return fig
+		else:
+			return plt.show()
 
 	# Stereo subplots fasceted
 	elif channels == '2':
@@ -450,17 +522,24 @@ def spectrogram(array, name, channels, sample_rate):
 		
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')
-		fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+
+		if fig is None:
+			fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+
+		else:
+			ax1 = fig.add_subplot(gridspec[0, 1])
+			ax2 = fig.add_subplot(gridspec[1, 1])
 		
 		# labeling axes & title
+		title = '%s Spectrogram' % name
+		if sub:
+			title = 'Spectrogram'
 		ax2.set_xlabel('Time (s)', fontsize='x-small')
 		ax1.set_ylabel('Left Frequency (kHz)', fontsize='x-small')
 		ax2.set_ylabel('Right Frequency (kHz)', fontsize='x-small')
-		ax1.set_title('%s Spectrogram' % name, fontsize='medium')
+		ax1.set_title(title, fontsize='medium')
 		ax1.tick_params(axis='both', which='major', labelsize=6)
 		ax2.tick_params(axis='both', which='major', labelsize=6)
-		# ax1.grid(True, axis='y', ls=':')
-		# ax2.grid(True, axis='y', ls=':')
 
 		# x axis on top
 		ax1.xaxis.tick_top()
@@ -470,7 +549,9 @@ def spectrogram(array, name, channels, sample_rate):
 		specr, fqr, tr, imr = ax2.specgram(right, Fs=sample_rate, cmap='magma', vmin=-120, vmax=0)
 		
 		# make space for colorbar & stack plots snug
-		fig.subplots_adjust(right=0.84, hspace=0)
+		fig.subplots_adjust(right=0.84)
+		if not sub:
+			fig.subplots_adjust(hspace=0)
 		
 		# colorbar
 		cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77]) # left, bottom, width, height
@@ -489,23 +570,34 @@ def spectrogram(array, name, channels, sample_rate):
 		# multicursor
 		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
 
-		return plt.show()
+		# individual figure or as part of larger figure
+		if sub:
+			return fig
+		else:
+			return plt.show()
 
-	else:
-		return ('Invalid Array')
-
-def vectorscope(array, name, code):
+def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 	'''
 	A stereo vectorscope polar sample plot of audio data
 	Side/Mid amplitudes as coordinates on X/Y 180 degree polar plot
 	array: array of audio data
 	name: audio datafile name
 	code: boolean True if array is encoded as mid/side, false if encoded as L/R
+	fig: external figure to plot onto if provided, default = None
+	single: boolean, False: plotting as subplot of larger figure, True: otherwise
 	'''
 	if code:
 		# dark background white text, initilize polar figure and axes
 		plt.style.use('dark_background')
-		fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+
+		if fig is None:
+			fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+
+		else:
+			if channels == '1':
+				ax = fig.add_subplot(224, projection='polar')
+			else:
+				ax = fig.add_subplot(gridspec[0, 1], projection='polar')
 
 		# converting cartesian coordinates to polar
 		absarray = np.absolute(array)
@@ -513,23 +605,82 @@ def vectorscope(array, name, code):
 		theta = np.arctan2(absarray[:,0], array[:,1])
 		
 		# plotting
+		title = 'Polar Dot Per Sample Vectorscope of %s' % name
+		if sub:
+			title = 'Polar Dot Per Sample Vectorscope'
 		ax.scatter(theta, r, s=0.25, c='indigo')
-		ax.set_title('Polar Dot Per Sample Vectorscope of %s' % name)
+		ax.set_title(title, fontsize='medium')
 		ax.set_thetamax(180)
 		ax.set_yticklabels([])
 		ax.set_xticklabels([])
 		ax.grid(False, axis='y')
 		ax.set_thetagrids((135.0, 45.0))
-		return plt.show()
+
+		# individual figure or as part of larger figure
+		if sub:
+			return fig
+		else:
+			return plt.show()
 
 	else:
 		# midside encoding
 		msarray, ms = midside(array, channels, name)
-		vectorscope(msarray, name, True)
+		vectorscope(msarray, name, True, fig, sub, gridspec)
+
+def visualizer(array, name, channels, sample_rate, code):
+	'''
+	array: numpy array of audio data
+	name: file name
+	channels: mono (1) or stereo (2) file
+	sample_rate: sampling rate of audio file
+	code: boolean True if array is encoded as mid/side, false if encoded as L/R
+	returns: fasceted subplots of waveform, magnitude, spectrogram & vectorscope
+	'''
+	# initialize figure with dark background and title
+	plt.style.use('dark_background')
+	fig = plt.figure(figsize=(12.8, 9.6))
+	plt.suptitle('%s Visualization' % name, fontsize='large')
+	fig.subplots_adjust(hspace=0)
+
+	# gridspec to snugly fascet only stereo spectrogram and waveform plots
+	# initialize for mono case
+	gs1, gs2 = None, None
+	if channels == '2':
+		# outer gridspec
+		outer = gridspec.GridSpec(nrows=2, ncols=1, figure=fig, hspace = 0.20, height_ratios = [2, 1])
+
+		# nested gridspecs
+		gs1 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec = outer[0])
+		gs2 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec = outer[1])
+
+	# subplots
+	waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
+	spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
+	magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
+	vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2)
+
+	plt.show()
 
 if __name__ == '__main__':
-	questions = [inquirer.Checkbox('tests', message='Which tests to run?', choices=['Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 'Vectorscope'],),]
+	questions = [inquirer.Checkbox('tests', message='Which tests to run?', choices=['Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 'Vectorscope', 'Visualizer'],),]
 	answers = inquirer.prompt(questions)
+
+	if 'Normalize' in answers['tests']:
+		# mono
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		# before normalization
+		waveform(data, name, channels, sample_rate)
+		data = normalize(data)
+		# after normalization
+		waveform(data, name, channels, sample_rate)
+
+		# stereo
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		# before normalization
+		waveform(data, name, channels, sample_rate)
+		data = normalize(data)
+		# after normalization
+		waveform(data, name, channels, sample_rate)
 
 	if 'Midside' in answers['tests']:
 		# midside encoding test mono
@@ -597,3 +748,13 @@ if __name__ == '__main__':
 		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
 		data[:,1] = 0
 		vectorscope(data, name, False)
+
+	if 'Visualizer' in answers['tests']:
+		# visualizer mono plot
+		# name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		# visualizer(data, name, channels, sample_rate, code=False, gridspec=)
+
+		# visualizer stereo plot
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		visualizer(data, name, channels, sample_rate, code=False)
+
