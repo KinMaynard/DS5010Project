@@ -44,12 +44,10 @@ vectorscope:
 visualizer:
 	Widgets
 		sliders for zoom
-		buttons too large
 		magnitude buttons nonfunctional
-		multicursor nonfunctional (doesn't even appear)
-		buttons decoupled from mag plot
+		spectrogram multicursor
 	Vectorscope larger
-	colorbar decoupled from spec plot
+	spectrogram shorter T window?
 '''
 
 import soundfile as sf
@@ -342,7 +340,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# individual figure or as part of larger figure
 		if sub:
-			return fig
+			return fig, multi
 		else:
 			return plt.show()
 
@@ -391,7 +389,8 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		state['line'] = line
 
 	# making room for button axis
-	plt.subplots_adjust(left=0.225)
+	if not sub:
+		plt.subplots_adjust(left=0.225)
 
 	# adding line & axes state variables
 	state.update({'ax': ax, 'data': array})
@@ -415,8 +414,10 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		state.update({'L': left, 'R': right, 'Sum': sumsig, 'Mid': mid, 'Side': side, 'data': left, 'line': line})
 
 		# LRSUM button axis (left, bottom, width, height)
-		rax = plt.axes([0.05, 0.7, 0.08, 0.2])
-
+		if not sub:
+			rax = plt.axes([0.05, 0.7, 0.08, 0.2])
+		else:
+			rax = plt.axes([0.04, 0.26, 0.04, 0.0835])
 		# LRSUM button
 		lrsums = RadioButtons(rax, ('L', 'R', 'Sum', 'Mid', 'Side'))
 
@@ -435,7 +436,10 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		lrsums.on_clicked(side)
 
 	# Linear dB bustton axis (left, bottom, width, height)
-	rax = plt.axes([0.05, 0.4, 0.08, 0.15])
+	if not sub:
+		rax = plt.axes([0.05, 0.4, 0.08, 0.15])
+	else:
+		rax = plt.axes([0.04, 0.2, 0.04, 0.05])
 
 	# Linear dB buttons
 	lindB = RadioButtons(rax, ('Lin', 'dB'))
@@ -456,7 +460,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 
 	# individual figure or as part of larger figure
 	if sub:
-		return fig
+		return fig, lrsums, side, lindB, scale
 	else:
 		return plt.show()
 
@@ -549,12 +553,14 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		specr, fqr, tr, imr = ax2.specgram(right, Fs=sample_rate, cmap='magma', vmin=-120, vmax=0)
 		
 		# make space for colorbar & stack plots snug
-		fig.subplots_adjust(right=0.84)
 		if not sub:
-			fig.subplots_adjust(hspace=0)
+			fig.subplots_adjust(right=0.84, hspace=0)
 		
 		# colorbar
-		cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77]) # left, bottom, width, height
+		if not sub:
+			cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77]) # left, bottom, width, height
+		else:
+			cbar_ax = fig.add_axes([0.905, 0.414, 0.003, 0.466]) # left, bottom, width, height
 		fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', fontsize='x-small')
 		cbar_ax.tick_params(labelsize=6)
 		
@@ -572,7 +578,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
 		# individual figure or as part of larger figure
 		if sub:
-			return fig
+			return fig, multi
 		else:
 			return plt.show()
 
@@ -653,16 +659,25 @@ def visualizer(array, name, channels, sample_rate, code):
 		gs1 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec = outer[0])
 		gs2 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec = outer[1])
 
-	# subplots
-	waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
-	spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
-	magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
+	# subplots currently multi_spec only shows
+	fig, multi_wav = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
+	fig, multi_spec = spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
+	fig, lrsums, side, lindB, scale = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
 	vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2)
+
+	# enabling mag buttons
+	side_button = side
+	lrsums.on_clicked(side)
+	scale_button = scale
+	lindB.on_clicked(scale)
 
 	plt.show()
 
 if __name__ == '__main__':
-	questions = [inquirer.Checkbox('tests', message='Which tests to run?', choices=['Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 'Vectorscope', 'Visualizer'],),]
+	questions = [inquirer.Checkbox('tests', message='Which tests to run?', 
+		choices=['Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 
+		'Vectorscope', 'Visualizer'],),]
+
 	answers = inquirer.prompt(questions)
 
 	if 'Normalize' in answers['tests']:
