@@ -10,7 +10,7 @@ This is a module for:
 Analysis:
 
 This is a module for:
-	Spectrogram (Mel Scale, DB Scale not amplitude)
+	Spectrogram (Mel Scale)
 	Tempo
 		transient detection
 	Key/Note
@@ -27,7 +27,14 @@ To Do:
 normalize:
 	doesn't function
 
+waveform:
+	test signals with peaks in side
+		asymetrical peaks so one side is louder than the other
+			check to see how the y axis scales with that
+				scales both sides to peak one of them or different axis limits?
+
 spectrogram:
+	mel scale
 	NFFT
 	noverlap
 	window
@@ -44,9 +51,9 @@ vectorscope:
 visualizer:
 	Widgets
 		sliders for zoom
-		magnitude buttons nonfunctional
-		spectrogram multicursor
-	Vectorscope larger
+			fix axes & resize slider for large plot
+			change colors
+		spectrogram & waveform multicursor
 	spectrogram shorter T window?
 '''
 
@@ -56,7 +63,7 @@ import sys
 import inquirer
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.widgets import MultiCursor, RadioButtons
+from matplotlib.widgets import MultiCursor, RadioButtons, Slider, Button
 import matplotlib.gridspec as gridspec
 
 def import_array(file):
@@ -271,9 +278,11 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')
 		
+		# initializing figure and axes
 		if fig is None:
 			fig, ax = plt.subplots()
 
+		# if plotting on external figure only adding subplot
 		else:
 			fig.add_subplot(221)
 
@@ -291,9 +300,50 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		time = array.size / sample_rate # seconds in file
 		ax.plot(np.arange(0.0, time, time / array.size), array, color='indigo')
 
+		# make room for slider
+		if not sub:
+			fig.subplots_adjust(bottom=0.2)
+
+		# zoom slider & axes, left, bottom, width, height
+		if sub:
+			zoom_slider_ax = fig.add_axes([0.14, 0.37, 0.2, 0.009])
+		else:
+			zoom_slider_ax = fig.add_axes([0.178, 0.1, 0.63, 0.02])
+
+		# zoom slider
+		zoom_slider = Slider(zoom_slider_ax, 'Zoom', -1, 1, valinit=0, initcolor='w', color='indigo')
+		zoom_slider.label.set_size('x-small')
+
+		# zoom slider widget callback function
+		def sliders_on_changed(val, scale_factor=0.25):
+			cur_xlim = ax.get_xlim()
+			cur_ylim = ax.get_ylim()
+			scale = zoom_slider.val * scale_factor
+			x_left = 0 + scale
+			x_right = 1 - scale
+			y_top = 10 - scale * 10
+			y_bottom = -10 + scale * 10
+			ax.set_xlim([x_left, x_right])
+			ax.set_ylim([y_bottom, y_top])
+			fig.canvas.draw_idle()
+		zoom_slider.on_changed(sliders_on_changed)
+
+		# zoom reset view button & axes, left, bottom, width, height
+		if sub:
+			reset_button_ax = fig.add_axes([0.368, 0.37, 0.0125, 0.01]) # Fix in axes spacing for big plot
+		else:
+			reset_button_ax = fig.add_axes([0.85, 0.098, 0.05, 0.03])
+
+		# reset button
+		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
+		reset_button.label.set_size('x-small')
+		def reset_button_on_clicked(mouse_event):
+			zoom_slider.reset()
+		reset_button.on_clicked(reset_button_on_clicked)
+
 		# individual figure or as part of larger figure
 		if sub:
-			return fig
+			return fig, zoom_slider, reset_button, sliders_on_changed, reset_button_on_clicked
 		else:
 			return plt.show()
 
@@ -305,9 +355,11 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')
 		
+		# initializing figure and axes
 		if fig is None:
 			fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
 
+		# if plotting on external figure only adding subplots
 		else:
 			ax1 = fig.add_subplot(gridspec[0, 0])
 			ax2 = fig.add_subplot(gridspec[1, 0])
@@ -324,8 +376,14 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		ax2.tick_params(axis='both', which='major', labelsize=6)
 		ax1.margins(0.001)
 		ax2.margins(0.001)
+
+		# snuggly fasceting subplots if plotting to external figure
 		if not sub:
 			fig.subplots_adjust(hspace=0)
+
+		# make room for slider
+		if not sub:
+			fig.subplots_adjust(bottom=0.2)
 
 		# x axis on top
 		ax1.xaxis.tick_top()
@@ -338,9 +396,50 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		# Multicursor
 		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
 
+		# zoom slider & axes, left, bottom, width, height
+		if sub:
+			zoom_slider_ax = fig.add_axes([0.14, 0.37, 0.2, 0.009])
+		else:
+			zoom_slider_ax = fig.add_axes([0.178, 0.1, 0.63, 0.02])
+		zoom_slider = Slider(zoom_slider_ax, 'Zoom', -1, 1, valinit=0, initcolor='w', color='indigo')
+		zoom_slider.label.set_size('x-small')
+
+		# get starting axis limits to autoscale with zoom slider, (test if need both axes in case of side peaks?)
+		# state variable dictionary
+		state = {'start_xlim': ax1.get_xlim(), 'start_ylim': ax1.get_ylim()}
+
+		# zoom slider widget callback function
+		def sliders_on_changed(val, scale_factor=0.25):
+			cur_xlim = ax1.get_xlim()
+			cur_ylim = ax1.get_ylim()
+			start_xlim = state['start_xlim']
+			start_ylim = state['start_ylim']
+			scale = zoom_slider.val * scale_factor
+			x_left = start_xlim[0] + scale
+			x_right = start_xlim[1] - scale
+			y_top = start_ylim[0] - scale * 10
+			y_bottom = start_ylim[1] + scale * 10
+			ax1.set_xlim([x_left, x_right])
+			ax1.set_ylim([y_bottom, y_top])
+			ax2.set_xlim([x_left, x_right])
+			ax2.set_ylim([y_bottom, y_top])
+			fig.canvas.draw_idle()
+		zoom_slider.on_changed(sliders_on_changed)
+
+		# zoom reset view button & axes left, bottom, width, height
+		if sub: 
+			reset_button_ax = fig.add_axes([0.368, 0.37, 0.0125, 0.01])
+		else:
+			reset_button_ax = fig.add_axes([0.85, 0.098, 0.05, 0.03])
+		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
+		reset_button.label.set_size('x-small')
+		def reset_button_on_clicked(mouse_event):
+			zoom_slider.reset()
+		reset_button.on_clicked(reset_button_on_clicked)
+
 		# individual figure or as part of larger figure
 		if sub:
-			return fig, multi
+			return fig, zoom_slider, reset_button, sliders_on_changed, reset_button_on_clicked
 		else:
 			return plt.show()
 
@@ -385,7 +484,6 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	if channels == '1':
 		# initial axis
 		sig, fq, line = ax.magnitude_spectrum(array, Fs=sample_rate, color='indigo')
-
 		state['line'] = line
 
 	# making room for button axis
@@ -394,6 +492,9 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 
 	# adding line & axes state variables
 	state.update({'ax': ax, 'data': array})
+
+	# facecolor for button widgets
+	button_face_color = 'black'
 			
 	if channels == '2':
 		# divide array into stereo components
@@ -415,11 +516,11 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 
 		# LRSUM button axis (left, bottom, width, height)
 		if not sub:
-			rax = plt.axes([0.05, 0.7, 0.08, 0.2])
+			rax = plt.axes([0.08, 0.7, 0.08, 0.2], facecolor=button_face_color, frame_on=False)
 		else:
-			rax = plt.axes([0.04, 0.26, 0.04, 0.0835])
+			rax = plt.axes([0.08, 0.26, 0.04, 0.0835], facecolor=button_face_color, frame_on=False)
 		# LRSUM button
-		lrsums = RadioButtons(rax, ('L', 'R', 'Sum', 'Mid', 'Side'))
+		lrsums = RadioButtons(rax, ('L', 'R', 'Sum', 'Mid', 'Side'), activecolor='indigo')
 
 		# Side callback function for lrsums buttons
 		def side(label):
@@ -435,14 +536,28 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 			fig.canvas.draw_idle()
 		lrsums.on_clicked(side)
 
+		# labelsize
+		for label in lrsums.labels:
+			label.set_fontsize('small')
+
+		# dynamically resize radio button height with figure size
+		rpos = rax.get_position().get_points()
+		fh = fig.get_figheight()
+		fw = fig.get_figwidth()
+		rscale = (rpos[:,1].ptp() / rpos[:,0].ptp()) * (fh / fw)
+		for circ in lrsums.circles:
+			circ.height /= rscale
+			circ.set_edgecolor('w')
+			circ.set_lw(0.5)
+
 	# Linear dB bustton axis (left, bottom, width, height)
 	if not sub:
-		rax = plt.axes([0.05, 0.4, 0.08, 0.15])
+		rax = plt.axes([0.08, 0.4, 0.08, 0.15], facecolor=button_face_color, frame_on=False)
 	else:
-		rax = plt.axes([0.04, 0.2, 0.04, 0.05])
+		rax = plt.axes([0.08, 0.2, 0.04, 0.05], facecolor=button_face_color, frame_on=False)
 
 	# Linear dB buttons
-	lindB = RadioButtons(rax, ('Lin', 'dB'))
+	lindB = RadioButtons(rax, ('Lin', 'dB'), activecolor='indigo')
 
 	# scale function
 	def scale(label):
@@ -457,6 +572,20 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		state['scale'] = state[label]
 		fig.canvas.draw_idle()
 	lindB.on_clicked(scale)
+
+	# labelsize
+	for label in lindB.labels:
+		label.set_fontsize('small')
+
+	# dynamically resize radio button height with figure size
+	rpos = rax.get_position().get_points()
+	fh = fig.get_figheight()
+	fw = fig.get_figwidth()
+	rscale = (rpos[:,1].ptp() / rpos[:,0].ptp()) * (fh / fw)
+	for circ in lindB.circles:
+		circ.height /= rscale
+		circ.set_edgecolor('w')
+		circ.set_lw(0.5)
 
 	# individual figure or as part of larger figure
 	if sub:
@@ -578,7 +707,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
 		# individual figure or as part of larger figure
 		if sub:
-			return fig, multi
+			return fig
 		else:
 			return plt.show()
 
@@ -601,9 +730,9 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 
 		else:
 			if channels == '1':
-				ax = fig.add_subplot(224, projection='polar')
+				ax = fig.add_subplot(224, polar=True)
 			else:
-				ax = fig.add_subplot(gridspec[0, 1], projection='polar')
+				ax = fig.add_subplot(gridspec[0, 1], polar=True)
 
 		# converting cartesian coordinates to polar
 		absarray = np.absolute(array)
@@ -615,12 +744,27 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 		if sub:
 			title = 'Polar Dot Per Sample Vectorscope'
 		ax.scatter(theta, r, s=0.25, c='indigo')
-		ax.set_title(title, fontsize='medium')
+		
+		# set title & bring down close to top of plot
+		if sub:
+			ax.set_title(title, fontsize='medium', pad=-105)
+		else:
+			ax.set_title(title, fontsize='medium', pad=-70)
+
+		# plotting 180 degrees
 		ax.set_thetamax(180)
 		ax.set_yticklabels([])
 		ax.set_xticklabels([])
 		ax.grid(False, axis='y')
+		# plotting only 2 theta grids
 		ax.set_thetagrids((135.0, 45.0))
+
+		# compensating for partial polar plot extra whitespace: left, bottom, width, height
+		if sub is False:
+			ax.set_position([0.1, 0.05, 0.8, 1])
+
+		else:
+			ax.set_position([0.6, -0.772, 0.245, 2])
 
 		# individual figure or as part of larger figure
 		if sub:
@@ -644,7 +788,7 @@ def visualizer(array, name, channels, sample_rate, code):
 	'''
 	# initialize figure with dark background and title
 	plt.style.use('dark_background')
-	fig = plt.figure(figsize=(12.8, 9.6))
+	fig = plt.figure(figsize=(26, 13.5))
 	plt.suptitle('%s Visualization' % name, fontsize='large')
 	fig.subplots_adjust(hspace=0)
 
@@ -652,16 +796,16 @@ def visualizer(array, name, channels, sample_rate, code):
 	# initialize for mono case
 	gs1, gs2 = None, None
 	if channels == '2':
-		# outer gridspec
-		outer = gridspec.GridSpec(nrows=2, ncols=1, figure=fig, hspace = 0.20, height_ratios = [2, 1])
+		# outer gridspec, hspace separates waveform & spectrogram plots from magnitude & vectorscope
+		outer = gridspec.GridSpec(nrows=2, ncols=1, figure=fig, hspace = 0.2, height_ratios = [2, 1])
 
 		# nested gridspecs
 		gs1 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec = outer[0])
 		gs2 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec = outer[1])
 
 	# subplots currently multi_spec only shows
-	fig, multi_wav = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
-	fig, multi_spec = spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
+	fig, zoom, reset, sliders_f, reset_f = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
+	spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
 	fig, lrsums, side, lindB, scale = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
 	vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2)
 
@@ -670,6 +814,9 @@ def visualizer(array, name, channels, sample_rate, code):
 	lrsums.on_clicked(side)
 	scale_button = scale
 	lindB.on_clicked(scale)
+
+	zoom.on_changed(sliders_f)
+	reset.on_clicked(reset_f)
 
 	plt.show()
 
