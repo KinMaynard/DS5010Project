@@ -49,12 +49,15 @@ vectorscope:
 		panned hard R
 
 visualizer:
+	Mono plot test
 	Widgets
-		sliders for zoom
-			fix axes & resize slider for large plot
-			change colors
 		spectrogram & waveform multicursor
 	spectrogram shorter T window?
+
+Scrolling & Panning
+	Moves halves of stereo plots individually
+		create versions of zoom factory and panhandler with multiple axes synced movement
+	Add to spectrogram & magnitude
 '''
 
 import soundfile as sf
@@ -65,6 +68,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.widgets import MultiCursor, RadioButtons, Slider, Button
 import matplotlib.gridspec as gridspec
+from mpl_interactions import ioff, panhandler, zoom_factory
 
 def import_array(file):
 	'''
@@ -300,50 +304,33 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		time = array.size / sample_rate # seconds in file
 		ax.plot(np.arange(0.0, time, time / array.size), array, color='indigo')
 
-		# make room for slider
-		if not sub:
-			fig.subplots_adjust(bottom=0.2)
+		# scrolling & panning
+		pan_handler = panhandler(fig, button=1)
 
-		# zoom slider & axes, left, bottom, width, height
+		# Scroll to zoom
+		disconnect_zoom = zoom_factory(ax)
+
+		# get starting axis limits to autoscale with zoom slider, (test if need both axes in case of side peaks?)
+		# state variable dictionary
+		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
+
+		# # zoom reset view button & axes, left, bottom, width, height
 		if sub:
-			zoom_slider_ax = fig.add_axes([0.14, 0.37, 0.2, 0.009])
+			reset_button_ax = fig.add_axes([0.465, 0.385, 0.0125, 0.01])
 		else:
-			zoom_slider_ax = fig.add_axes([0.178, 0.1, 0.63, 0.02])
-
-		# zoom slider
-		zoom_slider = Slider(zoom_slider_ax, 'Zoom', -1, 1, valinit=0, initcolor='w', color='indigo')
-		zoom_slider.label.set_size('x-small')
-
-		# zoom slider widget callback function
-		def sliders_on_changed(val, scale_factor=0.25):
-			cur_xlim = ax.get_xlim()
-			cur_ylim = ax.get_ylim()
-			scale = zoom_slider.val * scale_factor
-			x_left = 0 + scale
-			x_right = 1 - scale
-			y_top = 10 - scale * 10
-			y_bottom = -10 + scale * 10
-			ax.set_xlim([x_left, x_right])
-			ax.set_ylim([y_bottom, y_top])
-			fig.canvas.draw_idle()
-		zoom_slider.on_changed(sliders_on_changed)
-
-		# zoom reset view button & axes, left, bottom, width, height
-		if sub:
-			reset_button_ax = fig.add_axes([0.368, 0.37, 0.0125, 0.01]) # Fix in axes spacing for big plot
-		else:
-			reset_button_ax = fig.add_axes([0.85, 0.098, 0.05, 0.03])
+			reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
 
 		# reset button
 		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
 		reset_button.label.set_size('x-small')
 		def reset_button_on_clicked(mouse_event):
-			zoom_slider.reset()
+			ax.set_xlim(state['start_xlim'])
+			ax.set_ylim(state['start_ylim'])
 		reset_button.on_clicked(reset_button_on_clicked)
 
 		# individual figure or as part of larger figure
 		if sub:
-			return fig, zoom_slider, reset_button, sliders_on_changed, reset_button_on_clicked
+			return fig, reset_button, reset_button_on_clicked
 		else:
 			return plt.show()
 
@@ -381,10 +368,6 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		if not sub:
 			fig.subplots_adjust(hspace=0)
 
-		# make room for slider
-		if not sub:
-			fig.subplots_adjust(bottom=0.2)
-
 		# x axis on top
 		ax1.xaxis.tick_top()
 
@@ -396,50 +379,33 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		# Multicursor
 		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
 
-		# zoom slider & axes, left, bottom, width, height
-		if sub:
-			zoom_slider_ax = fig.add_axes([0.14, 0.37, 0.2, 0.009])
-		else:
-			zoom_slider_ax = fig.add_axes([0.178, 0.1, 0.63, 0.02])
-		zoom_slider = Slider(zoom_slider_ax, 'Zoom', -1, 1, valinit=0, initcolor='w', color='indigo')
-		zoom_slider.label.set_size('x-small')
+		# scrolling & panning
+		pan_handler = panhandler(fig, button=1)
 
-		# get starting axis limits to autoscale with zoom slider, (test if need both axes in case of side peaks?)
-		# state variable dictionary
-		state = {'start_xlim': ax1.get_xlim(), 'start_ylim': ax1.get_ylim()}
+		# Scroll to zoom
+		disconnect_zoom1 = zoom_factory(ax1)
+		disconnect_zoom2 = zoom_factory(ax2)
 
-		# zoom slider widget callback function
-		def sliders_on_changed(val, scale_factor=0.25):
-			cur_xlim = ax1.get_xlim()
-			cur_ylim = ax1.get_ylim()
-			start_xlim = state['start_xlim']
-			start_ylim = state['start_ylim']
-			scale = zoom_slider.val * scale_factor
-			x_left = start_xlim[0] + scale
-			x_right = start_xlim[1] - scale
-			y_top = start_ylim[0] - scale * 10
-			y_bottom = start_ylim[1] + scale * 10
-			ax1.set_xlim([x_left, x_right])
-			ax1.set_ylim([y_bottom, y_top])
-			ax2.set_xlim([x_left, x_right])
-			ax2.set_ylim([y_bottom, y_top])
-			fig.canvas.draw_idle()
-		zoom_slider.on_changed(sliders_on_changed)
+		# state variable dictionary for starting axis limits
+		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
 
-		# zoom reset view button & axes left, bottom, width, height
+		# zoom reset view button
 		if sub: 
-			reset_button_ax = fig.add_axes([0.368, 0.37, 0.0125, 0.01])
+			reset_button_ax = fig.add_axes([0.465, 0.385, 0.0125, 0.01]) # axes left, bottom, width, height
 		else:
-			reset_button_ax = fig.add_axes([0.85, 0.098, 0.05, 0.03])
+			reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
 		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
 		reset_button.label.set_size('x-small')
 		def reset_button_on_clicked(mouse_event):
-			zoom_slider.reset()
+			ax1.set_xlim(state['start_xlim1'])
+			ax2.set_xlim(state['start_xlim2'])
+			ax1.set_ylim(state['start_ylim1'])
+			ax2.set_ylim(state['start_ylim2'])
 		reset_button.on_clicked(reset_button_on_clicked)
 
 		# individual figure or as part of larger figure
 		if sub:
-			return fig, zoom_slider, reset_button, sliders_on_changed, reset_button_on_clicked
+			return fig, reset_button, reset_button_on_clicked
 		else:
 			return plt.show()
 
@@ -804,7 +770,7 @@ def visualizer(array, name, channels, sample_rate, code):
 		gs2 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec = outer[1])
 
 	# subplots currently multi_spec only shows
-	fig, zoom, reset, sliders_f, reset_f = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
+	fig, reset_wav, reset_wav_click = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
 	spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
 	fig, lrsums, side, lindB, scale = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
 	vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2)
@@ -815,8 +781,7 @@ def visualizer(array, name, channels, sample_rate, code):
 	scale_button = scale
 	lindB.on_clicked(scale)
 
-	zoom.on_changed(sliders_f)
-	reset.on_clicked(reset_f)
+	reset_wav.on_clicked(reset_wav_click)
 
 	plt.show()
 
