@@ -30,3 +30,4 @@ Main:
 
 Changes:
 'split, midside, invert, reverse, vectorscope, improved testing, multicursor'
+'visualizer mono, scroll/pan mag spec & visualizer, view reset buttons, wave 0 gridline'

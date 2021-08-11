@@ -27,20 +27,11 @@ To Do:
 normalize:
 	doesn't function
 
-waveform:
-	test signals with peaks in side
-		asymetrical peaks so one side is louder than the other
-			check to see how the y axis scales with that
-				scales both sides to peak one of them or different axis limits?
-
 spectrogram:
 	mel scale
 	NFFT
 	noverlap
 	window
-
-magnitude:
-	Sliders for zoom
 
 vectorscope:
 	test cases
@@ -49,15 +40,32 @@ vectorscope:
 		panned hard R
 
 visualizer:
-	Mono plot test
+	Mono
+		Spacing
+			colorbar
+			reset buttons
+				mag, spec, wave
+			Hspace between plots
+		Vectorscope mono compatibility
+		
 	Widgets
 		spectrogram & waveform multicursor
 	spectrogram shorter T window?
 
 Scrolling & Panning
-	Moves halves of stereo plots individually
-		create versions of zoom factory and panhandler with multiple axes synced movement
-	Add to spectrogram & magnitude
+	Rewrite zoomfactory & panhandler for syncronized subplot movement & dB scale mag plots
+		Moves halves of stereo plots individually
+			create versions of zoom factory and panhandler with multiple axes synced movement
+		Jumps down dB scale mag plots below view (almost "centering" 0?)
+		Cannot zoom, scroll or pan past original axis limits
+
+Performance
+	zoom, pan & scroll slow
+	mag buttons slow
+	multicursor slow
+
+Animated plots
+	y data over time
 '''
 
 import soundfile as sf
@@ -288,7 +296,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# if plotting on external figure only adding subplot
 		else:
-			fig.add_subplot(221)
+			ax = fig.add_subplot(221)
 
 		# labeling axes & title
 		title = '%s Waveform' % name
@@ -300,6 +308,9 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		ax.tick_params(axis='both', which='major', labelsize=6)
 		ax.margins(0.001)
 
+		# adding gridline on 0 above data
+		ax.axhline(0, linewidth=0.5, zorder=3)
+
 		# plot signal amplitude/time
 		time = array.size / sample_rate # seconds in file
 		ax.plot(np.arange(0.0, time, time / array.size), array, color='indigo')
@@ -310,13 +321,12 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		# Scroll to zoom
 		disconnect_zoom = zoom_factory(ax)
 
-		# get starting axis limits to autoscale with zoom slider, (test if need both axes in case of side peaks?)
-		# state variable dictionary
+		# state variable dictionary of starting axis limits
 		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
 
-		# # zoom reset view button & axes, left, bottom, width, height
+		# zoom reset view button & axes
 		if sub:
-			reset_button_ax = fig.add_axes([0.465, 0.385, 0.0125, 0.01])
+			reset_button_ax = fig.add_axes([0.465, 0.385, 0.0125, 0.01]) # left, bottom, width, height
 		else:
 			reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
 
@@ -363,6 +373,10 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		ax2.tick_params(axis='both', which='major', labelsize=6)
 		ax1.margins(0.001)
 		ax2.margins(0.001)
+
+		# adding gridline on 0 above data
+		ax1.axhline(0, linewidth=0.5, zorder=3)
+		ax2.axhline(0, linewidth=0.5, zorder=3)
 
 		# snuggly fasceting subplots if plotting to external figure
 		if not sub:
@@ -429,6 +443,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	# dark background white text, initilize figure and axes
 	plt.style.use('dark_background')
 
+	# figure and axes init in case of subplot or singular
 	if fig is None:
 		fig, ax = plt.subplots()
 
@@ -447,21 +462,23 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	ax.set_ylabel('Magnitude (dB)', fontsize='x-small')
 	ax.tick_params(axis='both', which='major', labelsize=6)
 
+	# mono
 	if channels == '1':
-		# initial axis
+		# initial ax
 		sig, fq, line = ax.magnitude_spectrum(array, Fs=sample_rate, color='indigo')
 		state['line'] = line
 
-	# making room for button axis
+	# making room for LRSUM &/or Lindb button axes
 	if not sub:
 		plt.subplots_adjust(left=0.225)
 
-	# adding line & axes state variables
+	# adding data & ax state variables
 	state.update({'ax': ax, 'data': array})
 
 	# facecolor for button widgets
 	button_face_color = 'black'
-			
+	
+	# Stereo
 	if channels == '2':
 		# divide array into stereo components
 		left, right = split(array, channels, name)
@@ -478,6 +495,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		# initial axis
 		sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate, color='indigo')
 
+		# state variable dictionary to keep track of plot status for button changes
 		state.update({'L': left, 'R': right, 'Sum': sumsig, 'Mid': mid, 'Side': side, 'data': left, 'line': line})
 
 		# LRSUM button axis (left, bottom, width, height)
@@ -485,6 +503,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 			rax = plt.axes([0.08, 0.7, 0.08, 0.2], facecolor=button_face_color, frame_on=False)
 		else:
 			rax = plt.axes([0.08, 0.26, 0.04, 0.0835], facecolor=button_face_color, frame_on=False)
+
 		# LRSUM button
 		lrsums = RadioButtons(rax, ('L', 'R', 'Sum', 'Mid', 'Side'), activecolor='indigo')
 
@@ -492,21 +511,26 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		def side(label):
 			# clear previous data
 			state['line'].remove()
+			
 			# plot
 			sig, fq, line = ax.magnitude_spectrum(state[label], Fs=sample_rate, scale=state['scale'], color='indigo')
+			
 			# recompute axis limits
 			ax.relim()
+			
 			# update state variables to new line & data
 			state['line'] = line
 			state['data'] = state[label]
 			fig.canvas.draw_idle()
+		
+		# connect button click event to side callback function
 		lrsums.on_clicked(side)
 
-		# labelsize
+		# labelsize for LRSUM buttons
 		for label in lrsums.labels:
 			label.set_fontsize('small')
 
-		# dynamically resize radio button height with figure size
+		# dynamically resize radio button height with figure size & setting color and width of button edges
 		rpos = rax.get_position().get_points()
 		fh = fig.get_figheight()
 		fw = fig.get_figwidth()
@@ -516,7 +540,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 			circ.set_edgecolor('w')
 			circ.set_lw(0.5)
 
-	# Linear dB bustton axis (left, bottom, width, height)
+	# Linear dB button axis (left, bottom, width, height)
 	if not sub:
 		rax = plt.axes([0.08, 0.4, 0.08, 0.15], facecolor=button_face_color, frame_on=False)
 	else:
@@ -525,18 +549,31 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	# Linear dB buttons
 	lindB = RadioButtons(rax, ('Lin', 'dB'), activecolor='indigo')
 
-	# scale function
+	# state variable dictionary of starting axis limits
+	xlim = ax.get_xlim()
+	ylim = ax.get_ylim()
+	state.update({'lin_xlim': xlim, 'lin_ylim': ylim, 'dB_xlim': xlim, 'dB_ylim': ylim})
+
+	# scale callback function for lindB buttons
 	def scale(label):
 		# clear data
 		state['line'].remove()
+		
 		# plot
 		sig, fq, line = ax.magnitude_spectrum(state['data'], Fs=sample_rate, scale=state[label], color='indigo')
+		
 		# recompute axis limits
 		ax.relim()
+
+		# scale the ax
+		ax.autoscale()
+		
 		# update state variables to new line & scale
 		state['line'] = line
 		state['scale'] = state[label]
 		fig.canvas.draw_idle()
+
+	# connect button click event to scale callback function
 	lindB.on_clicked(scale)
 
 	# labelsize
@@ -553,9 +590,37 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		circ.set_edgecolor('w')
 		circ.set_lw(0.5)
 
+	# scrolling & panning
+	pan_handler = panhandler(fig, button=1)
+
+	# Scroll to zoom
+	disconnect_zoom = zoom_factory(ax)
+
+	# zoom reset view button & axes
+	if sub:
+		reset_button_ax = fig.add_axes([0.465, 0.082, 0.0125, 0.01]) # left, bottom, width, height
+	else:
+		reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
+
+	# zoom reset view button
+	reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
+	reset_button.label.set_size('x-small')
+
+	# callback function for zoom reset button
+	def reset_button_on_clicked(mouse_event):
+		# recompute axis limits
+		ax.relim()
+
+		# scale the ax
+		ax.autoscale()
+	reset_button.on_clicked(reset_button_on_clicked)
+
 	# individual figure or as part of larger figure
 	if sub:
-		return fig, lrsums, side, lindB, scale
+		if channels == '2':
+			return fig, lrsums, side, lindB, scale, reset_button, reset_button_on_clicked
+		else:
+			return fig, lindB, scale, reset_button, reset_button_on_clicked
 	else:
 		return plt.show()
 
@@ -578,7 +643,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			fig, ax = plt.subplots()
 
 		else:
-			fig.add_subplot(ax = fig.add_subplot(222))
+			ax = fig.add_subplot(222)
 
 		# labeling axes & title
 		title = '%s Spectrogram' % name
@@ -608,9 +673,32 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/1000))
 		ax.yaxis.set_major_formatter(ticks)
 
+		# scrolling & panning
+		pan_handler = panhandler(fig, button=1)
+
+		# Scroll to zoom
+		disconnect_zoom = zoom_factory(ax)
+
+		# state variable dictionary of starting axis limits
+		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
+
+		# zoom reset view button & axes
+		if sub:
+			reset_button_ax = fig.add_axes([0.888, 0.385, 0.0125, 0.01]) # left, bottom, width, height
+		else:
+			reset_button_ax = fig.add_axes([0.79, 0.03, 0.05, 0.03])
+
+		# reset button
+		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
+		reset_button.label.set_size('x-small')
+		def reset_button_on_clicked(mouse_event):
+			ax.set_xlim(state['start_xlim'])
+			ax.set_ylim(state['start_ylim'])
+		reset_button.on_clicked(reset_button_on_clicked)
+
 		# individual figure or as part of larger figure
 		if sub:
-			return fig
+			return fig, reset_button, reset_button_on_clicked
 		else:
 			return plt.show()
 
@@ -671,9 +759,33 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		# multicursor
 		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
 
+		# scrolling & panning
+		pan_handler = panhandler(fig, button=1)
+
+		# Scroll to zoom
+		disconnect_zoom1 = zoom_factory(ax1)
+		disconnect_zoom2 = zoom_factory(ax2)
+
+		# state variable dictionary for starting axis limits
+		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
+
+		# zoom reset view button
+		if sub: 
+			reset_button_ax = fig.add_axes([0.888, 0.385, 0.0125, 0.01]) # axes left, bottom, width, height
+		else:
+			reset_button_ax = fig.add_axes([0.79, 0.03, 0.05, 0.03])
+		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
+		reset_button.label.set_size('x-small')
+		def reset_button_on_clicked(mouse_event):
+			ax1.set_xlim(state['start_xlim1'])
+			ax2.set_xlim(state['start_xlim2'])
+			ax1.set_ylim(state['start_ylim1'])
+			ax2.set_ylim(state['start_ylim2'])
+		reset_button.on_clicked(reset_button_on_clicked)
+
 		# individual figure or as part of larger figure
 		if sub:
-			return fig
+			return fig, reset_button, reset_button_on_clicked
 		else:
 			return plt.show()
 
@@ -769,19 +881,33 @@ def visualizer(array, name, channels, sample_rate, code):
 		gs1 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec = outer[0])
 		gs2 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec = outer[1])
 
+		# stereo mag plot with side button
+		fig, lrsums, side, lindB, scale, reset_mag, reset_mag_click = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
+
+		# ONCE MONO COMPATIBLE MOVE OUTSIDE THIS IF STATEMENT
+		vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2)
+		
+		# enabling mag buttons
+		lrsums.on_clicked(side)
+
+	else:
+		# mono mag plot without side button
+		fig, lindB, scale, reset_mag, reset_mag_click = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
+	
 	# subplots currently multi_spec only shows
 	fig, reset_wav, reset_wav_click = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
-	spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
-	fig, lrsums, side, lindB, scale = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
-	vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2)
+	fig, reset_spec, reset_spec_click = spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
 
 	# enabling mag buttons
-	side_button = side
-	lrsums.on_clicked(side)
-	scale_button = scale
 	lindB.on_clicked(scale)
 
+	# enabling view reset buttons
 	reset_wav.on_clicked(reset_wav_click)
+	reset_spec.on_clicked(reset_spec_click)
+	reset_mag.on_clicked(reset_mag_click)
+
+	# scrolling & panning
+	pan_handler = panhandler(fig, button=1)
 
 	plt.show()
 
@@ -878,8 +1004,8 @@ if __name__ == '__main__':
 
 	if 'Visualizer' in answers['tests']:
 		# visualizer mono plot
-		# name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
-		# visualizer(data, name, channels, sample_rate, code=False, gridspec=)
+		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		visualizer(data, name, channels, sample_rate, code=False)
 
 		# visualizer stereo plot
 		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
