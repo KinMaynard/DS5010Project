@@ -22,10 +22,14 @@ Exceptions:
 		divide by 0 error, happens when converting FFT to dBFS
 			run trim on data before to fix this for trailing and leading 0's
 			untested on zeros inside nonzero data
-
-To Do:
+########
+#To Do:#
+########
 normalize:
 	doesn't function
+
+Waveform
+	think I need to somehow factor signed integer when making plot to avoid discontinuity?
 
 spectrogram:
 	mel scale
@@ -41,23 +45,15 @@ vectorscope:
 
 visualizer:
 	Mono
-		Spacing
-			colorbar
-			reset buttons
-				mag, spec, wave
-			Hspace between plots
-		Vectorscope mono compatibility
-		
+		plot Vectorscope with mono compatibility
 	Widgets
 		spectrogram & waveform multicursor
 	spectrogram shorter T window?
 
 Scrolling & Panning
-	Rewrite zoomfactory & panhandler for syncronized subplot movement & dB scale mag plots
-		Moves halves of stereo plots individually
-			create versions of zoom factory and panhandler with multiple axes synced movement
+	dB scale mag plots
 		Jumps down dB scale mag plots below view (almost "centering" 0?)
-		Cannot zoom, scroll or pan past original axis limits
+		make it so cannot zoom, scroll or pan past original axis limits
 
 Performance
 	zoom, pan & scroll slow
@@ -66,6 +62,8 @@ Performance
 
 Animated plots
 	y data over time
+
+Realtime
 '''
 
 import soundfile as sf
@@ -326,7 +324,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# zoom reset view button & axes
 		if sub:
-			reset_button_ax = fig.add_axes([0.465, 0.385, 0.0125, 0.01]) # left, bottom, width, height
+			reset_button_ax = fig.add_axes([0.465, 0.502, 0.0125, 0.01]) # left, bottom, width, height
 		else:
 			reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
 
@@ -354,12 +352,12 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		
 		# initializing figure and axes
 		if fig is None:
-			fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+			fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True)
 
 		# if plotting on external figure only adding subplots
 		else:
 			ax1 = fig.add_subplot(gridspec[0, 0])
-			ax2 = fig.add_subplot(gridspec[1, 0])
+			ax2 = fig.add_subplot(gridspec[1, 0], sharex=ax1, sharey=ax1)
 
 		# labeling axes & title
 		title = '%s Waveform' % name
@@ -639,6 +637,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')
 		
+		# figure and axes init in case of subplot or singular
 		if fig is None:
 			fig, ax = plt.subplots()
 
@@ -653,16 +652,19 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		ax.set_ylabel('Frequency (kHz)', fontsize='x-small')
 		ax.set_title(title, fontsize='medium')
 		ax.tick_params(axis='both', which='major', labelsize=6)
-		# ax.grid(True, axis='y', ls=':')
 		
 		# plot spectrogram
 		spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma', vmin=-120, vmax=0)
 		
 		# make space for colorbar
-		fig.subplots_adjust(right=0.84)
+		if not sub:
+			fig.subplots_adjust(right=0.84)
 
 		# colorbar
-		cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768])	# left, bottom, width, height
+		if not sub:
+			cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768])	# left, bottom, width, height
+		else:
+			cbar_ax = fig.add_axes([0.905, 0.53, 0.003, 0.35])	# left, bottom, width, height
 		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', fontsize='x-small')
 		cbar_ax.tick_params(labelsize=5)
 		
@@ -684,7 +686,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
 		# zoom reset view button & axes
 		if sub:
-			reset_button_ax = fig.add_axes([0.888, 0.385, 0.0125, 0.01]) # left, bottom, width, height
+			reset_button_ax = fig.add_axes([0.888, 0.502, 0.0125, 0.01]) # left, bottom, width, height
 		else:
 			reset_button_ax = fig.add_axes([0.79, 0.03, 0.05, 0.03])
 
@@ -710,12 +712,13 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')
 
+		# figure and axes init in case of subplot or singular
 		if fig is None:
-			fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+			fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True)
 
 		else:
 			ax1 = fig.add_subplot(gridspec[0, 1])
-			ax2 = fig.add_subplot(gridspec[1, 1])
+			ax2 = fig.add_subplot(gridspec[1, 1], sharex=ax1, sharey=ax1)
 		
 		# labeling axes & title
 		title = '%s Spectrogram' % name
@@ -868,12 +871,14 @@ def visualizer(array, name, channels, sample_rate, code):
 	plt.style.use('dark_background')
 	fig = plt.figure(figsize=(26, 13.5))
 	plt.suptitle('%s Visualization' % name, fontsize='large')
-	fig.subplots_adjust(hspace=0)
 
 	# gridspec to snugly fascet only stereo spectrogram and waveform plots
 	# initialize for mono case
 	gs1, gs2 = None, None
 	if channels == '2':
+		# snugly fascet stereo subplots
+		fig.subplots_adjust(hspace=0)
+
 		# outer gridspec, hspace separates waveform & spectrogram plots from magnitude & vectorscope
 		outer = gridspec.GridSpec(nrows=2, ncols=1, figure=fig, hspace = 0.2, height_ratios = [2, 1])
 
