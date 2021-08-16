@@ -30,6 +30,7 @@ normalize:
 
 Waveform
 	think I need to somehow factor signed integer when making plot to avoid discontinuity?
+	use a sine wav to check discontinuity
 
 spectrogram:
 	mel scale
@@ -55,15 +56,45 @@ Scrolling & Panning
 		Jumps down dB scale mag plots below view (almost "centering" 0?)
 		make it so cannot zoom, scroll or pan past original axis limits
 
+Zoom
+	slow
+
 Performance
 	zoom, pan & scroll slow
 	mag buttons slow
 	multicursor slow
 
+	Performance Bottlenecks
+	Function   |Line| Context
+	Waveform	342		zoom_factory / generic.py line 363 self.fig.canvas.draw_idle()
+				420		"" ""
+				421		"" ""
+	Magnitude 	544		Side callback for lrsums button: fig.canvas.draw_idle()
+				547		redraw on click: lrsums.on_clicked(side)
+				594		Scale callback lindB: fig.canvas.draw_idle()
+				608		redraw on click: lindB.on_clicked(scale)
+				617		zoom_factory / generic.py line 363 self.fig.canvas.draw_idle()
+	Spectrogram 704		"" ""
+				791		"" ""
+				792		"" ""
+	Visualizer	919		redraw on click: lrsums.on_clicked(side)
+				930		redraw on click: lindB.on_clicked(scale)
+
+	only draw changed artists
+
 Animated plots
 	y data over time
 
 Realtime
+
+ZOOM CURRENTLY DISABLED ENABLE AFTER PERFORMANCE FIX
+
+Better test cases for waveform with small sine, saw, square waves
+	create test cases
+		Sine
+		Saw
+		Square
+	function to generate waves at given frequency, sample rate, duration
 '''
 
 import soundfile as sf
@@ -94,6 +125,17 @@ def import_array(file):
 	# reading the audio file as a soundfile numpy array
 	data, sample_rate = sf.read(file)
 	return name, channels, data, subtype, sample_rate
+
+def wave(type, frequency, peak, sample_rate, duration):
+	'''
+	type: string, sine, sawooth, square, triangle
+	frequency: int or float, cycles per second, Hz
+	peak: peak amplitude of array (-1, 1 for float values, for int values)
+	sample_rate: int samples per second (44100 etc.)
+	duration: int or float length of file in seconds
+	returns: numpy array of amplitudes the length of which divided by the sample rate is the duration in seconds
+	'''
+	pass
 
 def mask(array):
 	'''
@@ -311,13 +353,13 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# plot signal amplitude/time
 		time = array.size / sample_rate # seconds in file
-		ax.plot(np.arange(0.0, time, time / array.size), array, color='indigo')
+		ax.plot(np.linspace(0.0, time + 1, num=array.size), array, color='indigo')
 
 		# scrolling & panning
 		pan_handler = panhandler(fig, button=1)
 
 		# Scroll to zoom
-		disconnect_zoom = zoom_factory(ax)
+		# disconnect_zoom = zoom_factory(ax)
 
 		# state variable dictionary of starting axis limits
 		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
@@ -395,8 +437,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		pan_handler = panhandler(fig, button=1)
 
 		# Scroll to zoom
-		disconnect_zoom1 = zoom_factory(ax1)
-		disconnect_zoom2 = zoom_factory(ax2)
+		# disconnect_zoom1 = zoom_factory(ax1)
+		# disconnect_zoom2 = zoom_factory(ax2)
 
 		# state variable dictionary for starting axis limits
 		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
@@ -592,7 +634,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	pan_handler = panhandler(fig, button=1)
 
 	# Scroll to zoom
-	disconnect_zoom = zoom_factory(ax)
+	# disconnect_zoom = zoom_factory(ax)
 
 	# zoom reset view button & axes
 	if sub:
@@ -679,7 +721,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		pan_handler = panhandler(fig, button=1)
 
 		# Scroll to zoom
-		disconnect_zoom = zoom_factory(ax)
+		# disconnect_zoom = zoom_factory(ax)
 
 		# state variable dictionary of starting axis limits
 		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
@@ -766,8 +808,8 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		pan_handler = panhandler(fig, button=1)
 
 		# Scroll to zoom
-		disconnect_zoom1 = zoom_factory(ax1)
-		disconnect_zoom2 = zoom_factory(ax2)
+		# disconnect_zoom1 = zoom_factory(ax1)
+		# disconnect_zoom2 = zoom_factory(ax2)
 
 		# state variable dictionary for starting axis limits
 		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
@@ -837,6 +879,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 		ax.set_yticklabels([])
 		ax.set_xticklabels([])
 		ax.grid(False, axis='y')
+
 		# plotting only 2 theta grids
 		ax.set_thetagrids((135.0, 45.0))
 
@@ -923,9 +966,13 @@ if __name__ == '__main__':
 
 	answers = inquirer.prompt(questions)
 
+	# test files
+	mono = '../binaries/Clap Innerworks 1.wav'
+	stereo = '../binaries/Bottle.aiff'
+
 	if 'Normalize' in answers['tests']:
 		# mono
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		name, channels, data, subtype, sample_rate = import_array(mono)
 		# before normalization
 		waveform(data, name, channels, sample_rate)
 		data = normalize(data)
@@ -933,7 +980,7 @@ if __name__ == '__main__':
 		waveform(data, name, channels, sample_rate)
 
 		# stereo
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		name, channels, data, subtype, sample_rate = import_array(stereo)
 		# before normalization
 		waveform(data, name, channels, sample_rate)
 		data = normalize(data)
@@ -942,11 +989,11 @@ if __name__ == '__main__':
 
 	if 'Midside' in answers['tests']:
 		# midside encoding test mono
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		name, channels, data, subtype, sample_rate = import_array(mono)
 		midside(data, channels, name)
 
 		# midside encoding test stereo
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		name, channels, data, subtype, sample_rate = import_array(stereo)
 		encoded, ms = midside(data, channels, name)
 		print(encoded, ms)
 
@@ -956,63 +1003,63 @@ if __name__ == '__main__':
 
 	if 'Invert' in answers['tests']:
 		# Polarity inversion test
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		name, channels, data, subtype, sample_rate = import_array(stereo)
 		print(data)
 		print(invert(data))
 
 	if 'Reverse' in answers['tests']:
-		# Polarity inversion test
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		# Reverse array test
+		name, channels, data, subtype, sample_rate = import_array(stereo)
 		print(data)
 		print(reverse(data))
 
 	if 'Waveform' in answers['tests']:
 		# Waveform plot test case mono file
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		name, channels, data, subtype, sample_rate = import_array(mono)
 		waveform(data, name, channels, sample_rate)
 
 		# Waveform plot test case stereo file
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		name, channels, data, subtype, sample_rate = import_array(stereo)
 		waveform(data, name, channels, sample_rate)
 
 	if 'Magnitude' in answers['tests']:
 		# magnitude test mono file
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		name, channels, data, subtype, sample_rate = import_array(mono)
 		magnitude(data, name, channels, sample_rate)
 
 		# magnitude test stereo file
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		name, channels, data, subtype, sample_rate = import_array(stereo)
 		magnitude(data, name, channels, sample_rate)
 
 	if 'Spectrogram' in answers['tests']:
 		# spectrogram test case mono file
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		name, channels, data, subtype, sample_rate = import_array(mono)
 		# prevents divide by zero runtime exception
 		data = trim(data)
 		spectrogram(data, name, channels, sample_rate)
 
 		# spectrogram test case stereo file
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		name, channels, data, subtype, sample_rate = import_array(stereo)
 		# prevents divide by zero runtime exception
 		data = trim(data)
 		spectrogram(data, name, channels, sample_rate)
 
 	if 'Vectorscope' in answers['tests']:
 		# vectorscope stereo test
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		name, channels, data, subtype, sample_rate = import_array(stereo)
 		vectorscope(data, name, False)
 
 		# Stereo test left channel only
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		name, channels, data, subtype, sample_rate = import_array(stereo)
 		data[:,1] = 0
 		vectorscope(data, name, False)
 
 	if 'Visualizer' in answers['tests']:
 		# visualizer mono plot
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Clap Innerworks 1.wav')
+		name, channels, data, subtype, sample_rate = import_array(mono)
 		visualizer(data, name, channels, sample_rate, code=False)
 
 		# visualizer stereo plot
-		name, channels, data, subtype, sample_rate = import_array('../binaries/Bottle.aiff')
+		name, channels, data, subtype, sample_rate = import_array(stereo)
 		visualizer(data, name, channels, sample_rate, code=False)
 
