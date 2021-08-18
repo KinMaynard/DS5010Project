@@ -25,76 +25,76 @@ Exceptions:
 ########
 #To Do:#
 ########
-normalize:
-	doesn't function
+	normalize:
+		doesn't function
 
-Waveform
-	think I need to somehow factor signed integer when making plot to avoid discontinuity?
-	use a sine wav to check discontinuity
+	Waveform
+		think I need to somehow factor signed integer when making plot to avoid discontinuity?
+		use a sine wav to check discontinuity
 
-spectrogram:
-	mel scale
-	NFFT
-	noverlap
-	window
+	spectrogram:
+		mel scale
+		NFFT
+		noverlap
+		window
 
-vectorscope:
-	test cases
-		panned hard L
-			not showing anything in plot?
-		panned hard R
+	vectorscope:
+		test cases
+			panned hard L
+				not showing anything in plot?
+			panned hard R
 
-visualizer:
-	Mono
-		plot Vectorscope with mono compatibility
-	Widgets
-		spectrogram & waveform multicursor
-	spectrogram shorter T window?
+	visualizer:
+		Mono
+			plot Vectorscope with mono compatibility
+		Widgets
+			spectrogram & waveform multicursor
+		spectrogram shorter T window?
 
-Scrolling & Panning
-	dB scale mag plots
-		Jumps down dB scale mag plots below view (almost "centering" 0?)
-		make it so cannot zoom, scroll or pan past original axis limits
+	Scrolling & Panning
+		dB scale mag plots
+			Jumps down dB scale mag plots below view (almost "centering" 0?)
+			make it so cannot zoom, scroll or pan past original axis limits
 
-Zoom
-	slow
+	Zoom
+		slow
 
-Performance
-	zoom, pan & scroll slow
-	mag buttons slow
-	multicursor slow
+	Performance
+		zoom, pan & scroll slow
+		mag buttons slow
+		multicursor slow
 
-	Performance Bottlenecks
-	Function   |Line| Context
-	Waveform	342		zoom_factory / generic.py line 363 self.fig.canvas.draw_idle()
-				420		"" ""
-				421		"" ""
-	Magnitude 	544		Side callback for lrsums button: fig.canvas.draw_idle()
-				547		redraw on click: lrsums.on_clicked(side)
-				594		Scale callback lindB: fig.canvas.draw_idle()
-				608		redraw on click: lindB.on_clicked(scale)
-				617		zoom_factory / generic.py line 363 self.fig.canvas.draw_idle()
-	Spectrogram 704		"" ""
-				791		"" ""
-				792		"" ""
-	Visualizer	919		redraw on click: lrsums.on_clicked(side)
-				930		redraw on click: lindB.on_clicked(scale)
+		Performance Bottlenecks
+		Function   |Line| Context
+		Waveform	342		zoom_factory / generic.py line 363 self.fig.canvas.draw_idle()
+					420		"" ""
+					421		"" ""
+		Magnitude 	544		Side callback for lrsums button: fig.canvas.draw_idle()
+					547		redraw on click: lrsums.on_clicked(side)
+					594		Scale callback lindB: fig.canvas.draw_idle()
+					608		redraw on click: lindB.on_clicked(scale)
+					617		zoom_factory / generic.py line 363 self.fig.canvas.draw_idle()
+		Spectrogram 704		"" ""
+					791		"" ""
+					792		"" ""
+		Visualizer	919		redraw on click: lrsums.on_clicked(side)
+					930		redraw on click: lindB.on_clicked(scale)
 
-	only draw changed artists
+		only draw changed artists
 
-Animated plots
-	y data over time
+	Animated plots
+		y data over time
 
-Realtime
+	Realtime
 
-ZOOM CURRENTLY DISABLED ENABLE AFTER PERFORMANCE FIX
+	ZOOM CURRENTLY DISABLED ENABLE AFTER PERFORMANCE FIX
 
-Better test cases for waveform with small sine, saw, square waves
-	create test cases
-		Sine
-		Saw
-		Square
-	function to generate waves at given frequency, sample rate, duration
+	Better test cases for waveform with small sine, saw, square waves
+		create test cases
+			Sine
+			Saw
+			Square
+		function to generate waves at given frequency, sample rate, duration
 '''
 
 import soundfile as sf
