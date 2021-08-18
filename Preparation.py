@@ -24,6 +24,8 @@
 		dB scale mag plots
 			Jumps down dB scale mag plots below view (almost "centering" 0?)
 			make it so cannot zoom, scroll or pan past original axis limits
+		Part of toolbar already
+		Zoom factory getting added to matplotlib in next release
 
 	Zoom
 		slow
@@ -70,11 +72,11 @@ Possible features:
 		fundemental frequency/pitch detection
 		Detect all pitches in sample
 
-Exceptions:
-	Spectrogram
-		divide by 0 error, happens when converting FFT to dBFS
-			run trim on data before to fix this for trailing and leading 0's
-			untested on zeros inside nonzero data
+	Exceptions:
+		Spectrogram
+			divide by 0 error, happens when converting FFT to dBFS
+				run trim on data before to fix this for trailing and leading 0's
+				untested on zeros inside nonzero data
 '''
 
 import soundfile as sf
