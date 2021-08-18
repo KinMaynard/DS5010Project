@@ -1,42 +1,12 @@
 '''
-Preparation
-
-This is a module for:
-	Importing of audio files as numpy arrays
-	Exporting of numpy arrays as audio files
-	Trimming leading and trailing silence from audio files
-	Peak normalization of audio files
-
-Analysis:
-
-This is a module for:
-	Spectrogram (Mel Scale)
-	Tempo
-		transient detection
-	Key/Note
-		fundemental frequency/pitch detection
-		Detect all pitches in sample
-
-Exceptions:
-	Spectrogram
-		divide by 0 error, happens when converting FFT to dBFS
-			run trim on data before to fix this for trailing and leading 0's
-			untested on zeros inside nonzero data
 ########
 #To Do:#
 ########
+	UI
+		EVA
+
 	normalize:
 		doesn't function
-
-	Waveform
-		think I need to somehow factor signed integer when making plot to avoid discontinuity?
-		use a sine wav to check discontinuity
-
-	spectrogram:
-		mel scale
-		NFFT
-		noverlap
-		window
 
 	vectorscope:
 		test cases
@@ -49,7 +19,6 @@ Exceptions:
 			plot Vectorscope with mono compatibility
 		Widgets
 			spectrogram & waveform multicursor
-		spectrogram shorter T window?
 
 	Scrolling & Panning
 		dB scale mag plots
@@ -87,14 +56,25 @@ Exceptions:
 
 	Realtime
 
-	ZOOM CURRENTLY DISABLED ENABLE AFTER PERFORMANCE FIX
+	Exceptions:
+	Spectrogram
+		divide by 0 error, happens when converting FFT to dBFS
+			run trim on data before to fix this for trailing and leading 0's
+			untested on zeros inside nonzero data
 
-	Better test cases for waveform with small sine, saw, square waves
-		create test cases
-			Sine
-			Saw
-			Square
-		function to generate waves at given frequency, sample rate, duration
+Possible features:
+	Tempo
+		transient detection
+	
+	Key/Note
+		fundemental frequency/pitch detection
+		Detect all pitches in sample
+
+Exceptions:
+	Spectrogram
+		divide by 0 error, happens when converting FFT to dBFS
+			run trim on data before to fix this for trailing and leading 0's
+			untested on zeros inside nonzero data
 '''
 
 import soundfile as sf
@@ -125,17 +105,6 @@ def import_array(file):
 	# reading the audio file as a soundfile numpy array
 	data, sample_rate = sf.read(file)
 	return name, channels, data, subtype, sample_rate
-
-def wave(type, frequency, peak, sample_rate, duration):
-	'''
-	type: string, sine, sawooth, square, triangle
-	frequency: int or float, cycles per second, Hz
-	peak: peak amplitude of array (-1, 1 for float values, for int values)
-	sample_rate: int samples per second (44100 etc.)
-	duration: int or float length of file in seconds
-	returns: numpy array of amplitudes the length of which divided by the sample rate is the duration in seconds
-	'''
-	pass
 
 def mask(array):
 	'''
@@ -353,13 +322,13 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# plot signal amplitude/time
 		time = array.size / sample_rate # seconds in file
-		ax.plot(np.linspace(0.0, time + 1, num=array.size), array, color='indigo')
-
+		ax.plot(np.linspace(0.0, time, array.size), array, color='indigo')
+		
 		# scrolling & panning
 		pan_handler = panhandler(fig, button=1)
 
 		# Scroll to zoom
-		# disconnect_zoom = zoom_factory(ax)
+		disconnect_zoom = zoom_factory(ax)
 
 		# state variable dictionary of starting axis limits
 		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
@@ -426,9 +395,9 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		ax1.xaxis.tick_top()
 
 		# plot signal amplitude/time
-		time = array.size / sample_rate
-		ax1.plot(np.arange(0.0, time, time / left.size), left, color='indigo')
-		ax2.plot(np.arange(0.0, time, time / right.size), right, color='indigo')
+		time = left.size / sample_rate # only left size because otherwise will be double the amount of time
+		ax1.plot(np.linspace(0.0, time, left.size), left, color='indigo')
+		ax2.plot(np.linspace(0.0, time, right.size), right, color='indigo')
 
 		# Multicursor
 		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
@@ -437,8 +406,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		pan_handler = panhandler(fig, button=1)
 
 		# Scroll to zoom
-		# disconnect_zoom1 = zoom_factory(ax1)
-		# disconnect_zoom2 = zoom_factory(ax2)
+		disconnect_zoom1 = zoom_factory(ax1)
+		disconnect_zoom2 = zoom_factory(ax2)
 
 		# state variable dictionary for starting axis limits
 		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
@@ -634,7 +603,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	pan_handler = panhandler(fig, button=1)
 
 	# Scroll to zoom
-	# disconnect_zoom = zoom_factory(ax)
+	disconnect_zoom = zoom_factory(ax)
 
 	# zoom reset view button & axes
 	if sub:
@@ -721,7 +690,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		pan_handler = panhandler(fig, button=1)
 
 		# Scroll to zoom
-		# disconnect_zoom = zoom_factory(ax)
+		disconnect_zoom = zoom_factory(ax)
 
 		# state variable dictionary of starting axis limits
 		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
@@ -808,8 +777,8 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		pan_handler = panhandler(fig, button=1)
 
 		# Scroll to zoom
-		# disconnect_zoom1 = zoom_factory(ax1)
-		# disconnect_zoom2 = zoom_factory(ax2)
+		disconnect_zoom1 = zoom_factory(ax1)
+		disconnect_zoom2 = zoom_factory(ax2)
 
 		# state variable dictionary for starting axis limits
 		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
@@ -967,8 +936,8 @@ if __name__ == '__main__':
 	answers = inquirer.prompt(questions)
 
 	# test files
-	mono = '../binaries/Clap Innerworks 1.wav'
-	stereo = '../binaries/Bottle.aiff'
+	mono = '../binaries/hdchirp_88k_-3dBFS_lin.wav'
+	stereo = '../binaries/hdchirp_88k_-3dBFS_lin_Stereo.aiff'
 
 	if 'Normalize' in answers['tests']:
 		# mono
