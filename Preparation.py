@@ -1,82 +1,5 @@
 '''
-########
-#To Do:#
-########
-	UI
-		EVA
-
-	normalize:
-		doesn't function
-
-	vectorscope:
-		test cases
-			panned hard L
-				not showing anything in plot?
-			panned hard R
-
-	visualizer:
-		Mono
-			plot Vectorscope with mono compatibility
-		Widgets
-			spectrogram & waveform multicursor
-
-	Scrolling & Panning
-		dB scale mag plots
-			Jumps down dB scale mag plots below view (almost "centering" 0?)
-			make it so cannot zoom, scroll or pan past original axis limits
-		Part of toolbar already
-		Zoom factory getting added to matplotlib in next release
-
-	Zoom
-		slow
-
-	Performance
-		zoom, pan & scroll slow
-		mag buttons slow
-		multicursor slow
-
-		Performance Bottlenecks
-		Function   |Line| Context
-		Waveform	342		zoom_factory / generic.py line 363 self.fig.canvas.draw_idle()
-					420		"" ""
-					421		"" ""
-		Magnitude 	544		Side callback for lrsums button: fig.canvas.draw_idle()
-					547		redraw on click: lrsums.on_clicked(side)
-					594		Scale callback lindB: fig.canvas.draw_idle()
-					608		redraw on click: lindB.on_clicked(scale)
-					617		zoom_factory / generic.py line 363 self.fig.canvas.draw_idle()
-		Spectrogram 704		"" ""
-					791		"" ""
-					792		"" ""
-		Visualizer	919		redraw on click: lrsums.on_clicked(side)
-					930		redraw on click: lindB.on_clicked(scale)
-
-		only draw changed artists
-
-	Animated plots
-		y data over time
-
-	Realtime
-
-	Exceptions:
-	Spectrogram
-		divide by 0 error, happens when converting FFT to dBFS
-			run trim on data before to fix this for trailing and leading 0's
-			untested on zeros inside nonzero data
-
-Possible features:
-	Tempo
-		transient detection
-	
-	Key/Note
-		fundemental frequency/pitch detection
-		Detect all pitches in sample
-
-	Exceptions:
-		Spectrogram
-			divide by 0 error, happens when converting FFT to dBFS
-				run trim on data before to fix this for trailing and leading 0's
-				untested on zeros inside nonzero data
+Audio processing & visualization library
 '''
 
 import soundfile as sf
@@ -85,9 +8,11 @@ import sys
 import inquirer
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.widgets import MultiCursor, RadioButtons, Slider, Button
+from matplotlib.widgets import MultiCursor, RadioButtons, Button
 import matplotlib.gridspec as gridspec
-from mpl_interactions import ioff, panhandler, zoom_factory
+
+# use backend that supports animation & blitting
+mpl.use('Qt5Agg')
 
 def import_array(file):
 	'''
@@ -325,12 +250,6 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		# plot signal amplitude/time
 		time = array.size / sample_rate # seconds in file
 		ax.plot(np.linspace(0.0, time, array.size), array, color='indigo')
-		
-		# scrolling & panning
-		pan_handler = panhandler(fig, button=1)
-
-		# Scroll to zoom
-		disconnect_zoom = zoom_factory(ax)
 
 		# state variable dictionary of starting axis limits
 		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
@@ -403,13 +322,6 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# Multicursor
 		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
-
-		# scrolling & panning
-		pan_handler = panhandler(fig, button=1)
-
-		# Scroll to zoom
-		disconnect_zoom1 = zoom_factory(ax1)
-		disconnect_zoom2 = zoom_factory(ax2)
 
 		# state variable dictionary for starting axis limits
 		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
@@ -601,12 +513,6 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		circ.set_edgecolor('w')
 		circ.set_lw(0.5)
 
-	# scrolling & panning
-	pan_handler = panhandler(fig, button=1)
-
-	# Scroll to zoom
-	disconnect_zoom = zoom_factory(ax)
-
 	# zoom reset view button & axes
 	if sub:
 		reset_button_ax = fig.add_axes([0.465, 0.082, 0.0125, 0.01]) # left, bottom, width, height
@@ -644,7 +550,6 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 	fig: external figure to plot onto if provided, default = None
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
-	# Sliders for zoom
 	# Mono case
 	if channels == '1':
 		# dark background white text, initilize figure and axes
@@ -687,12 +592,6 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		# fq in kHz
 		ticks = mpl.ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x/1000))
 		ax.yaxis.set_major_formatter(ticks)
-
-		# scrolling & panning
-		pan_handler = panhandler(fig, button=1)
-
-		# Scroll to zoom
-		disconnect_zoom = zoom_factory(ax)
 
 		# state variable dictionary of starting axis limits
 		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
@@ -774,13 +673,6 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
 		# multicursor
 		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
-
-		# scrolling & panning
-		pan_handler = panhandler(fig, button=1)
-
-		# Scroll to zoom
-		disconnect_zoom1 = zoom_factory(ax1)
-		disconnect_zoom2 = zoom_factory(ax2)
 
 		# state variable dictionary for starting axis limits
 		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
@@ -924,9 +816,6 @@ def visualizer(array, name, channels, sample_rate, code):
 	reset_wav.on_clicked(reset_wav_click)
 	reset_spec.on_clicked(reset_spec_click)
 	reset_mag.on_clicked(reset_mag_click)
-
-	# scrolling & panning
-	pan_handler = panhandler(fig, button=1)
 
 	plt.show()
 
