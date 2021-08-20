@@ -796,9 +796,6 @@ def visualizer(array, name, channels, sample_rate, code):
 
 		# stereo mag plot with side button
 		fig, lrsums, side, lindB, scale, reset_mag, reset_mag_click = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
-
-		# ONCE MONO COMPATIBLE MOVE OUTSIDE THIS IF STATEMENT
-		vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2)
 		
 		# enabling mag buttons
 		lrsums.on_clicked(side)
@@ -810,6 +807,7 @@ def visualizer(array, name, channels, sample_rate, code):
 	# subplots currently multi_spec only shows
 	fig, reset_wav, reset_wav_click = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
 	fig, reset_spec, reset_spec_click = spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
+	fig = vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2)
 
 	# enabling mag buttons
 	lindB.on_clicked(scale)
@@ -908,6 +906,10 @@ if __name__ == '__main__':
 		spectrogram(data, name, channels, sample_rate)
 
 	if 'Vectorscope' in answers['tests']:
+		# vectorscope mono test
+		name, channels, data, subtype, sample_rate = import_array(mono)
+		vectorscope(data, name, False)
+
 		# vectorscope stereo test
 		name, channels, data, subtype, sample_rate = import_array(stereo)
 		vectorscope(data, name, False)
