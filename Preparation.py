@@ -152,32 +152,34 @@ def midside(array, channels, name, code=True):
 	'''
 	# check for stereo or mid/side array
 	if channels == '1':
-		return print('%s is mono, import 2 channel audio array for mid side processing.' % name)
+		# treat mono array as stereo array of 2 mono components (will sum to only mid data no side)
+		left, right = array, array
+
 	else:
 		# divide array into stereo components
 		left, right = split(array, channels, name)
 
-		if code:
-			# Mid/Side encoding
-			mid = 0.5 * (left + right)
-			side = 0.5 * (left - right)
+	if code:
+		# Mid/Side encoding
+		mid = 0.5 * (left + right)
+		side = 0.5 * (left - right)
 
-			encoded = np.stack((mid, side), axis=-1)
+		encoded = np.stack((mid, side), axis=-1)
 
-			midside = True
+		midside = True
 
-			return encoded, midside
+		return encoded, midside
 
-		else:
-			# Mid/Side decoding
-			newleft = left + right # mid + side
-			newright = left - right # mid - side
+	else:
+		# Mid/Side decoding
+		newleft = left + right # mid + side
+		newright = left - right # mid - side
 
-			decoded = np.stack((newleft, newright), axis=-1)
+		decoded = np.stack((newleft, newright), axis=-1)
 
-			midside = False
+		midside = False
 
-			return decoded, midside
+		return decoded, midside
 
 def invert(array):
 	'''
