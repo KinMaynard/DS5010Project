@@ -852,7 +852,8 @@ if __name__ == '__main__':
 	if 'Midside' in answers['tests']:
 		# midside encoding test mono
 		name, channels, data, subtype, sample_rate = import_array(mono)
-		midside(data, channels, name)
+		encoded, ms = midside(data, channels, name)
+		print(encoded, ms)
 
 		# midside encoding test stereo
 		name, channels, data, subtype, sample_rate = import_array(stereo)
