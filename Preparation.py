@@ -405,7 +405,8 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	ax.set_title(title, color='#F9A438', fontsize='medium')
 	ax.set_xlabel('Frequency (hz)', color='#F9A438', fontsize='x-small')
 	ax.set_ylabel('Magnitude (dB)', color='#F9A438', fontsize='x-small')
-	ax.tick_params(axis='both', which='major', color='#F9A438', labelsize=6, labelcolor='#F9A438')
+	ax.minorticks_on()
+	ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
 	# spine coloring
 	spine_ls = ['top', 'bottom', 'left', 'right']
@@ -601,7 +602,8 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		ax.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
 		ax.set_ylabel('Frequency (kHz)', color='#F9A438', fontsize='x-small')
 		ax.set_title(title, color='#F9A438', fontsize='medium')
-		ax.tick_params(axis='both', which='major', color='#F9A438', labelsize=6, labelcolor='#F9A438')
+		ax.minorticks_on()
+		ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
 		# spine coloring
 		spine_ls = ['top', 'bottom', 'left', 'right']
@@ -680,8 +682,10 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		ax1.set_ylabel('Left Frequency (kHz)', color='#F9A438', fontsize='x-small')
 		ax2.set_ylabel('Right Frequency (kHz)', color='#F9A438', fontsize='x-small')
 		ax1.set_title(title, color='#F9A438', fontsize='medium')
-		ax1.tick_params(axis='both', which='major', color='#F9A438', labelsize=6, labelcolor='#F9A438')
-		ax2.tick_params(axis='both', which='major', color='#F9A438', labelsize=6, labelcolor='#F9A438')
+		ax1.minorticks_on()
+		ax2.minorticks_on()
+		ax1.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
+		ax2.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
 		# x axis on top
 		ax1.xaxis.tick_top()
