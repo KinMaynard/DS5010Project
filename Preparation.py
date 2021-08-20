@@ -240,7 +240,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		title = '%s Waveform' % name
 		if sub:
 			title = 'Waveform'
-		ax.set_title(title, fontsize='medium')
+		ax.set_title(title, color='#F9A438', fontsize='medium')
 		ax.set_xlabel('Time (s)', fontsize='x-small')
 		ax.set_ylabel('Amplitude', fontsize='x-small')
 		ax.tick_params(axis='both', which='major', labelsize=6)
@@ -297,7 +297,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		title = '%s Waveform' % name
 		if sub:
 			title = 'Waveform'
-		ax1.set_title(title, fontsize='medium')
+		ax1.set_title(title, color='#F9A438', fontsize='medium')
 		ax2.set_xlabel('Time (s)', fontsize='x-small')
 		ax1.set_ylabel('Amplitude Left', fontsize='x-small')
 		ax2.set_ylabel('Amplitude Right', fontsize='x-small')
@@ -382,7 +382,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	title = '%s Magnitude Spectrum' % name
 	if sub:
 		title = 'Magnitude Spectrum'
-	ax.set_title(title, fontsize='medium')
+	ax.set_title(title, color='#F9A438', fontsize='medium')
 	ax.set_xlabel('Frequency (hz)', fontsize='x-small')
 	ax.set_ylabel('Magnitude (dB)', fontsize='x-small')
 	ax.tick_params(axis='both', which='major', labelsize=6)
@@ -570,7 +570,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			title = 'Spectrogram'
 		ax.set_xlabel('Time (s)', fontsize='x-small')
 		ax.set_ylabel('Frequency (kHz)', fontsize='x-small')
-		ax.set_title(title, fontsize='medium')
+		ax.set_title(title, color='#F9A438', fontsize='medium')
 		ax.tick_params(axis='both', which='major', labelsize=6)
 		
 		# plot spectrogram
@@ -641,7 +641,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		ax2.set_xlabel('Time (s)', fontsize='x-small')
 		ax1.set_ylabel('Left Frequency (kHz)', fontsize='x-small')
 		ax2.set_ylabel('Right Frequency (kHz)', fontsize='x-small')
-		ax1.set_title(title, fontsize='medium')
+		ax1.set_title(title, color='#F9A438', fontsize='medium')
 		ax1.tick_params(axis='both', which='major', labelsize=6)
 		ax2.tick_params(axis='both', which='major', labelsize=6)
 
@@ -735,9 +735,9 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 		
 		# set title & bring down close to top of plot
 		if sub:
-			ax.set_title(title, fontsize='medium', pad=-105)
+			ax.set_title(title, color='#F9A438', fontsize='medium', pad=-105)
 		else:
-			ax.set_title(title, fontsize='medium', pad=-70)
+			ax.set_title(title, color='#F9A438', fontsize='medium', pad=-70)
 
 		# plotting 180 degrees
 		ax.set_thetamax(180)
@@ -778,7 +778,7 @@ def visualizer(array, name, channels, sample_rate, code):
 	# initialize figure with dark background and title
 	plt.style.use('dark_background')
 	fig = plt.figure(figsize=(26, 13.5))
-	plt.suptitle('%s Visualization' % name, fontsize='large')
+	plt.suptitle('%s Visualization' % name, color='#F9A438', fontsize='large')
 
 	# gridspec to snugly fascet only stereo spectrogram and waveform plots
 	# initialize for mono case
