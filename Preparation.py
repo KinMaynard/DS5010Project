@@ -24,7 +24,8 @@ def import_array(file):
 	info = str(sf.info(file))
 
 	# includes file path
-	name = info[:info.find('\n')]
+	name_fp = info[:info.find('\n')]
+	name = name_fp[name_fp.rfind('/')+1:]
 	channels = info[info.find('channels:') + 10:info.find('channels:') + 11]
 	subtype = info[info.find('subtype:') + 9:]
 	subtype = subtype[subtype.find('['):]
@@ -243,15 +244,21 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		ax.set_title(title, color='#F9A438', fontsize='medium')
 		ax.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
 		ax.set_ylabel('Amplitude', color='#F9A438', fontsize='x-small')
-		ax.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
+		ax.minorticks_on()
+		ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 		ax.margins(0.001)
 
+		# spine coloring
+		spine_ls = ['top', 'bottom', 'left', 'right']
+		for spine in spine_ls:
+			ax.spines[spine].set_color('#F9A438')
+
 		# adding gridline on 0 above data
-		ax.axhline(0, linewidth=0.5, zorder=3)
+		ax.axhline(0, color='#F9A438', linewidth=0.5, zorder=3)
 
 		# plot signal amplitude/time
 		time = array.size / sample_rate # seconds in file
-		ax.plot(np.linspace(0.0, time, array.size), array, color='indigo')
+		ax.plot(np.linspace(0.0, time, array.size), array, color='#16F9DA')
 
 		# state variable dictionary of starting axis limits
 		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
@@ -263,8 +270,11 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 			reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
 
 		# reset button
-		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
+		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='#F9A438')
 		reset_button.label.set_size('x-small')
+		reset_button.label.set_color('#F0191C')
+		for spine in spine_ls:
+			reset_button_ax.spines[spine].set_color('#F0191C')
 		def reset_button_on_clicked(mouse_event):
 			ax.set_xlim(state['start_xlim'])
 			ax.set_ylim(state['start_ylim'])
@@ -301,14 +311,21 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		ax2.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
 		ax1.set_ylabel('Amplitude Left', color='#F9A438', fontsize='x-small')
 		ax2.set_ylabel('Amplitude Right', color='#F9A438', fontsize='x-small')
-		ax1.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
-		ax2.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
+		ax1.minorticks_on()
+		ax2.minorticks_on()
+		ax1.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
+		ax2.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 		ax1.margins(0.001)
 		ax2.margins(0.001)
 
 		# adding gridline on 0 above data
-		ax1.axhline(0, color='#F9A438', linewidth=0.5, zorder=3)
-		ax2.axhline(0, color='#F9A438', linewidth=0.5, zorder=3)
+		ax1.axhline(0, color='#16F9DA', linewidth=0.5, zorder=3)
+		ax2.axhline(0, color='#16F9DA', linewidth=0.5, zorder=3)
+
+		# spine coloring
+		spine_ls = ['top', 'bottom', 'left', 'right']
+		for ax, spine in zip([ax1, ax2], spine_ls):
+			plt.setp(ax.spines.values(), color='#F9A438')
 
 		# snuggly fasceting subplots if plotting to external figure
 		if not sub:
@@ -319,8 +336,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# plot signal amplitude/time
 		time = left.size / sample_rate # only left size because otherwise will be double the amount of time
-		ax1.plot(np.linspace(0.0, time, left.size), left, color='indigo')
-		ax2.plot(np.linspace(0.0, time, right.size), right, color='indigo')
+		ax1.plot(np.linspace(0.0, time, left.size), left, color='#F9A438')
+		ax2.plot(np.linspace(0.0, time, right.size), right, color='#F9A438')
 
 		# Multicursor
 		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
@@ -333,8 +350,11 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 			reset_button_ax = fig.add_axes([0.465, 0.385, 0.0125, 0.01]) # axes left, bottom, width, height
 		else:
 			reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
-		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
+		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='#F0191C')
 		reset_button.label.set_size('x-small')
+		reset_button.label.set_color('#F9A438')
+		for spine in spine_ls:
+			reset_button_ax.spines[spine].set_color('#F9A438')
 		def reset_button_on_clicked(mouse_event):
 			ax1.set_xlim(state['start_xlim1'])
 			ax2.set_xlim(state['start_xlim2'])
@@ -385,12 +405,17 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	ax.set_title(title, color='#F9A438', fontsize='medium')
 	ax.set_xlabel('Frequency (hz)', color='#F9A438', fontsize='x-small')
 	ax.set_ylabel('Magnitude (dB)', color='#F9A438', fontsize='x-small')
-	ax.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
+	ax.tick_params(axis='both', which='major', color='#F9A438', labelsize=6, labelcolor='#F9A438')
+
+	# spine coloring
+	spine_ls = ['top', 'bottom', 'left', 'right']
+	for spine in spine_ls:
+		ax.spines[spine].set_color('#F9A438')
 
 	# mono
 	if channels == '1':
 		# initial ax
-		sig, fq, line = ax.magnitude_spectrum(array, Fs=sample_rate, color='indigo')
+		sig, fq, line = ax.magnitude_spectrum(array, Fs=sample_rate, color='#F9A438')
 		state['line'] = line
 
 	# making room for LRSUM &/or Lindb button axes
@@ -418,7 +443,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		mid, side = split(msarray, channels, name)
 
 		# initial axis
-		sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate, color='indigo')
+		sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate, color='#F9A438')
 
 		# state variable dictionary to keep track of plot status for button changes
 		state.update({'L': left, 'R': right, 'Sum': sumsig, 'Mid': mid, 'Side': side, 'data': left, 'line': line})
@@ -430,7 +455,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 			rax = plt.axes([0.08, 0.26, 0.04, 0.0835], facecolor=button_face_color, frame_on=False)
 
 		# LRSUM button
-		lrsums = RadioButtons(rax, ('L', 'R', 'Sum', 'Mid', 'Side'), activecolor='indigo')
+		lrsums = RadioButtons(rax, ('L', 'R', 'Sum', 'Mid', 'Side'), activecolor='#16F9DA')
 
 		# Side callback function for lrsums buttons
 		def side(label):
@@ -438,7 +463,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 			state['line'].remove()
 			
 			# plot
-			sig, fq, line = ax.magnitude_spectrum(state[label], Fs=sample_rate, scale=state['scale'], color='indigo')
+			sig, fq, line = ax.magnitude_spectrum(state[label], Fs=sample_rate, scale=state['scale'], color='#F9A438')
 			
 			# recompute axis limits
 			ax.relim()
@@ -451,9 +476,10 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		# connect button click event to side callback function
 		lrsums.on_clicked(side)
 
-		# labelsize for LRSUM buttons
+		# labelsize & color for LRSUM buttons
 		for label in lrsums.labels:
 			label.set_fontsize('small')
+			label.set_color('#F9A438')
 
 		# dynamically resize radio button height with figure size & setting color and width of button edges
 		rpos = rax.get_position().get_points()
@@ -462,7 +488,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		rscale = (rpos[:,1].ptp() / rpos[:,0].ptp()) * (fh / fw)
 		for circ in lrsums.circles:
 			circ.height /= rscale
-			circ.set_edgecolor('w')
+			circ.set_edgecolor('#F9A438')
 			circ.set_lw(0.5)
 
 	# Linear dB button axis (left, bottom, width, height)
@@ -472,7 +498,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		rax = plt.axes([0.08, 0.2, 0.04, 0.05], facecolor=button_face_color, frame_on=False)
 
 	# Linear dB buttons
-	lindB = RadioButtons(rax, ('Lin', 'dB'), activecolor='indigo')
+	lindB = RadioButtons(rax, ('Lin', 'dB'), activecolor='#16F9DA')
 
 	# state variable dictionary of starting axis limits
 	xlim = ax.get_xlim()
@@ -485,7 +511,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		state['line'].remove()
 		
 		# plot
-		sig, fq, line = ax.magnitude_spectrum(state['data'], Fs=sample_rate, scale=state[label], color='indigo')
+		sig, fq, line = ax.magnitude_spectrum(state['data'], Fs=sample_rate, scale=state[label], color='#F9A438')
 		
 		# recompute axis limits
 		ax.relim()
@@ -501,9 +527,10 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	# connect button click event to scale callback function
 	lindB.on_clicked(scale)
 
-	# labelsize
+	# labelsize & color
 	for label in lindB.labels:
 		label.set_fontsize('small')
+		label.set_color('#F9A438')
 
 	# dynamically resize radio button height with figure size
 	rpos = rax.get_position().get_points()
@@ -512,7 +539,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	rscale = (rpos[:,1].ptp() / rpos[:,0].ptp()) * (fh / fw)
 	for circ in lindB.circles:
 		circ.height /= rscale
-		circ.set_edgecolor('w')
+		circ.set_edgecolor('#F9A438')
 		circ.set_lw(0.5)
 
 	# zoom reset view button & axes
@@ -522,8 +549,11 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
 
 	# zoom reset view button
-	reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
+	reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='#16F9DA')
 	reset_button.label.set_size('x-small')
+	reset_button.label.set_color('#F9A438')
+	for spine in spine_ls:
+			reset_button_ax.spines[spine].set_color('#F9A438')
 
 	# callback function for zoom reset button
 	def reset_button_on_clicked(mouse_event):
@@ -571,7 +601,12 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		ax.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
 		ax.set_ylabel('Frequency (kHz)', color='#F9A438', fontsize='x-small')
 		ax.set_title(title, color='#F9A438', fontsize='medium')
-		ax.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
+		ax.tick_params(axis='both', which='major', color='#F9A438', labelsize=6, labelcolor='#F9A438')
+
+		# spine coloring
+		spine_ls = ['top', 'bottom', 'left', 'right']
+		for spine in ['top', 'bottom', 'left', 'right']:
+			ax.spines[spine].set_color('#F9A438')
 		
 		# plot spectrogram
 		spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma', vmin=-120, vmax=0)
@@ -585,8 +620,8 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768])	# left, bottom, width, height
 		else:
 			cbar_ax = fig.add_axes([0.905, 0.53, 0.003, 0.35])	# left, bottom, width, height
-		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', fontsize='x-small')
-		cbar_ax.tick_params(color='#F9A438', labelsize=5)
+		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', color='#F9A438', fontsize='x-small')
+		cbar_ax.tick_params(color='#F9A438', labelsize=5, labelcolor='#F9A438')
 		
 		# limit y axis to human hearing range
 		ax.set_ylim([0, 20000])
@@ -607,6 +642,9 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		# reset button
 		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
 		reset_button.label.set_size('x-small')
+		reset_button.label.set_color('#F9A438')
+		for spine in spine_ls:
+			reset_button_ax.spines[spine].set_color('#F9A438')
 		def reset_button_on_clicked(mouse_event):
 			ax.set_xlim(state['start_xlim'])
 			ax.set_ylim(state['start_ylim'])
@@ -642,11 +680,16 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		ax1.set_ylabel('Left Frequency (kHz)', color='#F9A438', fontsize='x-small')
 		ax2.set_ylabel('Right Frequency (kHz)', color='#F9A438', fontsize='x-small')
 		ax1.set_title(title, color='#F9A438', fontsize='medium')
-		ax1.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
-		ax2.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
+		ax1.tick_params(axis='both', which='major', color='#F9A438', labelsize=6, labelcolor='#F9A438')
+		ax2.tick_params(axis='both', which='major', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
 		# x axis on top
 		ax1.xaxis.tick_top()
+
+		# spine coloring
+		spine_ls = ['top', 'bottom', 'left', 'right']
+		for ax, spine in zip([ax1, ax2], spine_ls):
+			plt.setp(ax.spines.values(), color='#F9A438')
 		
 		# plot spectrograms
 		specl, fql, tl, iml = ax1.specgram(left, Fs=sample_rate, cmap='magma', vmin=-120, vmax=0)
@@ -661,8 +704,8 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77]) # left, bottom, width, height
 		else:
 			cbar_ax = fig.add_axes([0.905, 0.414, 0.003, 0.466]) # left, bottom, width, height
-		fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', fontsize='x-small')
-		cbar_ax.tick_params(color='#F9A438', labelsize=6)
+		fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', color='#F9A438', fontsize='x-small')
+		cbar_ax.tick_params(color='#F9A438', labelsize=6, labelcolor='#F9A438')
 		
 		# limit y axes to human hearing range
 		ax1.set_ylim([0, 20000])
@@ -686,6 +729,9 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			reset_button_ax = fig.add_axes([0.79, 0.03, 0.05, 0.03])
 		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='indigo')
 		reset_button.label.set_size('x-small')
+		reset_button.label.set_color('#F9A438')
+		for spine in spine_ls:
+			reset_button_ax.spines[spine].set_color('#F9A438')
 		def reset_button_on_clicked(mouse_event):
 			ax1.set_xlim(state['start_xlim1'])
 			ax2.set_xlim(state['start_xlim2'])
@@ -731,7 +777,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 		title = 'Polar Dot Per Sample Vectorscope of %s' % name
 		if sub:
 			title = 'Polar Dot Per Sample Vectorscope'
-		ax.scatter(theta, r, s=0.25, c='indigo')
+		ax.scatter(theta, r, s=0.25, c='#F9A438')
 		
 		# set title & bring down close to top of plot
 		if sub:
@@ -744,9 +790,13 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 		ax.set_yticklabels([])
 		ax.set_xticklabels([])
 		ax.grid(False, axis='y')
+		ax.spines['polar'].set_color('#F9A438')
 
 		# plotting only 2 theta grids
 		ax.set_thetagrids((135.0, 45.0))
+
+		# thetagrid color
+		ax.xaxis.grid(color='#F9A438')
 
 		# compensating for partial polar plot extra whitespace: left, bottom, width, height
 		if sub is False:
