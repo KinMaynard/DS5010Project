@@ -241,9 +241,9 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		if sub:
 			title = 'Waveform'
 		ax.set_title(title, color='#F9A438', fontsize='medium')
-		ax.set_xlabel('Time (s)', fontsize='x-small')
-		ax.set_ylabel('Amplitude', fontsize='x-small')
-		ax.tick_params(axis='both', which='major', labelsize=6)
+		ax.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
+		ax.set_ylabel('Amplitude', color='#F9A438', fontsize='x-small')
+		ax.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
 		ax.margins(0.001)
 
 		# adding gridline on 0 above data
@@ -298,17 +298,17 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		if sub:
 			title = 'Waveform'
 		ax1.set_title(title, color='#F9A438', fontsize='medium')
-		ax2.set_xlabel('Time (s)', fontsize='x-small')
-		ax1.set_ylabel('Amplitude Left', fontsize='x-small')
-		ax2.set_ylabel('Amplitude Right', fontsize='x-small')
-		ax1.tick_params(axis='both', which='major', labelsize=6)
-		ax2.tick_params(axis='both', which='major', labelsize=6)
+		ax2.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
+		ax1.set_ylabel('Amplitude Left', color='#F9A438', fontsize='x-small')
+		ax2.set_ylabel('Amplitude Right', color='#F9A438', fontsize='x-small')
+		ax1.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
+		ax2.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
 		ax1.margins(0.001)
 		ax2.margins(0.001)
 
 		# adding gridline on 0 above data
-		ax1.axhline(0, linewidth=0.5, zorder=3)
-		ax2.axhline(0, linewidth=0.5, zorder=3)
+		ax1.axhline(0, color='#F9A438', linewidth=0.5, zorder=3)
+		ax2.axhline(0, color='#F9A438', linewidth=0.5, zorder=3)
 
 		# snuggly fasceting subplots if plotting to external figure
 		if not sub:
@@ -383,9 +383,9 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	if sub:
 		title = 'Magnitude Spectrum'
 	ax.set_title(title, color='#F9A438', fontsize='medium')
-	ax.set_xlabel('Frequency (hz)', fontsize='x-small')
-	ax.set_ylabel('Magnitude (dB)', fontsize='x-small')
-	ax.tick_params(axis='both', which='major', labelsize=6)
+	ax.set_xlabel('Frequency (hz)', color='#F9A438', fontsize='x-small')
+	ax.set_ylabel('Magnitude (dB)', color='#F9A438', fontsize='x-small')
+	ax.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
 
 	# mono
 	if channels == '1':
@@ -568,10 +568,10 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		title = '%s Spectrogram' % name
 		if sub:
 			title = 'Spectrogram'
-		ax.set_xlabel('Time (s)', fontsize='x-small')
-		ax.set_ylabel('Frequency (kHz)', fontsize='x-small')
+		ax.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
+		ax.set_ylabel('Frequency (kHz)', color='#F9A438', fontsize='x-small')
 		ax.set_title(title, color='#F9A438', fontsize='medium')
-		ax.tick_params(axis='both', which='major', labelsize=6)
+		ax.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
 		
 		# plot spectrogram
 		spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma', vmin=-120, vmax=0)
@@ -586,7 +586,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		else:
 			cbar_ax = fig.add_axes([0.905, 0.53, 0.003, 0.35])	# left, bottom, width, height
 		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', fontsize='x-small')
-		cbar_ax.tick_params(labelsize=5)
+		cbar_ax.tick_params(color='#F9A438', labelsize=5)
 		
 		# limit y axis to human hearing range
 		ax.set_ylim([0, 20000])
@@ -638,12 +638,12 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		title = '%s Spectrogram' % name
 		if sub:
 			title = 'Spectrogram'
-		ax2.set_xlabel('Time (s)', fontsize='x-small')
-		ax1.set_ylabel('Left Frequency (kHz)', fontsize='x-small')
-		ax2.set_ylabel('Right Frequency (kHz)', fontsize='x-small')
+		ax2.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
+		ax1.set_ylabel('Left Frequency (kHz)', color='#F9A438', fontsize='x-small')
+		ax2.set_ylabel('Right Frequency (kHz)', color='#F9A438', fontsize='x-small')
 		ax1.set_title(title, color='#F9A438', fontsize='medium')
-		ax1.tick_params(axis='both', which='major', labelsize=6)
-		ax2.tick_params(axis='both', which='major', labelsize=6)
+		ax1.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
+		ax2.tick_params(axis='both', which='major', color='#F9A438', labelsize=6)
 
 		# x axis on top
 		ax1.xaxis.tick_top()
@@ -662,7 +662,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		else:
 			cbar_ax = fig.add_axes([0.905, 0.414, 0.003, 0.466]) # left, bottom, width, height
 		fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', fontsize='x-small')
-		cbar_ax.tick_params(labelsize=6)
+		cbar_ax.tick_params(color='#F9A438', labelsize=6)
 		
 		# limit y axes to human hearing range
 		ax1.set_ylim([0, 20000])
