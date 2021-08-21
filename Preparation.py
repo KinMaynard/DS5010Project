@@ -811,7 +811,10 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 		
 		# set title & bring down close to top of plot
 		if sub:
-			ax.set_title(title, color='#F9A438', fontsize='medium', pad=-105)
+			if channels == '1':
+				ax.set_title(title, color='#F9A438', fontsize='medium', pad=-140)
+			else:
+				ax.set_title(title, color='#F9A438', fontsize='medium', pad=-105)
 		else:
 			ax.set_title(title, color='#F9A438', fontsize='medium', pad=-70)
 
@@ -833,7 +836,10 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 			ax.set_position([0.1, 0.05, 0.8, 1])
 
 		else:
-			ax.set_position([0.6, -0.772, 0.245, 2])
+			if channels == '1':
+				ax.set_position([0.55, -0.735, 0.350, 2.023]) # left, bottom, width, height
+			else:
+				ax.set_position([0.6, -0.772, 0.245, 2])
 
 		# individual figure or as part of larger figure
 		if sub:
@@ -864,7 +870,7 @@ def visualizer(array, name, channels, sample_rate, code):
 	mpl.rcParams['font.sans-serif'] = 'Helvetica'
 	
 	# Title
-	plt.suptitle('%s Visualization' % name, color='#F9A438', fontsize='large')
+	plt.suptitle('%s VISUALIZATION' % name, color='#F9A438', fontsize='xx-large', fontweight=900)
 
 	# gridspec to snugly fascet only stereo spectrogram and waveform plots
 	# initialize for mono case
@@ -907,7 +913,7 @@ def visualizer(array, name, channels, sample_rate, code):
 
 if __name__ == '__main__':
 	questions = [inquirer.Checkbox('tests', message='Which tests to run?', 
-		choices=['Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 
+		choices=['Mono', 'Stereo', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 
 		'Vectorscope', 'Visualizer'],),]
 
 	answers = inquirer.prompt(questions)
@@ -916,101 +922,122 @@ if __name__ == '__main__':
 	mono = '../binaries/hdchirp_88k_-3dBFS_lin.wav'
 	stereo = '../binaries/hdchirp_88k_-3dBFS_lin_Stereo.aiff'
 
-	if 'Normalize' in answers['tests']:
-		# mono
-		name, channels, data, subtype, sample_rate = import_array(mono)
-		# before normalization
-		waveform(data, name, channels, sample_rate)
-		data = normalize(data)
-		# after normalization
-		waveform(data, name, channels, sample_rate)
+	if 'Mono' in answers['tests']:
+		if 'Normalize' in answers['tests']:
+			# mono
+			name, channels, data, subtype, sample_rate = import_array(mono)
+			# before normalization
+			waveform(data, name, channels, sample_rate)
+			data = normalize(data)
+			# after normalization
+			waveform(data, name, channels, sample_rate)
 
-		# stereo
-		name, channels, data, subtype, sample_rate = import_array(stereo)
-		# before normalization
-		waveform(data, name, channels, sample_rate)
-		data = normalize(data)
-		# after normalization
-		waveform(data, name, channels, sample_rate)
+		if 'Midside' in answers['tests']:
+			# midside encoding test mono
+			name, channels, data, subtype, sample_rate = import_array(mono)
+			encoded, ms = midside(data, channels, name)
+			print(encoded, ms)
 
-	if 'Midside' in answers['tests']:
-		# midside encoding test mono
-		name, channels, data, subtype, sample_rate = import_array(mono)
-		encoded, ms = midside(data, channels, name)
-		print(encoded, ms)
+		if 'Invert' in answers['tests']:
+			# Polarity inversion test
+			name, channels, data, subtype, sample_rate = import_array(mono)
+			print(data)
+			print(invert(data))
 
-		# midside encoding test stereo
-		name, channels, data, subtype, sample_rate = import_array(stereo)
-		encoded, ms = midside(data, channels, name)
-		print(encoded, ms)
+		if 'Reverse' in answers['tests']:
+			# Reverse array test
+			name, channels, data, subtype, sample_rate = import_array(mono)
+			print(data)
+			print(reverse(data))
 
-		# midside decoding test stereo
-		decoded, ms = midside(encoded, channels, name, code=False)
-		print(decoded, ms)
+		if 'Waveform' in answers['tests']:
+			# Waveform plot test case mono file
+			name, channels, data, subtype, sample_rate = import_array(mono)
+			waveform(data, name, channels, sample_rate)
 
-	if 'Invert' in answers['tests']:
-		# Polarity inversion test
-		name, channels, data, subtype, sample_rate = import_array(stereo)
-		print(data)
-		print(invert(data))
+		if 'Magnitude' in answers['tests']:
+			# magnitude test mono file
+			name, channels, data, subtype, sample_rate = import_array(mono)
+			magnitude(data, name, channels, sample_rate)
 
-	if 'Reverse' in answers['tests']:
-		# Reverse array test
-		name, channels, data, subtype, sample_rate = import_array(stereo)
-		print(data)
-		print(reverse(data))
+		if 'Spectrogram' in answers['tests']:
+			# spectrogram test case mono file
+			name, channels, data, subtype, sample_rate = import_array(mono)
+			# prevents divide by zero runtime exception
+			data = trim(data)
+			spectrogram(data, name, channels, sample_rate)
 
-	if 'Waveform' in answers['tests']:
-		# Waveform plot test case mono file
-		name, channels, data, subtype, sample_rate = import_array(mono)
-		waveform(data, name, channels, sample_rate)
+		if 'Vectorscope' in answers['tests']:
+			# vectorscope mono test
+			name, channels, data, subtype, sample_rate = import_array(mono)
+			vectorscope(data, name, False)
 
-		# Waveform plot test case stereo file
-		name, channels, data, subtype, sample_rate = import_array(stereo)
-		waveform(data, name, channels, sample_rate)
+		if 'Visualizer' in answers['tests']:
+			# visualizer mono plot
+			name, channels, data, subtype, sample_rate = import_array(mono)
+			visualizer(data, name, channels, sample_rate, code=False)
 
-	if 'Magnitude' in answers['tests']:
-		# magnitude test mono file
-		name, channels, data, subtype, sample_rate = import_array(mono)
-		magnitude(data, name, channels, sample_rate)
+	if 'Stereo' in answers['tests']:
+		if 'Normalize' in answers['tests']:
+			# stereo
+			name, channels, data, subtype, sample_rate = import_array(stereo)
+			# before normalization
+			waveform(data, name, channels, sample_rate)
+			data = normalize(data)
+			# after normalization
+			waveform(data, name, channels, sample_rate)
 
-		# magnitude test stereo file
-		name, channels, data, subtype, sample_rate = import_array(stereo)
-		magnitude(data, name, channels, sample_rate)
+		if 'Midside' in answers['tests']:
+			# midside encoding test stereo
+			name, channels, data, subtype, sample_rate = import_array(stereo)
+			encoded, ms = midside(data, channels, name)
+			print(encoded, ms)
 
-	if 'Spectrogram' in answers['tests']:
-		# spectrogram test case mono file
-		name, channels, data, subtype, sample_rate = import_array(mono)
-		# prevents divide by zero runtime exception
-		data = trim(data)
-		spectrogram(data, name, channels, sample_rate)
+			# midside decoding test stereo
+			decoded, ms = midside(encoded, channels, name, code=False)
+			print(decoded, ms)
 
-		# spectrogram test case stereo file
-		name, channels, data, subtype, sample_rate = import_array(stereo)
-		# prevents divide by zero runtime exception
-		data = trim(data)
-		spectrogram(data, name, channels, sample_rate)
+		if 'Invert' in answers['tests']:
+			# Polarity inversion test
+			name, channels, data, subtype, sample_rate = import_array(stereo)
+			print(data)
+			print(invert(data))
 
-	if 'Vectorscope' in answers['tests']:
-		# vectorscope mono test
-		name, channels, data, subtype, sample_rate = import_array(mono)
-		vectorscope(data, name, False)
+		if 'Reverse' in answers['tests']:
+			# Reverse array test
+			name, channels, data, subtype, sample_rate = import_array(stereo)
+			print(data)
+			print(reverse(data))
 
-		# vectorscope stereo test
-		name, channels, data, subtype, sample_rate = import_array(stereo)
-		vectorscope(data, name, False)
+		if 'Waveform' in answers['tests']:
+			# Waveform plot test case stereo file
+			name, channels, data, subtype, sample_rate = import_array(stereo)
+			waveform(data, name, channels, sample_rate)
 
-		# Stereo test left channel only
-		name, channels, data, subtype, sample_rate = import_array(stereo)
-		data[:,1] = 0
-		vectorscope(data, name, False)
+		if 'Magnitude' in answers['tests']:
+			# magnitude test stereo file
+			name, channels, data, subtype, sample_rate = import_array(stereo)
+			magnitude(data, name, channels, sample_rate)
 
-	if 'Visualizer' in answers['tests']:
-		# visualizer mono plot
-		name, channels, data, subtype, sample_rate = import_array(mono)
-		visualizer(data, name, channels, sample_rate, code=False)
+		if 'Spectrogram' in answers['tests']:
+			# spectrogram test case stereo file
+			name, channels, data, subtype, sample_rate = import_array(stereo)
+			# prevents divide by zero runtime exception
+			data = trim(data)
+			spectrogram(data, name, channels, sample_rate)
 
-		# visualizer stereo plot
-		name, channels, data, subtype, sample_rate = import_array(stereo)
-		visualizer(data, name, channels, sample_rate, code=False)
+		if 'Vectorscope' in answers['tests']:
+			# vectorscope stereo test
+			name, channels, data, subtype, sample_rate = import_array(stereo)
+			vectorscope(data, name, False)
+
+			# Stereo test left channel only
+			name, channels, data, subtype, sample_rate = import_array(stereo)
+			data[:,1] = 0
+			vectorscope(data, name, False)
+
+		if 'Visualizer' in answers['tests']:
+			# visualizer stereo plot
+			name, channels, data, subtype, sample_rate = import_array(stereo)
+			visualizer(data, name, channels, sample_rate, code=False)
 
