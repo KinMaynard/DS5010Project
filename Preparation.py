@@ -224,6 +224,10 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 	fig: external figure to plot onto if provided, default = None
 	returns: waveform plot of intensity/time either alone or as part of provided fig
 	'''
+	# Font
+	mpl.rcParams['font.family'] = 'sans-serif'
+	mpl.rcParams['font.sans-serif'] = 'Helvetica'
+
 	# mono
 	if channels == '1':
 		# dark background white text, initilize figure and axes
@@ -238,12 +242,12 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 			ax = fig.add_subplot(221)
 
 		# labeling axes & title
-		title = '%s Waveform' % name
+		title = '%s WAVEFORM' % name
 		if sub:
-			title = 'Waveform'
+			title = 'WAVEFORM'
 		ax.set_title(title, color='#F9A438', fontsize='medium')
-		ax.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
-		ax.set_ylabel('Amplitude', color='#F9A438', fontsize='x-small')
+		ax.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
+		ax.set_ylabel('AMPLITUDE', color='#F9A438', fontsize='x-small')
 		ax.minorticks_on()
 		ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 		ax.margins(0.001)
@@ -265,12 +269,12 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# zoom reset view button & axes
 		if sub:
-			reset_button_ax = fig.add_axes([0.465, 0.502, 0.0125, 0.01]) # left, bottom, width, height
+			reset_button_ax = fig.add_axes([0.463, 0.502, 0.0145, 0.01]) # left, bottom, width, height
 		else:
-			reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
+			reset_button_ax = fig.add_axes([0.84, 0.03, 0.06, 0.03])
 
 		# reset button
-		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='#7E0000')
+		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
 		reset_button.label.set_size('x-small')
 		reset_button.label.set_color('#F0191C')
 		for spine in spine_ls:
@@ -304,13 +308,13 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 			ax2 = fig.add_subplot(gridspec[1, 0], sharex=ax1, sharey=ax1)
 
 		# labeling axes & title
-		title = '%s Waveform' % name
+		title = '%s WAVEFORM' % name
 		if sub:
-			title = 'Waveform'
+			title = 'WAVEFORM'
 		ax1.set_title(title, color='#F9A438', fontsize='medium')
-		ax2.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
-		ax1.set_ylabel('Amplitude Left', color='#F9A438', fontsize='x-small')
-		ax2.set_ylabel('Amplitude Right', color='#F9A438', fontsize='x-small')
+		ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
+		ax1.set_ylabel('AMPLITUDE LEFT', color='#F9A438', fontsize='x-small')
+		ax2.set_ylabel('AMPLITUDE RIGHT', color='#F9A438', fontsize='x-small')
 		ax1.minorticks_on()
 		ax2.minorticks_on()
 		ax1.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
@@ -347,10 +351,10 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# zoom reset view button
 		if sub: 
-			reset_button_ax = fig.add_axes([0.465, 0.385, 0.0125, 0.01]) # axes left, bottom, width, height
+			reset_button_ax = fig.add_axes([0.463, 0.385, 0.0145, 0.01]) # axes left, bottom, width, height
 		else:
-			reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
-		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='#7E0000')
+			reset_button_ax = fig.add_axes([0.84, 0.03, 0.06, 0.03])
+		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
 		reset_button.label.set_size('x-small')
 		reset_button.label.set_color('#F0191C')
 		for spine in spine_ls:
@@ -383,7 +387,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	'''
 
 	# dictionary of state variables
-	state = {'Lin': 'linear', 'dB': 'dB', 'scale': 'linear'}
+	state = {'LIN': 'linear', 'dB': 'dB', 'scale': 'linear'}
 
 	# dark background white text, initilize figure and axes
 	plt.style.use('dark_background')
@@ -398,13 +402,15 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		else:
 			ax = fig.add_subplot(gridspec[0, 0])
 
+	# Font
+	mpl.rcParams['font.family'] = 'sans-serif'
+	mpl.rcParams['font.sans-serif'] = 'Helvetica'
+
 	# labeling axes & title
-	title = '%s Magnitude Spectrum' % name
+	title = '%s MAGNITUDE SPECTRUM' % name
 	if sub:
-		title = 'Magnitude Spectrum'
+		title = 'MAGNITUDE SPECTRUM'
 	ax.set_title(title, color='#F9A438', fontsize='medium')
-	ax.set_xlabel('Frequency (hz)', color='#F9A438', fontsize='x-small')
-	ax.set_ylabel('Magnitude (dB)', color='#F9A438', fontsize='x-small')
 	ax.minorticks_on()
 	ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
@@ -447,7 +453,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate, color='#FB636F')
 
 		# state variable dictionary to keep track of plot status for button changes
-		state.update({'L': left, 'R': right, 'Sum': sumsig, 'Mid': mid, 'Side': side, 'data': left, 'line': line})
+		state.update({'L': left, 'R': right, 'SUM': sumsig, 'MID': mid, 'SIDE': side, 'data': left, 'line': line})
 
 		# LRSUM button axis (left, bottom, width, height)
 		if not sub:
@@ -456,7 +462,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 			rax = plt.axes([0.08, 0.26, 0.04, 0.0835], facecolor=button_face_color, frame_on=False)
 
 		# LRSUM button
-		lrsums = RadioButtons(rax, ('L', 'R', 'Sum', 'Mid', 'Side'), activecolor='#5C8BC6')
+		lrsums = RadioButtons(rax, ('L', 'R', 'SUM', 'MID', 'SIDE'), activecolor='#5C8BC6')
 
 		# Side callback function for lrsums buttons
 		def side(label):
@@ -468,6 +474,10 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 			
 			# recompute axis limits
 			ax.relim()
+
+			# Set Labels
+			ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize='x-small')
+			ax.set_ylabel('MAGNITUDE (%s)' % state['scale'], color='#F9A438', fontsize='x-small')
 			
 			# update state variables to new line & data
 			state['line'] = line
@@ -499,7 +509,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		rax = plt.axes([0.08, 0.2, 0.04, 0.05], facecolor=button_face_color, frame_on=False)
 
 	# Linear dB buttons
-	lindB = RadioButtons(rax, ('Lin', 'dB'), activecolor='#5C8BC6')
+	lindB = RadioButtons(rax, ('LIN', 'dB'), activecolor='#5C8BC6')
 
 	# state variable dictionary of starting axis limits
 	xlim = ax.get_xlim()
@@ -519,6 +529,10 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 
 		# scale the ax
 		ax.autoscale()
+
+		# Set Labels
+		ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize='x-small')
+		ax.set_ylabel('MAGNITUDE (%s)' % label, color='#F9A438', fontsize='x-small')
 		
 		# update state variables to new line & scale
 		state['line'] = line
@@ -543,14 +557,18 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		circ.set_edgecolor('#F9A438')
 		circ.set_lw(0.5)
 
+	# Axis Labels
+	ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize='x-small')
+	ax.set_ylabel('MAGNITUDE (LIN)', color='#F9A438', fontsize='x-small')
+
 	# zoom reset view button & axes
 	if sub:
-		reset_button_ax = fig.add_axes([0.465, 0.082, 0.0125, 0.01]) # left, bottom, width, height
+		reset_button_ax = fig.add_axes([0.463, 0.082, 0.0145, 0.01]) # left, bottom, width, height
 	else:
-		reset_button_ax = fig.add_axes([0.85, 0.03, 0.05, 0.03])
+		reset_button_ax = fig.add_axes([0.84, 0.03, 0.06, 0.03])
 
 	# zoom reset view button
-	reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='#7E0000')
+	reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
 	reset_button.label.set_size('x-small')
 	reset_button.label.set_color('#F0191C')
 	for spine in spine_ls:
@@ -583,6 +601,10 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 	fig: external figure to plot onto if provided, default = None
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
+	# Font
+	mpl.rcParams['font.family'] = 'sans-serif'
+	mpl.rcParams['font.sans-serif'] = 'Helvetica'
+
 	# Mono case
 	if channels == '1':
 		# dark background white text, initilize figure and axes
@@ -596,11 +618,11 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			ax = fig.add_subplot(222)
 
 		# labeling axes & title
-		title = '%s Spectrogram' % name
+		title = '%s SPECTROGRAM' % name
 		if sub:
-			title = 'Spectrogram'
-		ax.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
-		ax.set_ylabel('Frequency (kHz)', color='#F9A438', fontsize='x-small')
+			title = 'SPECTROGRAM'
+		ax.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
+		ax.set_ylabel('FREQUENCY (KHZ)', color='#F9A438', fontsize='x-small')
 		ax.set_title(title, color='#F9A438', fontsize='medium')
 		ax.minorticks_on()
 		ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
@@ -622,7 +644,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768])	# left, bottom, width, height
 		else:
 			cbar_ax = fig.add_axes([0.905, 0.53, 0.003, 0.35])	# left, bottom, width, height
-		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', color='#F9A438', fontsize='x-small')
+		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', fontsize='x-small')
 		cbar_ax.tick_params(color='#F9A438', labelsize=5, labelcolor='#F9A438')
 		
 		# limit y axis to human hearing range
@@ -637,12 +659,12 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
 		# zoom reset view button & axes
 		if sub:
-			reset_button_ax = fig.add_axes([0.888, 0.502, 0.0125, 0.01]) # left, bottom, width, height
+			reset_button_ax = fig.add_axes([0.886, 0.502, 0.0145, 0.01]) # left, bottom, width, height
 		else:
-			reset_button_ax = fig.add_axes([0.79, 0.03, 0.05, 0.03])
+			reset_button_ax = fig.add_axes([0.78, 0.03, 0.06, 0.03])
 
 		# reset button
-		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='#7E0000')
+		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
 		reset_button.label.set_size('x-small')
 		reset_button.label.set_color('#F0191C')
 		for spine in spine_ls:
@@ -675,12 +697,12 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			ax2 = fig.add_subplot(gridspec[1, 1], sharex=ax1, sharey=ax1)
 		
 		# labeling axes & title
-		title = '%s Spectrogram' % name
+		title = '%s SPECTROGRAM' % name
 		if sub:
-			title = 'Spectrogram'
-		ax2.set_xlabel('Time (s)', color='#F9A438', fontsize='x-small')
-		ax1.set_ylabel('Left Frequency (kHz)', color='#F9A438', fontsize='x-small')
-		ax2.set_ylabel('Right Frequency (kHz)', color='#F9A438', fontsize='x-small')
+			title = 'SPECTROGRAM'
+		ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
+		ax1.set_ylabel('LEFT FREQUENCY (KHZ)', color='#F9A438', fontsize='x-small')
+		ax2.set_ylabel('RIGHT FREQUENCY (KHZ)', color='#F9A438', fontsize='x-small')
 		ax1.set_title(title, color='#F9A438', fontsize='medium')
 		ax1.minorticks_on()
 		ax2.minorticks_on()
@@ -708,7 +730,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77]) # left, bottom, width, height
 		else:
 			cbar_ax = fig.add_axes([0.905, 0.414, 0.003, 0.466]) # left, bottom, width, height
-		fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('Amplitude (dB)', color='#F9A438', fontsize='x-small')
+		fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', fontsize='x-small')
 		cbar_ax.tick_params(color='#F9A438', labelsize=6, labelcolor='#F9A438')
 		
 		# limit y axes to human hearing range
@@ -728,10 +750,10 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
 		# zoom reset view button
 		if sub: 
-			reset_button_ax = fig.add_axes([0.888, 0.385, 0.0125, 0.01]) # axes left, bottom, width, height
+			reset_button_ax = fig.add_axes([0.886, 0.385, 0.0145, 0.01]) # axes left, bottom, width, height
 		else:
-			reset_button_ax = fig.add_axes([0.79, 0.03, 0.05, 0.03])
-		reset_button = Button(reset_button_ax, 'Reset', color='black', hovercolor='#7E0000')
+			reset_button_ax = fig.add_axes([0.78, 0.03, 0.06, 0.03])
+		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
 		reset_button.label.set_size('x-small')
 		reset_button.label.set_color('#F0191C')
 		for spine in spine_ls:
@@ -772,15 +794,19 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 			else:
 				ax = fig.add_subplot(gridspec[0, 1], polar=True)
 
+		# Font
+		mpl.rcParams['font.family'] = 'sans-serif'
+		mpl.rcParams['font.sans-serif'] = 'Helvetica'
+
 		# converting cartesian coordinates to polar
 		absarray = np.absolute(array)
 		r = np.sqrt(np.sum(np.square(array), axis=1))
 		theta = np.arctan2(absarray[:,0], array[:,1])
 		
 		# plotting
-		title = 'Polar Dot Per Sample Vectorscope of %s' % name
+		title = '%s POLAR DOT PER SAMPLE VECTORSCOPE' % name
 		if sub:
-			title = 'Polar Dot Per Sample Vectorscope'
+			title = 'POLAR DOT PER SAMPLE VECTORSCOPE'
 		ax.scatter(theta, r, s=0.25, c='#4B9D39')
 		
 		# set title & bring down close to top of plot
@@ -832,6 +858,12 @@ def visualizer(array, name, channels, sample_rate, code):
 	# initialize figure with dark background and title
 	plt.style.use('dark_background')
 	fig = plt.figure(figsize=(26, 13.5))
+
+	# Font
+	mpl.rcParams['font.family'] = 'sans-serif'
+	mpl.rcParams['font.sans-serif'] = 'Helvetica'
+	
+	# Title
 	plt.suptitle('%s Visualization' % name, color='#F9A438', fontsize='large')
 
 	# gridspec to snugly fascet only stereo spectrogram and waveform plots
