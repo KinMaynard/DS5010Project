@@ -912,24 +912,34 @@ def visualizer(array, name, channels, sample_rate, code):
 	plt.show()
 
 if __name__ == '__main__':
+	# Test selector
 	questions = [inquirer.Checkbox('tests', message='Which tests to run?', 
 		choices=['Mono', 'Stereo', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 
 		'Vectorscope', 'Visualizer'],),]
 
 	answers = inquirer.prompt(questions)
 
-	# test files
-	mono = '../binaries/hdchirp_88k_-3dBFS_lin.wav'
-	stereo = '../binaries/hdchirp_88k_-3dBFS_lin_Stereo.aiff'
-
 	if 'Mono' in answers['tests']:
+		# Waveform to perform tests on
+		questions2 = [inquirer.List('waves', message='Which mono wave to test?', 
+			choices=[('Silence', '../binaries/silence_44100_-infdBFS_Mono.aiff'), ('White Noise', '../binaries/white_88k_-3dBFS.wav'), 
+			('Linear Chirp', '../binaries/hdchirp_88k_-3dBFS_lin.wav'), ('Sin 100Hz', '../binaries/sin_44100_100Hz_-3dBFS_1s.wav'), 
+			('Sweep 1-44kHz', '../binaries/hdsweep_1Hz_44000Hz_-3dBFS_30s.wav')],
+			default=('White Noise', '../binaries/white_88k_-3dBFS.wav')),]
+
+		answers2 = inquirer.prompt(questions2)
+
+		mono = answers2['waves']
+		
 		if 'Normalize' in answers['tests']:
 			# mono
 			name, channels, data, subtype, sample_rate = import_array(mono)
 			# before normalization
+			print('Waveform before normalization.')
 			waveform(data, name, channels, sample_rate)
 			data = normalize(data)
 			# after normalization
+			print('Waveform after normalization.')
 			waveform(data, name, channels, sample_rate)
 
 		if 'Midside' in answers['tests']:
@@ -978,6 +988,17 @@ if __name__ == '__main__':
 			visualizer(data, name, channels, sample_rate, code=False)
 
 	if 'Stereo' in answers['tests']:
+		# Waveform to perform tests on
+		questions2 = [inquirer.List('waves', message='Which stereo wave to test?', 
+			choices=[('Silence Stereo', '../binaries/silence_44100_-infdBFS_Stereo.aiff'), ('White Noise Stereo', '../binaries/whitenoise_44100_0dBFS_Stereo.aiff'), 
+			('Chirp Stereo', '../binaries/hdchirp_88k_-3dBFS_lin_Stereo.aiff'), ('Sin 440Hz Stereo', '../binaries/sin_44100_440Hz_-.8dBFS_Stereo.aiff'), 
+			('Lopez Song Stereo', '../binaries/Saija Original Mix.aiff')],
+			default=('White Noise Stereo', '../binaries/whitenoise_44100_0dBFS_Stereo.aiff')),]
+
+		answers2 = inquirer.prompt(questions2)
+
+		stereo = answers2['waves']
+
 		if 'Normalize' in answers['tests']:
 			# stereo
 			name, channels, data, subtype, sample_rate = import_array(stereo)
