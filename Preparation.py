@@ -12,13 +12,15 @@ from matplotlib.widgets import MultiCursor, RadioButtons, Button
 import matplotlib.gridspec as gridspec
 
 # use backend that supports animation & blitting
-mpl.use('Qt5Agg')
+# mpl.use('Qt5Agg')
 
-def import_array(file):
+def import_array(file, buffer=1024, overlap=0):
 	'''
 	Import audio file as 64 bit float array
 	file: audio file
-	returns: a filename, number of channels, data (a 64 bit float numpy array of audio data), subtype: the files subtype, sample rate
+	buffer: buffer size for block generator [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384] or default None
+	returns: a filename, number of channels, data (a 64 bit float numpy array of audio data), 
+			subtype: the files subtype, sample rate and a blockwise generator.
 	'''
 	# extracting the filename and subtype from soundfile's info object
 	info = str(sf.info(file))
@@ -32,7 +34,10 @@ def import_array(file):
 
 	# reading the audio file as a soundfile numpy array
 	data, sample_rate = sf.read(file)
-	return name, channels, data, subtype, sample_rate
+
+	# creating block generator
+	blocks = sf.blocks(file, blocksize=buffer, overlap=overlap, sample_rate=sample_rate, channels=channels)
+	return name, channels, data, subtype, sample_rate, blocks
 
 def mask(array):
 	'''
@@ -250,7 +255,6 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		ax.set_ylabel('AMPLITUDE', color='#F9A438', fontsize='x-small')
 		ax.minorticks_on()
 		ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
-		ax.margins(0.001)
 
 		# spine coloring
 		spine_ls = ['top', 'bottom', 'left', 'right']
@@ -262,7 +266,11 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# plot signal amplitude/time
 		time = array.size / sample_rate # seconds in file
-		ax.plot(np.linspace(0.0, time, array.size), array, color='#16F9DA')
+		line = np.stack((np.linspace(0.0, time, array.size), array), axis=-1)
+		col = mpl.collections.LineCollection([line], color='#16F9DA')
+		ax.add_collection(col, autolim=True)
+
+		ax.margins(0.001)
 
 		# state variable dictionary of starting axis limits
 		state = {'start_xlim': ax.get_xlim(), 'start_ylim': ax.get_ylim()}
@@ -319,8 +327,6 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		ax2.minorticks_on()
 		ax1.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 		ax2.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
-		ax1.margins(0.001)
-		ax2.margins(0.001)
 
 		# adding gridline on 0 above data
 		ax1.axhline(0, color='#F9A438', linewidth=0.5, zorder=3)
@@ -340,14 +346,22 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# plot signal amplitude/time
 		time = left.size / sample_rate # only left size because otherwise will be double the amount of time
-		ax1.plot(np.linspace(0.0, time, left.size), left, color='#16F9DA')
-		ax2.plot(np.linspace(0.0, time, right.size), right, color='#16F9DA')
+		line1 = np.stack((np.linspace(0.0, time, left.size), left), axis=-1)
+		line2 = np.stack((np.linspace(0.0, time, left.size), right), axis=-1)
+		col1 = mpl.collections.LineCollection([line1], color='#16F9DA')
+		col2 = mpl.collections.LineCollection([line2], color='#16F9DA')
+		ax1.add_collection(col1, autolim=True)
+		ax2.add_collection(col2, autolim=True)
+
+		ax1.margins(0.001)
+		ax2.margins(0.001)
 
 		# Multicursor
 		multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
 
 		# state variable dictionary for starting axis limits
-		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
+		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 
+				'start_ylim2': ax2.get_ylim()}
 
 		# zoom reset view button
 		if sub: 
@@ -930,10 +944,10 @@ if __name__ == '__main__':
 		answers2 = inquirer.prompt(questions2)
 
 		mono = answers2['waves']
+
+		name, channels, data, subtype, sample_rate, blocks = import_array(mono)
 		
 		if 'Normalize' in answers['tests']:
-			# mono
-			name, channels, data, subtype, sample_rate = import_array(mono)
 			# before normalization
 			print('Waveform before normalization.')
 			waveform(data, name, channels, sample_rate)
@@ -944,47 +958,39 @@ if __name__ == '__main__':
 
 		if 'Midside' in answers['tests']:
 			# midside encoding test mono
-			name, channels, data, subtype, sample_rate = import_array(mono)
 			encoded, ms = midside(data, channels, name)
 			print(encoded, ms)
 
 		if 'Invert' in answers['tests']:
 			# Polarity inversion test
-			name, channels, data, subtype, sample_rate = import_array(mono)
 			print(data)
 			print(invert(data))
 
 		if 'Reverse' in answers['tests']:
 			# Reverse array test
-			name, channels, data, subtype, sample_rate = import_array(mono)
 			print(data)
 			print(reverse(data))
 
 		if 'Waveform' in answers['tests']:
 			# Waveform plot test case mono file
-			name, channels, data, subtype, sample_rate = import_array(mono)
 			waveform(data, name, channels, sample_rate)
 
 		if 'Magnitude' in answers['tests']:
 			# magnitude test mono file
-			name, channels, data, subtype, sample_rate = import_array(mono)
 			magnitude(data, name, channels, sample_rate)
 
 		if 'Spectrogram' in answers['tests']:
 			# spectrogram test case mono file
-			name, channels, data, subtype, sample_rate = import_array(mono)
 			# prevents divide by zero runtime exception
 			data = trim(data)
 			spectrogram(data, name, channels, sample_rate)
 
 		if 'Vectorscope' in answers['tests']:
 			# vectorscope mono test
-			name, channels, data, subtype, sample_rate = import_array(mono)
 			vectorscope(data, name, False)
 
 		if 'Visualizer' in answers['tests']:
 			# visualizer mono plot
-			name, channels, data, subtype, sample_rate = import_array(mono)
 			visualizer(data, name, channels, sample_rate, code=False)
 
 	if 'Stereo' in answers['tests']:
@@ -999,9 +1005,9 @@ if __name__ == '__main__':
 
 		stereo = answers2['waves']
 
+		name, channels, data, subtype, sample_rate, blocks = import_array(stereo)
+
 		if 'Normalize' in answers['tests']:
-			# stereo
-			name, channels, data, subtype, sample_rate = import_array(stereo)
 			# before normalization
 			waveform(data, name, channels, sample_rate)
 			data = normalize(data)
@@ -1010,7 +1016,6 @@ if __name__ == '__main__':
 
 		if 'Midside' in answers['tests']:
 			# midside encoding test stereo
-			name, channels, data, subtype, sample_rate = import_array(stereo)
 			encoded, ms = midside(data, channels, name)
 			print(encoded, ms)
 
@@ -1020,45 +1025,37 @@ if __name__ == '__main__':
 
 		if 'Invert' in answers['tests']:
 			# Polarity inversion test
-			name, channels, data, subtype, sample_rate = import_array(stereo)
 			print(data)
 			print(invert(data))
 
 		if 'Reverse' in answers['tests']:
 			# Reverse array test
-			name, channels, data, subtype, sample_rate = import_array(stereo)
 			print(data)
 			print(reverse(data))
 
 		if 'Waveform' in answers['tests']:
 			# Waveform plot test case stereo file
-			name, channels, data, subtype, sample_rate = import_array(stereo)
 			waveform(data, name, channels, sample_rate)
 
 		if 'Magnitude' in answers['tests']:
 			# magnitude test stereo file
-			name, channels, data, subtype, sample_rate = import_array(stereo)
 			magnitude(data, name, channels, sample_rate)
 
 		if 'Spectrogram' in answers['tests']:
 			# spectrogram test case stereo file
-			name, channels, data, subtype, sample_rate = import_array(stereo)
 			# prevents divide by zero runtime exception
 			data = trim(data)
 			spectrogram(data, name, channels, sample_rate)
 
 		if 'Vectorscope' in answers['tests']:
 			# vectorscope stereo test
-			name, channels, data, subtype, sample_rate = import_array(stereo)
 			vectorscope(data, name, False)
 
 			# Stereo test left channel only
-			name, channels, data, subtype, sample_rate = import_array(stereo)
 			data[:,1] = 0
 			vectorscope(data, name, False)
 
 		if 'Visualizer' in answers['tests']:
 			# visualizer stereo plot
-			name, channels, data, subtype, sample_rate = import_array(stereo)
 			visualizer(data, name, channels, sample_rate, code=False)
 
