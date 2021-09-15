@@ -14,13 +14,12 @@ import matplotlib.gridspec as gridspec
 # use backend that supports animation & blitting
 # mpl.use('Qt5Agg')
 
-def import_array(file, buffer=1024, overlap=0):
+def import_array(file):
 	'''
 	Import audio file as 64 bit float array
 	file: audio file
-	buffer: buffer size for block generator [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384] or default None
 	returns: a filename, number of channels, data (a 64 bit float numpy array of audio data), 
-			subtype: the files subtype, sample rate and a blockwise generator.
+			subtype: the files subtype, sample rate.
 	'''
 	# extracting the filename and subtype from soundfile's info object
 	info = str(sf.info(file))
@@ -35,9 +34,24 @@ def import_array(file, buffer=1024, overlap=0):
 	# reading the audio file as a soundfile numpy array
 	data, sample_rate = sf.read(file)
 
-	# creating block generator
-	blocks = sf.blocks(file, blocksize=buffer, overlap=overlap, sample_rate=sample_rate, channels=channels)
-	return name, channels, data, subtype, sample_rate, blocks
+	return name, channels, data, subtype, sample_rate
+
+def downsample(array, channels, sample_rate, buffer=1024):
+	'''
+	array: numpy array of audio data
+	channels: 1 mono 2 stereo
+	sample_rate: samples per second in array
+	buffer: # of bins [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384], default 1024
+	returns: array downsampled at buffer/second
+	'''
+	# the remainder of dividing buffer from array length
+	len_partial_bin = buffer - len(array) % buffer
+	# pad end of array with mean of last bin so array size divisible by buffer
+	padded = np.pad(array, (0, len_last_bin), 'mean', stat_length=(0, len_last_bin))
+
+	# separate array into bins of size buffer, average the bins into new array return array
+	# populate new array with averages of every (buffer size) samples
+	return np.mean(padded.reshape(-1, buffer), axis=1)
 
 def mask(array):
 	'''
@@ -222,7 +236,7 @@ def export_array(name, array, sample_rate, subtype):
 
 def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
-	array: numpy array of audio data
+	array: downsampled array of audio data
 	name: file name
 	channels: mono (1) or stereo (2) file
 	sample_rate: sampling rate of audio file
@@ -389,7 +403,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
 	plots the log magnitude spectrum of an audio signal magnitude dB/frequency
-	array: array of audio data
+	array: downsampled array of audio data
 	name: audio file name
 	channels: 1 mono or 2 stereo
 	sample_rate: sampling rate of audio file
@@ -609,7 +623,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
 	Creates a spectrogram given an array of audio data
-	array: 1 or 2d numpy array of audio data
+	array: downsampled 1 or 2d numpy array of audio data
 	channels: 1 mono or 2 stereo, number of channels in audio array
 	name: name of the audio file
 	fig: external figure to plot onto if provided, default = None
@@ -789,7 +803,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 	'''
 	A stereo vectorscope polar sample plot of audio data
 	Side/Mid amplitudes as coordinates on X/Y 180 degree polar plot
-	array: array of audio data
+	array: downsampled array of audio data
 	name: audio datafile name
 	code: boolean True if array is encoded as mid/side, false if encoded as L/R
 	fig: external figure to plot onto if provided, default = None
@@ -868,7 +882,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 
 def visualizer(array, name, channels, sample_rate, code):
 	'''
-	array: numpy array of audio data
+	array: downsampled numpy array of audio data
 	name: file name
 	channels: mono (1) or stereo (2) file
 	sample_rate: sampling rate of audio file
@@ -928,7 +942,7 @@ def visualizer(array, name, channels, sample_rate, code):
 if __name__ == '__main__':
 	# Test selector
 	questions = [inquirer.Checkbox('tests', message='Which tests to run?', 
-		choices=['Mono', 'Stereo', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 
+		choices=['Mono', 'Stereo', 'Downsample', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 
 		'Vectorscope', 'Visualizer'],),]
 
 	answers = inquirer.prompt(questions)
@@ -945,7 +959,11 @@ if __name__ == '__main__':
 
 		mono = answers2['waves']
 
-		name, channels, data, subtype, sample_rate, blocks = import_array(mono)
+		name, channels, data, subtype, sample_rate = import_array(mono)
+
+		if 'Downsample' in answers['tests']:
+			# downsampling test mono
+			print(downsample(data, channels, sample_rate))
 		
 		if 'Normalize' in answers['tests']:
 			# before normalization
@@ -1005,7 +1023,11 @@ if __name__ == '__main__':
 
 		stereo = answers2['waves']
 
-		name, channels, data, subtype, sample_rate, blocks = import_array(stereo)
+		name, channels, data, subtype, sample_rate = import_array(stereo)
+
+		if 'Downsample' in answers['tests']:
+			# downsampling test stereo
+			print(downsample(data, channels, sample_rate))
 
 		if 'Normalize' in answers['tests']:
 			# before normalization
