@@ -44,14 +44,50 @@ def downsample(array, channels, sample_rate, buffer=1024):
 	buffer: # of bins [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384], default 1024
 	returns: array downsampled at buffer/second
 	'''
-	# the remainder of dividing buffer from array length
-	len_partial_bin = buffer - len(array) % buffer
-	# pad end of array with mean of last bin so array size divisible by buffer
-	padded = np.pad(array, (0, len_last_bin), 'mean', stat_length=(0, len_last_bin))
+	breakpoint()
+	if channels == '2':
+		# either of len buffer if array divisible by buffer or length of the partial buffer
+		partial_buffer_len = buffer - len(array) % buffer
+		left, right = split(array, channels, name)
 
-	# separate array into bins of size buffer, average the bins into new array return array
-	# populate new array with averages of every (buffer size) samples
-	return np.mean(padded.reshape(-1, buffer), axis=1)
+		# either of len buffer if array divisible by buffer or length of the partial buffer
+		lpartial_buffer_len = buffer - len(left) % buffer
+		rpartial_buffer_len = buffer - len(right) % buffer
+
+		# array didn't need padding
+		if lpartial_buffer_len == buffer:
+			# separate array into bins of size buffer, average the bins into new array return array
+			# populate new array with averages of every (buffer size) samples
+			lbin = np.mean(left.reshape(-1, buffer), axis=1)
+			rbin = np.mean(right.reshape(-1, buffer), axis=1)
+			return lbin, rbin
+
+		# array needed padding for last bin
+		else:
+			# pad end of array with mean of last bin so array size divisible by buffer
+			lpadded = np.pad(left, pad_width=((0, partial_buffer_len), ), mode='mean', stat_length=(len(left) % buffer,))
+			lbins = np.mean(lpadded.reshape(-1, buffer), axis=1)
+			rpadded = np.pad(right, pad_width=((0, partial_buffer_len), ), mode='mean', stat_length=(len(right) % buffer,))
+			rbins = np.mean(rpadded.reshape(-1, buffer), axis=1)
+			bins = np.stack((lbins, rbins), axis=-1)
+			return bins
+
+	else:
+		# either of len buffer if array divisible by buffer or length of the partial buffer
+		partial_buffer_len = buffer - len(array) % buffer
+
+		# array didn't need padding
+		if partial_buffer_len == buffer:
+			# separate array into bins of size buffer, average the bins into new array return array
+			# populate new array with averages of every (buffer size) samples
+			return np.mean(array.reshape(-1, buffer), axis=1)
+
+		# array needed padding for last bin
+		else:
+			# pad end of array with mean of last bin so array size divisible by buffer
+			padded = np.pad(array, pad_width=((0, partial_buffer_len), ), mode='mean', stat_length=(len(array) % buffer,))
+			bins = np.mean(padded.reshape(-1, buffer), axis=1) 
+			return bins
 
 def mask(array):
 	'''
@@ -963,7 +999,8 @@ if __name__ == '__main__':
 
 		if 'Downsample' in answers['tests']:
 			# downsampling test mono
-			print(downsample(data, channels, sample_rate))
+			bins = downsample(data, channels, sample_rate)
+			print(bins)
 		
 		if 'Normalize' in answers['tests']:
 			# before normalization
@@ -1027,7 +1064,8 @@ if __name__ == '__main__':
 
 		if 'Downsample' in answers['tests']:
 			# downsampling test stereo
-			print(downsample(data, channels, sample_rate))
+			bins = downsample(data, channels, sample_rate)
+			print(bins)
 
 		if 'Normalize' in answers['tests']:
 			# before normalization
