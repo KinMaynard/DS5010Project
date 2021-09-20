@@ -36,58 +36,34 @@ def import_array(file):
 
 	return name, channels, data, subtype, sample_rate
 
-def downsample(array, channels, sample_rate, buffer=1024):
+def downsample(array, channels, buffer=32):
 	'''
 	array: numpy array of audio data
 	channels: 1 mono 2 stereo
 	sample_rate: samples per second in array
-	buffer: # of bins [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384], default 1024
+	buffer: # of bins [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384], default 32
 	returns: array downsampled at buffer/second
 	'''
-	breakpoint()
-	if channels == '2':
-		# either of len buffer if array divisible by buffer or length of the partial buffer
-		partial_buffer_len = buffer - len(array) % buffer
-		left, right = split(array, channels, name)
+	# either of len buffer if array divisible by buffer or length of the partial buffer
+	partial_buffer = len(array) % buffer
+	to_fill = buffer - partial_buffer
 
-		# either of len buffer if array divisible by buffer or length of the partial buffer
-		lpartial_buffer_len = buffer - len(left) % buffer
-		rpartial_buffer_len = buffer - len(right) % buffer
+	# array didn't need padding
+	if partial_buffer == 0:
+		# separate array into bins of size buffer, average the bins into new array return array
+		# populate new array with averages of every (buffer size) samples
+		return np.mean(array.reshape(-1, buffer), axis=1)
 
-		# array didn't need padding
-		if lpartial_buffer_len == buffer:
-			# separate array into bins of size buffer, average the bins into new array return array
-			# populate new array with averages of every (buffer size) samples
-			lbin = np.mean(left.reshape(-1, buffer), axis=1)
-			rbin = np.mean(right.reshape(-1, buffer), axis=1)
-			return lbin, rbin
-
-		# array needed padding for last bin
-		else:
-			# pad end of array with mean of last bin so array size divisible by buffer
-			lpadded = np.pad(left, pad_width=((0, partial_buffer_len), ), mode='mean', stat_length=(len(left) % buffer,))
-			lbins = np.mean(lpadded.reshape(-1, buffer), axis=1)
-			rpadded = np.pad(right, pad_width=((0, partial_buffer_len), ), mode='mean', stat_length=(len(right) % buffer,))
-			rbins = np.mean(rpadded.reshape(-1, buffer), axis=1)
-			bins = np.stack((lbins, rbins), axis=-1)
-			return bins
-
+	# array needed padding for last bin
 	else:
-		# either of len buffer if array divisible by buffer or length of the partial buffer
-		partial_buffer_len = buffer - len(array) % buffer
-
-		# array didn't need padding
-		if partial_buffer_len == buffer:
-			# separate array into bins of size buffer, average the bins into new array return array
-			# populate new array with averages of every (buffer size) samples
-			return np.mean(array.reshape(-1, buffer), axis=1)
-
-		# array needed padding for last bin
+		# pad end of array with mean of last bin so array size divisible by buffer
+		if channels == '1':
+			width = ((0, to_fill), )
 		else:
-			# pad end of array with mean of last bin so array size divisible by buffer
-			padded = np.pad(array, pad_width=((0, partial_buffer_len), ), mode='mean', stat_length=(len(array) % buffer,))
-			bins = np.mean(padded.reshape(-1, buffer), axis=1) 
-			return bins
+			width = ((0, to_fill), (0, 0))
+		padded = np.pad(array, pad_width=width, mode='mean', stat_length=(partial_buffer,))
+		bins = np.mean(padded.reshape(-1, buffer), axis=1)
+		return bins
 
 def mask(array):
 	'''
@@ -272,7 +248,7 @@ def export_array(name, array, sample_rate, subtype):
 
 def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
-	array: downsampled array of audio data
+	array: array of audio data
 	name: file name
 	channels: mono (1) or stereo (2) file
 	sample_rate: sampling rate of audio file
@@ -439,7 +415,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
 	plots the log magnitude spectrum of an audio signal magnitude dB/frequency
-	array: downsampled array of audio data
+	array: array of audio data
 	name: audio file name
 	channels: 1 mono or 2 stereo
 	sample_rate: sampling rate of audio file
@@ -449,7 +425,6 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		Lin: plot with linear or or no scaling, dB: plot with dB scaling: amplitude (20 * log10)
 	returns: a plot of the log magnitude spectrum of an audio array with radio buttons for signal array & fq scale
 	'''
-
 	# dictionary of state variables
 	state = {'LIN': 'linear', 'dB': 'dB', 'scale': 'linear'}
 
@@ -659,7 +634,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
 	Creates a spectrogram given an array of audio data
-	array: downsampled 1 or 2d numpy array of audio data
+	array: 1 or 2d numpy array of audio data
 	channels: 1 mono or 2 stereo, number of channels in audio array
 	name: name of the audio file
 	fig: external figure to plot onto if provided, default = None
@@ -839,7 +814,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 	'''
 	A stereo vectorscope polar sample plot of audio data
 	Side/Mid amplitudes as coordinates on X/Y 180 degree polar plot
-	array: downsampled array of audio data
+	array: array of audio data
 	name: audio datafile name
 	code: boolean True if array is encoded as mid/side, false if encoded as L/R
 	fig: external figure to plot onto if provided, default = None
@@ -918,7 +893,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 
 def visualizer(array, name, channels, sample_rate, code):
 	'''
-	array: downsampled numpy array of audio data
+	array: numpy array of audio data
 	name: file name
 	channels: mono (1) or stereo (2) file
 	sample_rate: sampling rate of audio file
@@ -999,7 +974,7 @@ if __name__ == '__main__':
 
 		if 'Downsample' in answers['tests']:
 			# downsampling test mono
-			bins = downsample(data, channels, sample_rate)
+			bins = downsample(data, channels)
 			print(bins)
 		
 		if 'Normalize' in answers['tests']:
@@ -1064,7 +1039,7 @@ if __name__ == '__main__':
 
 		if 'Downsample' in answers['tests']:
 			# downsampling test stereo
-			bins = downsample(data, channels, sample_rate)
+			bins = downsample(data, channels)
 			print(bins)
 
 		if 'Normalize' in answers['tests']:
