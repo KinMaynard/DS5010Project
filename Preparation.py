@@ -36,7 +36,7 @@ def import_array(file):
 
 	return name, channels, data, subtype, sample_rate
 
-def downsample(array, channels, bin_size=32):
+def bins(array, channels, bin_size=16):
 	'''
 	array: numpy array of audio data
 	channels: 1 mono, 2 stereo
@@ -58,11 +58,14 @@ def downsample(array, channels, bin_size=32):
 		# pad end of array with mean of last bin so array size divisible by bin_size
 		if channels == '1':
 			width = ((0, to_fill), )
+			padded = np.pad(array, pad_width=width, mode='mean', stat_length=(partial_bin,))
+			downsampled = np.mean(padded.reshape(-1, bin_size), axis=1)
+
 		else:
 			width = ((0, to_fill), (0, 0))
-		padded = np.pad(array, pad_width=width, mode='mean', stat_length=(partial_bin,))
-		binned = np.mean(padded.reshape(-1, bin_size), axis=1)
-		return binned
+			padded = np.pad(array, pad_width=width, mode='mean', stat_length=(partial_bin,))
+			downsampled = padded.reshape(-1, bin_size, padded.shape[1]).mean(axis=1)
+		return downsampled
 
 def mask(array):
 	'''
@@ -973,7 +976,7 @@ def visualizer(array, name, channels, sample_rate, code):
 if __name__ == '__main__':
 	# Test selector
 	questions = [inquirer.Checkbox('tests', message='Which tests to run?', 
-		choices=['Mono', 'Stereo', 'Downsample', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 
+		choices=['Mono', 'Stereo', 'Downsample', 'Bins', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 
 		'Vectorscope', 'Visualizer'],),]
 
 	answers = inquirer.prompt(questions)
@@ -992,10 +995,10 @@ if __name__ == '__main__':
 
 		name, channels, data, subtype, sample_rate = import_array(mono)
 
-		if 'Downsample' in answers['tests']:
+		if 'Bins' in answers['tests']:
 			# downsampling test mono
-			bins = downsample(data, channels)
-			print(bins)
+			binned = bins(data, channels)
+			print(binned)
 		
 		if 'Normalize' in answers['tests']:
 			# before normalization
@@ -1020,6 +1023,10 @@ if __name__ == '__main__':
 			# Reverse array test
 			print(data)
 			print(reverse(data))
+
+		if 'Downsample' in answers['tests']:
+			# downsampling for visualization
+			data = bins(data, channels)
 
 		if 'Waveform' in answers['tests']:
 			# Waveform plot test case mono file
@@ -1057,10 +1064,10 @@ if __name__ == '__main__':
 
 		name, channels, data, subtype, sample_rate = import_array(stereo)
 
-		if 'Downsample' in answers['tests']:
+		if 'Bins' in answers['tests']:
 			# downsampling test stereo
-			bins = downsample(data, channels)
-			print(bins)
+			binned = bins(data, channels)
+			print(binned)
 
 		if 'Normalize' in answers['tests']:
 			# before normalization
@@ -1087,6 +1094,10 @@ if __name__ == '__main__':
 			# Reverse array test
 			print(data)
 			print(reverse(data))
+
+		if 'Downsample' in answers['tests']:
+			# downsampling for visualization
+			data = bins(data, channels)
 
 		if 'Waveform' in answers['tests']:
 			# Waveform plot test case stereo file
