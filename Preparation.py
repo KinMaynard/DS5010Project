@@ -19,7 +19,7 @@ def import_array(file):
 	Import audio file as 64 bit float array
 	file: audio file
 	returns: a filename, number of channels, data (a 64 bit float numpy array of audio data), 
-			subtype: the files subtype, sample rate.
+			the files subtype and sample rate of the file.
 	'''
 	# extracting the filename and subtype from soundfile's info object
 	info = str(sf.info(file))
@@ -36,39 +36,38 @@ def import_array(file):
 
 	return name, channels, data, subtype, sample_rate
 
-def downsample(array, channels, buffer=32):
+def downsample(array, channels, bin_size=32):
 	'''
 	array: numpy array of audio data
-	channels: 1 mono 2 stereo
-	sample_rate: samples per second in array
-	buffer: # of bins [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384], default 32
-	returns: array downsampled at buffer/second
+	channels: 1 mono, 2 stereo
+	bin_size: [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384], default 32
+	returns: downsampled array
 	'''
-	# either of len buffer if array divisible by buffer or length of the partial buffer
-	partial_buffer = len(array) % buffer
-	to_fill = buffer - partial_buffer
+	# either of len bin_size if array divisible by bin_size or length of the partial bin
+	partial_bin = len(array) % bin_size
+	to_fill = bin_size - partial_bin
 
 	# array didn't need padding
-	if partial_buffer == 0:
-		# separate array into bins of size buffer, average the bins into new array return array
-		# populate new array with averages of every (buffer size) samples
-		return np.mean(array.reshape(-1, buffer), axis=1)
+	if partial_bin == 0:
+		# separate array into bins of size bin_size, average the bins into new array return array
+		# populate new array with averages of every (bin_size) samples
+		return np.mean(array.reshape(-1, bin_size), axis=1)
 
 	# array needed padding for last bin
 	else:
-		# pad end of array with mean of last bin so array size divisible by buffer
+		# pad end of array with mean of last bin so array size divisible by bin_size
 		if channels == '1':
 			width = ((0, to_fill), )
 		else:
 			width = ((0, to_fill), (0, 0))
-		padded = np.pad(array, pad_width=width, mode='mean', stat_length=(partial_buffer,))
-		bins = np.mean(padded.reshape(-1, buffer), axis=1)
-		return bins
+		padded = np.pad(array, pad_width=width, mode='mean', stat_length=(partial_bin,))
+		binned = np.mean(padded.reshape(-1, bin_size), axis=1)
+		return binned
 
 def mask(array):
 	'''
 	calculates a boolean mask of non zeros (values greater than positive epsilon smaller
-	than negative epsilon)
+		than negative epsilon)
 	array: numpy array of audio data
 	returns boolean mask of nonzeros (values greater than epsilon) in array
 	'''
@@ -79,10 +78,11 @@ def mask(array):
 def first_nonzero(array, axis, mask, invalid_val=-1):
 	'''
 	Helper function for trim function that gets the index of the first non_zero element in an array
+	
 	array: 1d or 2d numpy array of audio data
-	axis: generic axis specifier along which to access elements 
-	invalid_value: marker for dimensions of only zeros
+	axis: generic axis specifier along which to access elements
 	mask: boolean array of non zeros (non epsilon) values in array
+	invalid_value: marker for dimensions of only zeros
 	returns: index of first non zero value in array
 	
 	argmax returns indicies of first matches (True values) in cases where max occurs multiple times, 
@@ -97,10 +97,11 @@ def first_nonzero(array, axis, mask, invalid_val=-1):
 def last_nonzero(array, axis, mask, invalid_val=-1):
 	'''
 	Helper function for trim function that gets the index of the last non_zero element in an array
+	
 	array: 1d or 2d numpy array of audio data
 	axis: generic axis specifier axis along which to access elements
-	invalid_value: marker for dimensions of only zeros, default argument is -1
 	mask: boolean array of non zeros (non epsilon) values in array
+	invalid_value: marker for dimensions of only zeros, default argument is -1
 	returns: index of last non zero value in array
 
 	Similar behavior to first_nonzero however we flip along the axis to access and use argmax again
@@ -233,6 +234,7 @@ def reverse(array):
 def export_array(name, array, sample_rate, subtype):
 	'''
 	Export numpy array as audio file
+	
 	name: file to write to (truncates & overwrites if file exists) (str, int or file like object)
 	array: soundfile object, numpy array of audio data as 64 bit float
 	sample_rate: sample rate of the audio data
@@ -253,6 +255,9 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 	channels: mono (1) or stereo (2) file
 	sample_rate: sampling rate of audio file
 	fig: external figure to plot onto if provided, default = None
+	sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
+	gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
+
 	returns: waveform plot of intensity/time either alone or as part of provided fig
 	'''
 	# Font
@@ -304,19 +309,19 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		# zoom reset view button & axes
 		if sub:
 			reset_button_ax = fig.add_axes([0.463, 0.502, 0.0145, 0.01]) # left, bottom, width, height
-		else:
-			reset_button_ax = fig.add_axes([0.84, 0.03, 0.06, 0.03])
 
-		# reset button
-		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-		reset_button.label.set_size('x-small')
-		reset_button.label.set_color('#F0191C')
-		for spine in spine_ls:
-			reset_button_ax.spines[spine].set_color('#F0191C')
-		def reset_button_on_clicked(mouse_event):
-			ax.set_xlim(state['start_xlim'])
-			ax.set_ylim(state['start_ylim'])
-		reset_button.on_clicked(reset_button_on_clicked)
+			# reset button
+			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
+			reset_button.label.set_size('x-small')
+			reset_button.label.set_color('#F0191C')
+			for spine in spine_ls:
+				reset_button_ax.spines[spine].set_color('#F0191C')
+
+			# callback function for zoom reset button
+			def reset_button_on_clicked(mouse_event):
+				ax.set_xlim(state['start_xlim'])
+				ax.set_ylim(state['start_ylim'])
+			reset_button.on_clicked(reset_button_on_clicked)
 
 		# individual figure or as part of larger figure
 		if sub:
@@ -392,19 +397,21 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		# zoom reset view button
 		if sub: 
 			reset_button_ax = fig.add_axes([0.463, 0.385, 0.0145, 0.01]) # axes left, bottom, width, height
-		else:
-			reset_button_ax = fig.add_axes([0.84, 0.03, 0.06, 0.03])
-		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-		reset_button.label.set_size('x-small')
-		reset_button.label.set_color('#F0191C')
-		for spine in spine_ls:
-			reset_button_ax.spines[spine].set_color('#F0191C')
-		def reset_button_on_clicked(mouse_event):
-			ax1.set_xlim(state['start_xlim1'])
-			ax2.set_xlim(state['start_xlim2'])
-			ax1.set_ylim(state['start_ylim1'])
-			ax2.set_ylim(state['start_ylim2'])
-		reset_button.on_clicked(reset_button_on_clicked)
+			
+			# reset button
+			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
+			reset_button.label.set_size('x-small')
+			reset_button.label.set_color('#F0191C')
+			for spine in spine_ls:
+				reset_button_ax.spines[spine].set_color('#F0191C')
+
+			# callback function for zoom reset button
+			def reset_button_on_clicked(mouse_event):
+				ax1.set_xlim(state['start_xlim1'])
+				ax2.set_xlim(state['start_xlim2'])
+				ax1.set_ylim(state['start_ylim1'])
+				ax2.set_ylim(state['start_ylim2'])
+			reset_button.on_clicked(reset_button_on_clicked)
 
 		# individual figure or as part of larger figure
 		if sub:
@@ -420,9 +427,13 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	channels: 1 mono or 2 stereo
 	sample_rate: sampling rate of audio file
 	fig: external figure to plot onto if provided, default = None
+	sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
+	gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
+
 	Radio buttons: 
 		L: plots left channel, R: plots right channel, Sum: plots L+R, Mid: plots mid channel, Side: plots side channel
 		Lin: plot with linear or or no scaling, dB: plot with dB scaling: amplitude (20 * log10)
+	
 	returns: a plot of the log magnitude spectrum of an audio array with radio buttons for signal array & fq scale
 	'''
 	# dictionary of state variables
@@ -603,24 +614,22 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	# zoom reset view button & axes
 	if sub:
 		reset_button_ax = fig.add_axes([0.463, 0.082, 0.0145, 0.01]) # left, bottom, width, height
-	else:
-		reset_button_ax = fig.add_axes([0.84, 0.03, 0.06, 0.03])
 
-	# zoom reset view button
-	reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-	reset_button.label.set_size('x-small')
-	reset_button.label.set_color('#F0191C')
-	for spine in spine_ls:
-		reset_button_ax.spines[spine].set_color('#F0191C')
+		# zoom reset view button
+		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
+		reset_button.label.set_size('x-small')
+		reset_button.label.set_color('#F0191C')
+		for spine in spine_ls:
+			reset_button_ax.spines[spine].set_color('#F0191C')
 
-	# callback function for zoom reset button
-	def reset_button_on_clicked(mouse_event):
-		# recompute axis limits
-		ax.relim()
+		# callback function for zoom reset button
+		def reset_button_on_clicked(mouse_event):
+			# recompute axis limits
+			ax.relim()
 
-		# scale the ax
-		ax.autoscale()
-	reset_button.on_clicked(reset_button_on_clicked)
+			# scale the ax
+			ax.autoscale()
+		reset_button.on_clicked(reset_button_on_clicked)
 
 	# individual figure or as part of larger figure
 	if sub:
@@ -634,10 +643,14 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
 	Creates a spectrogram given an array of audio data
+	
 	array: 1 or 2d numpy array of audio data
 	channels: 1 mono or 2 stereo, number of channels in audio array
 	name: name of the audio file
 	fig: external figure to plot onto if provided, default = None
+	sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
+	gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
+
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
 	# Font
@@ -699,19 +712,19 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		# zoom reset view button & axes
 		if sub:
 			reset_button_ax = fig.add_axes([0.886, 0.502, 0.0145, 0.01]) # left, bottom, width, height
-		else:
-			reset_button_ax = fig.add_axes([0.78, 0.03, 0.06, 0.03])
 
-		# reset button
-		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-		reset_button.label.set_size('x-small')
-		reset_button.label.set_color('#F0191C')
-		for spine in spine_ls:
-			reset_button_ax.spines[spine].set_color('#F0191C')
-		def reset_button_on_clicked(mouse_event):
-			ax.set_xlim(state['start_xlim'])
-			ax.set_ylim(state['start_ylim'])
-		reset_button.on_clicked(reset_button_on_clicked)
+			# reset button
+			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
+			reset_button.label.set_size('x-small')
+			reset_button.label.set_color('#F0191C')
+			for spine in spine_ls:
+				reset_button_ax.spines[spine].set_color('#F0191C')
+			
+			# callback function for zoom reset button
+			def reset_button_on_clicked(mouse_event):
+				ax.set_xlim(state['start_xlim'])
+				ax.set_ylim(state['start_ylim'])
+			reset_button.on_clicked(reset_button_on_clicked)
 
 		# individual figure or as part of larger figure
 		if sub:
@@ -790,19 +803,21 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		# zoom reset view button
 		if sub: 
 			reset_button_ax = fig.add_axes([0.886, 0.385, 0.0145, 0.01]) # axes left, bottom, width, height
-		else:
-			reset_button_ax = fig.add_axes([0.78, 0.03, 0.06, 0.03])
-		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-		reset_button.label.set_size('x-small')
-		reset_button.label.set_color('#F0191C')
-		for spine in spine_ls:
-			reset_button_ax.spines[spine].set_color('#F0191C')
-		def reset_button_on_clicked(mouse_event):
-			ax1.set_xlim(state['start_xlim1'])
-			ax2.set_xlim(state['start_xlim2'])
-			ax1.set_ylim(state['start_ylim1'])
-			ax2.set_ylim(state['start_ylim2'])
-		reset_button.on_clicked(reset_button_on_clicked)
+			
+			# reset button
+			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
+			reset_button.label.set_size('x-small')
+			reset_button.label.set_color('#F0191C')
+			for spine in spine_ls:
+				reset_button_ax.spines[spine].set_color('#F0191C')
+			
+			# callback function for zoom reset button
+			def reset_button_on_clicked(mouse_event):
+				ax1.set_xlim(state['start_xlim1'])
+				ax2.set_xlim(state['start_xlim2'])
+				ax1.set_ylim(state['start_ylim1'])
+				ax2.set_ylim(state['start_ylim2'])
+			reset_button.on_clicked(reset_button_on_clicked)
 
 		# individual figure or as part of larger figure
 		if sub:
@@ -814,11 +829,15 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 	'''
 	A stereo vectorscope polar sample plot of audio data
 	Side/Mid amplitudes as coordinates on X/Y 180 degree polar plot
+	
 	array: array of audio data
 	name: audio datafile name
 	code: boolean True if array is encoded as mid/side, false if encoded as L/R
 	fig: external figure to plot onto if provided, default = None
-	single: boolean, False: plotting as subplot of larger figure, True: otherwise
+	sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
+	gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
+	
+	returns: a vectorscope polar dot per sample plot of audio data
 	'''
 	if code:
 		# dark background white text, initilize polar figure and axes
@@ -898,6 +917,7 @@ def visualizer(array, name, channels, sample_rate, code):
 	channels: mono (1) or stereo (2) file
 	sample_rate: sampling rate of audio file
 	code: boolean True if array is encoded as mid/side, false if encoded as L/R
+	
 	returns: fasceted subplots of waveform, magnitude, spectrogram & vectorscope
 	'''
 	# initialize figure with dark background and title
