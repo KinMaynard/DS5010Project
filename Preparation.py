@@ -425,6 +425,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
 	'''
 	plots the log magnitude spectrum of an audio signal magnitude dB/frequency
+	
 	array: array of audio data
 	name: audio file name
 	channels: 1 mono or 2 stereo
