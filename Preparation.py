@@ -11,9 +11,6 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import MultiCursor, RadioButtons, Button
 import matplotlib.gridspec as gridspec
 
-# use backend that supports animation & blitting
-# mpl.use('Qt5Agg')
-
 def import_array(file):
 	'''
 	Import audio file as 64 bit float array
