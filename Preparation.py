@@ -287,8 +287,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		if sub:
 			title = 'WAVEFORM'
 		ax.set_title(title, color='#F9A438', fontsize=10)
-		ax.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
-		ax.set_ylabel('AMPLITUDE', color='#F9A438', fontsize='x-small')
+		ax.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
+		ax.set_ylabel('AMPLITUDE', color='#F9A438', fontsize=7)
 		ax.minorticks_on()
 		ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
@@ -317,7 +317,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-			reset_button.label.set_size('x-small')
+			reset_button.label.set_size(7)
 			reset_button.label.set_color('#F0191C')
 			for spine in spine_ls:
 				reset_button_ax.spines[spine].set_color('#F0191C')
@@ -356,9 +356,9 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		if sub:
 			title = 'WAVEFORM'
 		ax1.set_title(title, color='#F9A438', fontsize=10)
-		ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
-		ax1.set_ylabel('AMPLITUDE LEFT', color='#F9A438', fontsize='x-small')
-		ax2.set_ylabel('AMPLITUDE RIGHT', color='#F9A438', fontsize='x-small')
+		ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
+		ax1.set_ylabel('AMPLITUDE LEFT', color='#F9A438', fontsize=7)
+		ax2.set_ylabel('AMPLITUDE RIGHT', color='#F9A438', fontsize=7)
 		ax1.minorticks_on()
 		ax2.minorticks_on()
 		ax1.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
@@ -405,7 +405,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 			
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-			reset_button.label.set_size('x-small')
+			reset_button.label.set_size(7)
 			reset_button.label.set_color('#F0191C')
 			for spine in spine_ls:
 				reset_button_ax.spines[spine].set_color('#F0191C')
@@ -532,8 +532,8 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 			ax.relim()
 
 			# Set Labels
-			ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize='x-small')
-			ax.set_ylabel('MAGNITUDE (%s)' % state['scale'], color='#F9A438', fontsize='x-small')
+			ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
+			ax.set_ylabel('MAGNITUDE (%s)' % state['scale'], color='#F9A438', fontsize=7)
 			
 			# update state variables to new line & data
 			state['line'] = line
@@ -587,8 +587,8 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		ax.autoscale()
 
 		# Set Labels
-		ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize='x-small')
-		ax.set_ylabel('MAGNITUDE (%s)' % label, color='#F9A438', fontsize='x-small')
+		ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
+		ax.set_ylabel('MAGNITUDE (%s)' % label, color='#F9A438', fontsize=7)
 		
 		# update state variables to new line & scale
 		state['line'] = line
@@ -614,8 +614,8 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		circ.set_lw(0.5)
 
 	# Axis Labels
-	ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize='x-small')
-	ax.set_ylabel('MAGNITUDE (LIN)', color='#F9A438', fontsize='x-small')
+	ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
+	ax.set_ylabel('MAGNITUDE (LIN)', color='#F9A438', fontsize=7)
 
 	# zoom reset view button & axes
 	if sub:
@@ -623,7 +623,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 
 		# zoom reset view button
 		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-		reset_button.label.set_size('x-small')
+		reset_button.label.set_size(7)
 		reset_button.label.set_color('#F0191C')
 		for spine in spine_ls:
 			reset_button_ax.spines[spine].set_color('#F0191C')
@@ -679,8 +679,8 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		title = '%s SPECTROGRAM' % name
 		if sub:
 			title = 'SPECTROGRAM'
-		ax.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
-		ax.set_ylabel('FREQUENCY (KHZ)', color='#F9A438', fontsize='x-small')
+		ax.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
+		ax.set_ylabel('FREQUENCY (KHZ)', color='#F9A438', fontsize=7)
 		ax.set_title(title, color='#F9A438', fontsize=10)
 		ax.minorticks_on()
 		ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
@@ -721,7 +721,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-			reset_button.label.set_size('x-small')
+			reset_button.label.set_size(7)
 			reset_button.label.set_color('#F0191C')
 			for spine in spine_ls:
 				reset_button_ax.spines[spine].set_color('#F0191C')
@@ -758,9 +758,9 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		title = '%s SPECTROGRAM' % name
 		if sub:
 			title = 'SPECTROGRAM'
-		ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
-		ax1.set_ylabel('LEFT FREQUENCY (KHZ)', color='#F9A438', fontsize='x-small')
-		ax2.set_ylabel('RIGHT FREQUENCY (KHZ)', color='#F9A438', fontsize='x-small')
+		ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
+		ax1.set_ylabel('LEFT FREQUENCY (KHZ)', color='#F9A438', fontsize=7)
+		ax2.set_ylabel('RIGHT FREQUENCY (KHZ)', color='#F9A438', fontsize=7)
 		ax1.set_title(title, color='#F9A438', fontsize=10)
 		ax1.minorticks_on()
 		ax2.minorticks_on()
@@ -812,7 +812,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-			reset_button.label.set_size('x-small')
+			reset_button.label.set_size(7)
 			reset_button.label.set_color('#F0191C')
 			for spine in spine_ls:
 				reset_button_ax.spines[spine].set_color('#F0191C')
