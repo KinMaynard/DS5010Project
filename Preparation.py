@@ -545,7 +545,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 
 		# labelsize & color for LRSUM buttons
 		for label in lrsums.labels:
-			label.set_fontsize('small')
+			label.set_fontsize(8)
 			label.set_color('#F9A438')
 
 		# dynamically resize radio button height with figure size & setting color and width of button edges
@@ -600,7 +600,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 
 	# labelsize & color
 	for label in lindB.labels:
-		label.set_fontsize('small')
+		label.set_fontsize(8)
 		label.set_color('#F9A438')
 
 	# dynamically resize radio button height with figure size
@@ -702,7 +702,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768])	# left, bottom, width, height
 		else:
 			cbar_ax = fig.add_axes([0.905, 0.53, 0.003, 0.35])	# left, bottom, width, height
-		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', fontsize='x-small')
+		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', fontsize=7)
 		cbar_ax.tick_params(color='#F9A438', labelsize=5, labelcolor='#F9A438')
 		
 		# limit y axis to human hearing range
