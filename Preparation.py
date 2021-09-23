@@ -11,6 +11,9 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import MultiCursor, RadioButtons, Button
 import matplotlib.gridspec as gridspec
 
+# use backend that supports animation, blitting & figure window resizing
+mpl.use('Qt5Agg')
+
 def import_array(file):
 	'''
 	Import audio file as 64 bit float array
@@ -925,7 +928,9 @@ def visualizer(array, name, channels, sample_rate, code):
 	'''
 	# initialize figure with dark background and title
 	plt.style.use('dark_background')
-	fig = plt.figure(figsize=(26, 13.5))
+	fig = plt.figure() # figsize=(26, 13.5)
+	figmanager = plt.get_current_fig_manager()
+	figmanager.window.showMaximized()
 
 	# Font
 	mpl.rcParams['font.family'] = 'sans-serif'
