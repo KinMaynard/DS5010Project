@@ -286,7 +286,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		title = '%s WAVEFORM' % name
 		if sub:
 			title = 'WAVEFORM'
-		ax.set_title(title, color='#F9A438', fontsize='medium')
+		ax.set_title(title, color='#F9A438', fontsize=10)
 		ax.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
 		ax.set_ylabel('AMPLITUDE', color='#F9A438', fontsize='x-small')
 		ax.minorticks_on()
@@ -355,7 +355,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		title = '%s WAVEFORM' % name
 		if sub:
 			title = 'WAVEFORM'
-		ax1.set_title(title, color='#F9A438', fontsize='medium')
+		ax1.set_title(title, color='#F9A438', fontsize=10)
 		ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
 		ax1.set_ylabel('AMPLITUDE LEFT', color='#F9A438', fontsize='x-small')
 		ax2.set_ylabel('AMPLITUDE RIGHT', color='#F9A438', fontsize='x-small')
@@ -466,7 +466,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	title = '%s MAGNITUDE SPECTRUM' % name
 	if sub:
 		title = 'MAGNITUDE SPECTRUM'
-	ax.set_title(title, color='#F9A438', fontsize='medium')
+	ax.set_title(title, color='#F9A438', fontsize=10)
 	ax.minorticks_on()
 	ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
@@ -550,9 +550,9 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 
 		# dynamically resize radio button height with figure size & setting color and width of button edges
 		rpos = rax.get_position().get_points()
-		fh = fig.get_figheight()
-		fw = fig.get_figwidth()
-		rscale = (rpos[:,1].ptp() / rpos[:,0].ptp()) * (fh / fw)
+		fig_height = fig.get_figheight()
+		fig_width = fig.get_figwidth()
+		rscale = (rpos[:,1].ptp() / rpos[:,0].ptp()) * (fig_height / fig_width)
 		for circ in lrsums.circles:
 			circ.height /= rscale
 			circ.set_edgecolor('#F9A438')
@@ -681,7 +681,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			title = 'SPECTROGRAM'
 		ax.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
 		ax.set_ylabel('FREQUENCY (KHZ)', color='#F9A438', fontsize='x-small')
-		ax.set_title(title, color='#F9A438', fontsize='medium')
+		ax.set_title(title, color='#F9A438', fontsize=10)
 		ax.minorticks_on()
 		ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
@@ -761,7 +761,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize='x-small')
 		ax1.set_ylabel('LEFT FREQUENCY (KHZ)', color='#F9A438', fontsize='x-small')
 		ax2.set_ylabel('RIGHT FREQUENCY (KHZ)', color='#F9A438', fontsize='x-small')
-		ax1.set_title(title, color='#F9A438', fontsize='medium')
+		ax1.set_title(title, color='#F9A438', fontsize=10)
 		ax1.minorticks_on()
 		ax2.minorticks_on()
 		ax1.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
@@ -876,9 +876,9 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 		# set title & bring down close to top of plot
 		if sub:
 			if channels == '1':
-				ax.set_title(title, color='#F9A438', fontsize='medium', pad=-140)
+				ax.set_title(title, color='#F9A438', fontsize=10, pad=-140)
 			else:
-				ax.set_title(title, color='#F9A438', fontsize='medium', pad=-105)
+				ax.set_title(title, color='#F9A438', fontsize=10, pad=-105)
 		else:
 			ax.set_title(title, color='#F9A438', fontsize='medium', pad=-70)
 
@@ -937,7 +937,7 @@ def visualizer(array, name, channels, sample_rate, code):
 	mpl.rcParams['font.sans-serif'] = 'Helvetica'
 	
 	# Title
-	plt.suptitle('%s VISUALIZATION' % name, color='#F9A438', fontsize='xx-large', fontweight=900)
+	plt.suptitle('%s VISUALIZATION' % name, color='#F9A438', fontsize=17.5, fontweight=900)
 
 	# gridspec to snugly fascet only stereo spectrogram and waveform plots
 	# initialize for mono case
