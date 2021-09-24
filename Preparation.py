@@ -361,7 +361,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# zoom reset view button & axes
 		if sub:
-			reset_button_ax = fig.add_axes([0.463, 0.502, 0.0145, 0.01]) # left, bottom, width, height
+			reset_button_ax = fig.add_axes([0.463, 0.49, 0.0145, 0.01]) # left, bottom, width, height
 
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
@@ -453,7 +453,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# zoom reset view button
 		if sub: 
-			reset_button_ax = fig.add_axes([0.463, 0.385, 0.0145, 0.01]) # axes left, bottom, width, height
+			reset_button_ax = fig.add_axes([0.463, 0.373, 0.0145, 0.01]) # axes left, bottom, width, height
 			
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
@@ -572,7 +572,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		if not sub:
 			rax = plt.axes([0.08, 0.7, 0.08, 0.2], facecolor=button_face_color, frame_on=False)
 		else:
-			rax = plt.axes([0.08, 0.26, 0.04, 0.0835], facecolor=button_face_color, frame_on=False)
+			rax = plt.axes([0.07, 0.26, 0.04, 0.0835], facecolor=button_face_color, frame_on=False)
 
 		# LRSUM button
 		lrsums = RadioButtons(rax, ('L', 'R', 'SUM', 'MID', 'SIDE'), activecolor='#5C8BC6')
@@ -623,7 +623,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	if not sub:
 		rax = plt.axes([0.08, 0.4, 0.08, 0.15], facecolor=button_face_color, frame_on=False)
 	else:
-		rax = plt.axes([0.08, 0.2, 0.04, 0.05], facecolor=button_face_color, frame_on=False)
+		rax = plt.axes([0.07, 0.2, 0.04, 0.05], facecolor=button_face_color, frame_on=False)
 
 	# Linear dB buttons
 	lindB = RadioButtons(rax, ('LIN', 'dB'), activecolor='#5C8BC6')
@@ -684,7 +684,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 
 	# zoom reset view button & axes
 	if sub:
-		reset_button_ax = fig.add_axes([0.463, 0.082, 0.0145, 0.01]) # left, bottom, width, height
+		reset_button_ax = fig.add_axes([0.463, 0.07, 0.0145, 0.01]) # left, bottom, width, height
 
 		# zoom reset view button
 		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
@@ -790,7 +790,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
 		# zoom reset view button & axes
 		if sub:
-			reset_button_ax = fig.add_axes([0.886, 0.502, 0.0145, 0.01]) # left, bottom, width, height
+			reset_button_ax = fig.add_axes([0.886, 0.49, 0.0145, 0.01]) # left, bottom, width, height
 
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
@@ -887,7 +887,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
 		# zoom reset view button
 		if sub: 
-			reset_button_ax = fig.add_axes([0.886, 0.385, 0.0145, 0.01]) # axes left, bottom, width, height
+			reset_button_ax = fig.add_axes([0.886, 0.373, 0.0145, 0.01]) # axes left, bottom, width, height
 			
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
