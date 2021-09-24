@@ -960,9 +960,9 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 		# set title & bring down close to top of plot
 		if sub:
 			if channels == '1':
-				title_vec = ax.set_title(title, color='#F9A438', fontsize=10, pad=-140)
+				title_vec = ax.set_title(title, y=0.78, color='#F9A438', fontsize=10)
 			else:
-				title_vec = ax.set_title(title, color='#F9A438', fontsize=10, pad=-105)
+				title_vec = ax.set_title(title, y=.78, color='#F9A438', fontsize=10)
 		else:
 			ax.set_title(title, color='#F9A438', fontsize='medium', pad=-70)
 
@@ -988,8 +988,9 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 				ax.set_position([0.55, -0.735, 0.350, 2.023]) # left, bottom, width, height
 			else:
 				ax.set_position([0.6, -0.772, 0.245, 2])
+
+		# store text to be resized
 		if resize_ls is not None:
-			# store text to be resized
 			resize_ls.append(title_vec)
 
 		# individual figure or as part of larger figure
