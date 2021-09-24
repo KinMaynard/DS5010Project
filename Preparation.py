@@ -361,17 +361,22 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# zoom reset view button & axes
 		if sub:
-			reset_button_ax = fig.add_axes([0.463, 0.49, 0.0145, 0.01]) # left, bottom, width, height
+			# store initial figure dimesions
+			fig_width, fig_height = fig.get_size_inches() * fig.dpi
+
+			# reset button axis size based on figure size to look correct on multiple screens
+			if fig_height <= 1700:
+				reset_button_ax = fig.add_axes([0.455, 0.49, 0.022, 0.015]) # left, bottom, width, height
+
+			else:
+				reset_button_ax = fig.add_axes([0.463, 0.49, 0.0145, 0.01]) # left, bottom, width, height
 
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-
-			# store initial figure dimesions
-			fig_width, fig_height = fig.get_size_inches() * fig.dpi
 			
 			# small screen, smaller label
 			if fig_height <= 1700:
-				reset_button.label.set_size(3)
+				reset_button.label.set_size(6)
 
 			# big screen, big label
 			else:
@@ -464,17 +469,22 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# zoom reset view button
 		if sub: 
-			reset_button_ax = fig.add_axes([0.463, 0.373, 0.0145, 0.01]) # axes left, bottom, width, height
+			# store initial figure dimesions
+			fig_width, fig_height = fig.get_size_inches() * fig.dpi
+
+			# reset button axis size based on figure size to look correct on multiple screens
+			if fig_height <= 1700:
+				reset_button_ax = fig.add_axes([0.455, 0.373, 0.022, 0.015])
+
+			else:
+				reset_button_ax = fig.add_axes([0.463, 0.373, 0.0145, 0.01]) # axes left, bottom, width, height
 			
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
 			
-			# store initial figure dimesions
-			fig_width, fig_height = fig.get_size_inches() * fig.dpi
-			
 			# small screen, smaller label
 			if fig_height <= 1700:
-				reset_button.label.set_size(3)
+				reset_button.label.set_size(6)
 
 			# big screen, big label
 			else:
@@ -706,17 +716,22 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 
 	# zoom reset view button & axes
 	if sub:
-		reset_button_ax = fig.add_axes([0.463, 0.07, 0.0145, 0.01]) # left, bottom, width, height
+		# store initial figure dimesions
+		fig_width, fig_height = fig.get_size_inches() * fig.dpi
+
+		# reset button axis size based on figure size to look correct on multiple screens
+		if fig_height <= 1700:
+			reset_button_ax = fig.add_axes([0.455, 0.07, 0.022, 0.015])
+
+		else:
+			reset_button_ax = fig.add_axes([0.463, 0.07, 0.0145, 0.01]) # left, bottom, width, height
 
 		# zoom reset view button
 		reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
 		
-		# store initial figure dimesions
-		fig_width, fig_height = fig.get_size_inches() * fig.dpi
-		
 		# small screen, smaller label
 		if fig_height <= 1700:
-			reset_button.label.set_size(3)
+			reset_button.label.set_size(6)
 
 		# big screen, big label
 		else:
@@ -823,17 +838,22 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
 		# zoom reset view button & axes
 		if sub:
-			reset_button_ax = fig.add_axes([0.886, 0.49, 0.0145, 0.01]) # left, bottom, width, height
+			# store initial figure dimesions
+			fig_width, fig_height = fig.get_size_inches() * fig.dpi
+			
+			# reset button axis size based on figure size to look correct on multiple screens
+			if fig_height <= 1700:
+				reset_button_ax = fig.add_axes([0.878, 0.49, 0.022, 0.015])
+
+			else:
+				reset_button_ax = fig.add_axes([0.886, 0.49, 0.0145, 0.01]) # left, bottom, width, height
 
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
 			
-			# store initial figure dimesions
-			fig_width, fig_height = fig.get_size_inches() * fig.dpi
-			
 			# small screen, smaller label
 			if fig_height <= 1700:
-				reset_button.label.set_size(3)
+				reset_button.label.set_size(6)
 
 			# big screen, big label
 			else:
@@ -930,18 +950,23 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
 
 		# zoom reset view button
-		if sub: 
-			reset_button_ax = fig.add_axes([0.886, 0.373, 0.0145, 0.01]) # axes left, bottom, width, height
+		if sub:
+			# store initial figure dimesions
+			fig_width, fig_height = fig.get_size_inches() * fig.dpi
+
+			# reset button axis size based on figure size to look correct on multiple screens
+			if fig_height <= 1700:
+				reset_button_ax = fig.add_axes([0.878, 0.373, 0.022, 0.015])
+
+			else:
+				reset_button_ax = fig.add_axes([0.886, 0.373, 0.0145, 0.01]) # axes left, bottom, width, height
 			
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
 			
-			# store initial figure dimesions
-			fig_width, fig_height = fig.get_size_inches() * fig.dpi
-			
 			# small screen, smaller label
 			if fig_height <= 1700:
-				reset_button.label.set_size(3)
+				reset_button.label.set_size(6)
 
 			# big screen, big label
 			else:
