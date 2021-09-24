@@ -370,11 +370,11 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 			fig_width, fig_height = fig.get_size_inches() * fig.dpi
 			
 			# small screen, smaller label
-			if fig_height <= 1500:
+			if fig_height <= 1700:
 				reset_button.label.set_size(3)
 
 			# big screen, big label
-			if fig_height >= 2500:
+			else:
 				reset_button.label.set_size(7)
 
 			reset_button.label.set_color('#F0191C')
@@ -473,11 +473,11 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 			fig_width, fig_height = fig.get_size_inches() * fig.dpi
 			
 			# small screen, smaller label
-			if fig_height <= 1500:
+			if fig_height <= 1700:
 				reset_button.label.set_size(3)
 
 			# big screen, big label
-			if fig_height >= 2500:
+			else:
 				reset_button.label.set_size(7)
 			
 			reset_button.label.set_color('#F0191C')
@@ -715,11 +715,11 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		fig_width, fig_height = fig.get_size_inches() * fig.dpi
 		
 		# small screen, smaller label
-		if fig_height <= 1500:
+		if fig_height <= 1700:
 			reset_button.label.set_size(3)
 
 		# big screen, big label
-		if fig_height >= 2500:
+		else:
 			reset_button.label.set_size(7)
 		
 		reset_button.label.set_color('#F0191C')
@@ -832,11 +832,11 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			fig_width, fig_height = fig.get_size_inches() * fig.dpi
 			
 			# small screen, smaller label
-			if fig_height <= 1500:
+			if fig_height <= 1700:
 				reset_button.label.set_size(3)
 
 			# big screen, big label
-			if fig_height >= 2500:
+			else:
 				reset_button.label.set_size(7)
 			
 			reset_button.label.set_color('#F0191C')
@@ -940,11 +940,11 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			fig_width, fig_height = fig.get_size_inches() * fig.dpi
 			
 			# small screen, smaller label
-			if fig_height <= 1500:
+			if fig_height <= 1700:
 				reset_button.label.set_size(3)
 
 			# big screen, big label
-			if fig_height >= 2500:
+			else:
 				reset_button.label.set_size(7)
 			
 			reset_button.label.set_color('#F0191C')
