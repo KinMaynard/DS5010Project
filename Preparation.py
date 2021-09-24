@@ -253,7 +253,54 @@ def export_array(name, array, sample_rate, subtype):
 ### Visualization ###
 #####################
 
-def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
+class TextResizer():
+	'''
+	Handles resizing text in plots by a factor of the scale of a window resize event. 
+	Whenever the window is resized, the text in the plots is resized proportionally.
+	Stores the initial figure height and fontsizes, updating the fontsizes once the 
+	figure is resized, scaled by the new figure height divided by the initial height.
+	'''
+	def __init__(self, texts, fig=None, minimal=4):
+		'''
+		texts: list of text objects in figure being resized by this class
+		fig: matplotlib figure object, the figure being resized
+		minimal: minimal fontsize resize threshold
+		'''
+		# sanity check & for minimal testing examples
+		if not fig: 
+			fig = plt.gcf()
+
+		# class attributes
+		self.texts = texts
+		self.fig = fig
+		self.minimal = minimal
+		
+		# create list of fontsizes for all text objects in texts list
+		self.fontsizes = [t.get_fontsize() for t in self.texts]
+
+		# store initial figure windowheight (the window width is unused)
+		self.windowwidth, self.windowheight = fig.get_size_inches() * fig.dpi
+
+	def __call__(self, event=None):
+		'''
+		Callback function for figure resize events. Factors the fontsizes of text
+		objects in the texts list by the scale of the current figure height from the
+		initial figure height.
+		'''
+		# scale of current figure height by initial figure height
+		scale = event.height / (self.windowheight / 2) # halving height lets size enlarge again
+
+		# resizing fontsizes for text objects in texts list
+		for i in range(len(self.texts)):
+			'''
+			Factors each fontsize in the texts list by the scale bottom bounded by 
+			minimal and sets the fontsize of the text object in the text list
+			to this new scaled fontsize
+			'''
+			newsize = np.max([int(self.fontsizes[i] * scale), self.minimal])
+			self.texts[i].set_fontsize(newsize)
+
+def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
 	'''
 	array: array of audio data
 	name: file name
@@ -262,6 +309,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 	fig: external figure to plot onto if provided, default = None
 	sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
 	gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
+	resize_ls: list of text objects to be resized on window resize events when plotting inside visualizer, default None
 
 	returns: waveform plot of intensity/time either alone or as part of provided fig
 	'''
@@ -286,9 +334,9 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		title = '%s WAVEFORM' % name
 		if sub:
 			title = 'WAVEFORM'
-		ax.set_title(title, color='#F9A438', fontsize=10)
-		ax.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
-		ax.set_ylabel('AMPLITUDE', color='#F9A438', fontsize=7)
+		title_mono = ax.set_title(title, color='#F9A438', fontsize=10)
+		xlabel_mono = ax.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
+		ylabel_mono = ax.set_ylabel('AMPLITUDE', color='#F9A438', fontsize=7)
 		ax.minorticks_on()
 		ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
@@ -328,9 +376,13 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 				ax.set_ylim(state['start_ylim'])
 			reset_button.on_clicked(reset_button_on_clicked)
 
+		if resize_ls is not None:
+			# store text to be resized
+			resize_ls.extend([title_mono, xlabel_mono, ylabel_mono, reset_button.label])
+
 		# individual figure or as part of larger figure
 		if sub:
-			return fig, reset_button, reset_button_on_clicked
+			return fig, reset_button, reset_button_on_clicked, resize_ls
 		else:
 			return plt.show()
 
@@ -355,10 +407,10 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 		title = '%s WAVEFORM' % name
 		if sub:
 			title = 'WAVEFORM'
-		ax1.set_title(title, color='#F9A438', fontsize=10)
-		ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
-		ax1.set_ylabel('AMPLITUDE LEFT', color='#F9A438', fontsize=7)
-		ax2.set_ylabel('AMPLITUDE RIGHT', color='#F9A438', fontsize=7)
+		title_stereo = ax1.set_title(title, color='#F9A438', fontsize=10)
+		xlabel = ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
+		ylabel_L = ax1.set_ylabel('AMPLITUDE LEFT', color='#F9A438', fontsize=7)
+		ylabel_R = ax2.set_ylabel('AMPLITUDE RIGHT', color='#F9A438', fontsize=7)
 		ax1.minorticks_on()
 		ax2.minorticks_on()
 		ax1.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
@@ -418,13 +470,17 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 				ax2.set_ylim(state['start_ylim2'])
 			reset_button.on_clicked(reset_button_on_clicked)
 
+		if resize_ls is not None:
+			# store text to be resized
+			resize_ls.extend([title_stereo, xlabel, ylabel_L, ylabel_R, reset_button.label])
+
 		# individual figure or as part of larger figure
 		if sub:
-			return fig, reset_button, reset_button_on_clicked
+			return fig, reset_button, reset_button_on_clicked, resize_ls
 		else:
 			return plt.show()
 
-def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
+def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
 	'''
 	plots the log magnitude spectrum of an audio signal magnitude dB/frequency
 	
@@ -435,6 +491,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	fig: external figure to plot onto if provided, default = None
 	sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
 	gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
+	resize_ls: list of text objects to be resized on window resize events when plotting inside visualizer, default None
 
 	Radio buttons: 
 		L: plots left channel, R: plots right channel, Sum: plots L+R, Mid: plots mid channel, Side: plots side channel
@@ -466,7 +523,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	title = '%s MAGNITUDE SPECTRUM' % name
 	if sub:
 		title = 'MAGNITUDE SPECTRUM'
-	ax.set_title(title, color='#F9A438', fontsize=10)
+	title_mag = ax.set_title(title, color='#F9A438', fontsize=10)
 	ax.minorticks_on()
 	ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
@@ -532,8 +589,8 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 			ax.relim()
 
 			# Set Labels
-			ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
-			ax.set_ylabel('MAGNITUDE (%s)' % state['scale'], color='#F9A438', fontsize=7)
+			xlabel = ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
+			ylabel = ax.set_ylabel('MAGNITUDE (%s)' % state['scale'], color='#F9A438', fontsize=7)
 			
 			# update state variables to new line & data
 			state['line'] = line
@@ -547,6 +604,10 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		for label in lrsums.labels:
 			label.set_fontsize(8)
 			label.set_color('#F9A438')
+
+			if resize_ls is not None:
+				# add to resize list for resizing in visualizer 
+				resize_ls.append(label)
 
 		# dynamically resize radio button height with figure size & setting color and width of button edges
 		rpos = rax.get_position().get_points()
@@ -587,8 +648,8 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		ax.autoscale()
 
 		# Set Labels
-		ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
-		ax.set_ylabel('MAGNITUDE (%s)' % label, color='#F9A438', fontsize=7)
+		xlabel = ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
+		ylabel = ax.set_ylabel('MAGNITUDE (%s)' % label, color='#F9A438', fontsize=7)
 		
 		# update state variables to new line & scale
 		state['line'] = line
@@ -603,6 +664,10 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		label.set_fontsize(8)
 		label.set_color('#F9A438')
 
+		if resize_ls is not None:
+			# add to resize list for resizing in visualizer 
+			resize_ls.append(label)
+
 	# dynamically resize radio button height with figure size
 	rpos = rax.get_position().get_points()
 	fh = fig.get_figheight()
@@ -614,8 +679,8 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		circ.set_lw(0.5)
 
 	# Axis Labels
-	ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
-	ax.set_ylabel('MAGNITUDE (LIN)', color='#F9A438', fontsize=7)
+	xlabel = ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
+	ylabel = ax.set_ylabel('MAGNITUDE (LIN)', color='#F9A438', fontsize=7)
 
 	# zoom reset view button & axes
 	if sub:
@@ -637,16 +702,21 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 			ax.autoscale()
 		reset_button.on_clicked(reset_button_on_clicked)
 
+	if resize_ls is not None:
+		# store text to be resized
+		resize_ls.extend([title_mag, xlabel, ylabel, reset_button.label])
+
 	# individual figure or as part of larger figure
 	if sub:
+		# only return lrsums button if stereo array
 		if channels == '2':
-			return fig, lrsums, side, lindB, scale, reset_button, reset_button_on_clicked
+			return fig, lrsums, side, lindB, scale, reset_button, reset_button_on_clicked, resize_ls
 		else:
-			return fig, lindB, scale, reset_button, reset_button_on_clicked
+			return fig, lindB, scale, reset_button, reset_button_on_clicked, resize_ls
 	else:
 		return plt.show()
 
-def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None):
+def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
 	'''
 	Creates a spectrogram given an array of audio data
 	
@@ -656,6 +726,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 	fig: external figure to plot onto if provided, default = None
 	sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
 	gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
+	resize_ls: list of text objects to be resized on window resize events when plotting inside visualizer, default None
 
 	returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
 	'''
@@ -679,9 +750,9 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		title = '%s SPECTROGRAM' % name
 		if sub:
 			title = 'SPECTROGRAM'
-		ax.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
-		ax.set_ylabel('FREQUENCY (KHZ)', color='#F9A438', fontsize=7)
-		ax.set_title(title, color='#F9A438', fontsize=10)
+		xlabel = ax.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
+		ylabel = ax.set_ylabel('FREQUENCY (KHZ)', color='#F9A438', fontsize=7)
+		title_mono = ax.set_title(title, color='#F9A438', fontsize=10)
 		ax.minorticks_on()
 		ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
 
@@ -704,6 +775,8 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			cbar_ax = fig.add_axes([0.905, 0.53, 0.003, 0.35])	# left, bottom, width, height
 		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', fontsize=7)
 		cbar_ax.tick_params(color='#F9A438', labelsize=5, labelcolor='#F9A438')
+		# get colorbar label for resizing
+		cbarlabel = cbar_ax.get_yaxis().get_label()
 		
 		# limit y axis to human hearing range
 		ax.set_ylim([0, 20000])
@@ -732,9 +805,13 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 				ax.set_ylim(state['start_ylim'])
 			reset_button.on_clicked(reset_button_on_clicked)
 
+		if resize_ls is not None:
+			# store text to be resized
+			resize_ls.extend([title_mono, xlabel, ylabel, cbarlabel, reset_button.label])
+
 		# individual figure or as part of larger figure
 		if sub:
-			return fig, reset_button, reset_button_on_clicked
+			return fig, reset_button, reset_button_on_clicked, resize_ls
 		else:
 			return plt.show()
 
@@ -758,10 +835,10 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		title = '%s SPECTROGRAM' % name
 		if sub:
 			title = 'SPECTROGRAM'
-		ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
-		ax1.set_ylabel('LEFT FREQUENCY (KHZ)', color='#F9A438', fontsize=7)
-		ax2.set_ylabel('RIGHT FREQUENCY (KHZ)', color='#F9A438', fontsize=7)
-		ax1.set_title(title, color='#F9A438', fontsize=10)
+		xlabel = ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
+		ylabel_L = ax1.set_ylabel('LEFT FREQUENCY (KHZ)', color='#F9A438', fontsize=7)
+		ylabel_R = ax2.set_ylabel('RIGHT FREQUENCY (KHZ)', color='#F9A438', fontsize=7)
+		title_stereo = ax1.set_title(title, color='#F9A438', fontsize=10)
 		ax1.minorticks_on()
 		ax2.minorticks_on()
 		ax1.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
@@ -788,8 +865,10 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77]) # left, bottom, width, height
 		else:
 			cbar_ax = fig.add_axes([0.905, 0.414, 0.003, 0.466]) # left, bottom, width, height
-		fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', fontsize='x-small')
+		colorbar = fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', fontsize='x-small')
 		cbar_ax.tick_params(color='#F9A438', labelsize=6, labelcolor='#F9A438')
+		# get colorbar label for resizing
+		cbarlabel = cbar_ax.get_yaxis().get_label()
 		
 		# limit y axes to human hearing range
 		ax1.set_ylim([0, 20000])
@@ -825,13 +904,17 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 				ax2.set_ylim(state['start_ylim2'])
 			reset_button.on_clicked(reset_button_on_clicked)
 
+		if resize_ls is not None:
+			# store text to be resized
+			resize_ls.extend([title_stereo, xlabel, ylabel_L, ylabel_R, cbarlabel, reset_button.label])
+
 		# individual figure or as part of larger figure
 		if sub:
-			return fig, reset_button, reset_button_on_clicked
+			return fig, reset_button, reset_button_on_clicked, resize_ls
 		else:
 			return plt.show()
 
-def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
+def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls=None):
 	'''
 	A stereo vectorscope polar sample plot of audio data
 	Side/Mid amplitudes as coordinates on X/Y 180 degree polar plot
@@ -842,6 +925,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 	fig: external figure to plot onto if provided, default = None
 	sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
 	gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
+	resize_ls: list of text objects to be resized on window resize events when plotting inside visualizer, default None
 	
 	returns: a vectorscope polar dot per sample plot of audio data
 	'''
@@ -876,9 +960,9 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 		# set title & bring down close to top of plot
 		if sub:
 			if channels == '1':
-				ax.set_title(title, color='#F9A438', fontsize=10, pad=-140)
+				title_vec = ax.set_title(title, color='#F9A438', fontsize=10, pad=-140)
 			else:
-				ax.set_title(title, color='#F9A438', fontsize=10, pad=-105)
+				title_vec = ax.set_title(title, color='#F9A438', fontsize=10, pad=-105)
 		else:
 			ax.set_title(title, color='#F9A438', fontsize='medium', pad=-70)
 
@@ -904,17 +988,20 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None):
 				ax.set_position([0.55, -0.735, 0.350, 2.023]) # left, bottom, width, height
 			else:
 				ax.set_position([0.6, -0.772, 0.245, 2])
+		if resize_ls is not None:
+			# store text to be resized
+			resize_ls.append(title_vec)
 
 		# individual figure or as part of larger figure
 		if sub:
-			return fig
+			return fig, resize_ls
 		else:
 			return plt.show()
 
 	else:
 		# midside encoding
 		msarray, ms = midside(array, channels, name)
-		vectorscope(msarray, name, True, fig, sub, gridspec)
+		return vectorscope(msarray, name, True, fig, sub, gridspec, resize_ls)
 
 def visualizer(array, name, channels, sample_rate, code):
 	'''
@@ -928,7 +1015,9 @@ def visualizer(array, name, channels, sample_rate, code):
 	'''
 	# initialize figure with dark background and title
 	plt.style.use('dark_background')
-	fig = plt.figure() # figsize=(26, 13.5)
+	fig = plt.figure()
+
+	# maximize figure window to screen size
 	figmanager = plt.get_current_fig_manager()
 	figmanager.window.showMaximized()
 
@@ -937,7 +1026,10 @@ def visualizer(array, name, channels, sample_rate, code):
 	mpl.rcParams['font.sans-serif'] = 'Helvetica'
 	
 	# Title
-	plt.suptitle('%s VISUALIZATION' % name, color='#F9A438', fontsize=17.5, fontweight=900)
+	title = plt.suptitle('%s VISUALIZATION' % name, color='#F9A438', fontsize=17.5, fontweight=900)
+
+	# store text objects for later resizing when window resized
+	resize_ls = [title]
 
 	# gridspec to snugly fascet only stereo spectrogram and waveform plots
 	# initialize for mono case
@@ -954,19 +1046,19 @@ def visualizer(array, name, channels, sample_rate, code):
 		gs2 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec = outer[1])
 
 		# stereo mag plot with side button
-		fig, lrsums, side, lindB, scale, reset_mag, reset_mag_click = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
+		fig, lrsums, side, lindB, scale, reset_mag, reset_mag_click, resize_ls = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2, resize_ls=resize_ls)
 		
 		# enabling mag buttons
 		lrsums.on_clicked(side)
 
 	else:
 		# mono mag plot without side button
-		fig, lindB, scale, reset_mag, reset_mag_click = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2)
+		fig, lindB, scale, reset_mag, reset_mag_click, resize_ls = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2, resize_ls=resize_ls)
 	
 	# subplots currently multi_spec only shows
-	fig, reset_wav, reset_wav_click = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
-	fig, reset_spec, reset_spec_click = spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1)
-	fig = vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2)
+	fig, reset_wav, reset_wav_click, resize_ls = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1, resize_ls=resize_ls)
+	fig, reset_spec, reset_spec_click, resize_ls = spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1, resize_ls=resize_ls)
+	fig, resize_ls = vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2, resize_ls=resize_ls)
 
 	# enabling mag buttons
 	lindB.on_clicked(scale)
@@ -975,6 +1067,9 @@ def visualizer(array, name, channels, sample_rate, code):
 	reset_wav.on_clicked(reset_wav_click)
 	reset_spec.on_clicked(reset_spec_click)
 	reset_mag.on_clicked(reset_mag_click)
+
+	# connect the figure resize events to the font resizing callback function
+	cid = plt.gcf().canvas.mpl_connect("resize_event", TextResizer(resize_ls))
 
 	plt.show()
 
