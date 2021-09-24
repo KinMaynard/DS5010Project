@@ -260,7 +260,7 @@ class TextResizer():
 	Stores the initial figure height and fontsizes, updating the fontsizes once the 
 	figure is resized, scaled by the new figure height divided by the initial height.
 	'''
-	def __init__(self, texts, fig=None, minimal=4):
+	def __init__(self, texts, fig=None, minimal=2):
 		'''
 		texts: list of text objects in figure being resized by this class
 		fig: matplotlib figure object, the figure being resized
@@ -572,7 +572,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		if not sub:
 			rax = plt.axes([0.08, 0.7, 0.08, 0.2], facecolor=button_face_color, frame_on=False)
 		else:
-			rax = plt.axes([0.07, 0.26, 0.04, 0.0835], facecolor=button_face_color, frame_on=False)
+			rax = plt.axes([0.06, 0.26, 0.04, 0.0835], facecolor=button_face_color, frame_on=False)
 
 		# LRSUM button
 		lrsums = RadioButtons(rax, ('L', 'R', 'SUM', 'MID', 'SIDE'), activecolor='#5C8BC6')
@@ -623,7 +623,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	if not sub:
 		rax = plt.axes([0.08, 0.4, 0.08, 0.15], facecolor=button_face_color, frame_on=False)
 	else:
-		rax = plt.axes([0.07, 0.2, 0.04, 0.05], facecolor=button_face_color, frame_on=False)
+		rax = plt.axes([0.06, 0.2, 0.04, 0.05], facecolor=button_face_color, frame_on=False)
 
 	# Linear dB buttons
 	lindB = RadioButtons(rax, ('LIN', 'dB'), activecolor='#5C8BC6')
