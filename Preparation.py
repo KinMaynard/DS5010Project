@@ -260,7 +260,7 @@ class TextResizer():
 	Stores the initial figure height and fontsizes, updating the fontsizes once the 
 	figure is resized, scaled by the new figure height divided by the initial height.
 	'''
-	def __init__(self, texts, fig=None, minimal=4):
+	def __init__(self, texts, fig=None, minimal=2):
 		'''
 		texts: list of text objects in figure being resized by this class
 		fig: matplotlib figure object, the figure being resized
@@ -365,7 +365,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-			reset_button.label.set_size(5)
+			reset_button.label.set_size(7)
 			reset_button.label.set_color('#F0191C')
 			for spine in spine_ls:
 				reset_button_ax.spines[spine].set_color('#F0191C')
@@ -457,7 +457,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 			
 			# reset button
 			reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
-			reset_button.label.set_size(5)
+			reset_button.label.set_size(7)
 			reset_button.label.set_color('#F0191C')
 			for spine in spine_ls:
 				reset_button_ax.spines[spine].set_color('#F0191C')
