@@ -260,7 +260,7 @@ class TextResizer():
 	Stores the initial figure height and fontsizes, updating the fontsizes once the 
 	figure is resized, scaled by the new figure height divided by the initial height.
 	'''
-	def __init__(self, texts, fig=None, minimal=2):
+	def __init__(self, texts, fig=None, minimal=1):
 		'''
 		texts: list of text objects in figure being resized by this class
 		fig: matplotlib figure object, the figure being resized
