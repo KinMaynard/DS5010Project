@@ -14,6 +14,9 @@ import matplotlib.gridspec as gridspec
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
 
+# ignore divide by 0 error in log
+np.seterr(divide = 'ignore')
+
 def import_array(file):
 	'''
 	Import audio file as 64 bit float array
@@ -809,7 +812,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		for spine in ['top', 'bottom', 'left', 'right']:
 			ax.spines[spine].set_color('#F9A438')
 		
-		# plot spectrogram
+		# plot spectrogram (only im is used for colorbar)
 		spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma', vmin=-120, vmax=0)
 		
 		# make space for colorbar
@@ -823,6 +826,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 			cbar_ax = fig.add_axes([0.905, 0.53, 0.003, 0.35])	# left, bottom, width, height
 		fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', fontsize=7)
 		cbar_ax.tick_params(color='#F9A438', labelsize=5, labelcolor='#F9A438')
+
 		# get colorbar label for resizing
 		cbarlabel = cbar_ax.get_yaxis().get_label()
 		
@@ -1219,8 +1223,6 @@ if __name__ == '__main__':
 
 		if 'Spectrogram' in answers['tests']:
 			# spectrogram test case mono file
-			# prevents divide by zero runtime exception
-			data = trim(data)
 			spectrogram(data, name, channels, sample_rate)
 
 		if 'Vectorscope' in answers['tests']:
@@ -1290,8 +1292,6 @@ if __name__ == '__main__':
 
 		if 'Spectrogram' in answers['tests']:
 			# spectrogram test case stereo file
-			# prevents divide by zero runtime exception
-			data = trim(data)
 			spectrogram(data, name, channels, sample_rate)
 
 		if 'Vectorscope' in answers['tests']:
