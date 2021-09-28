@@ -1054,9 +1054,16 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 
 		# plotting 180 degrees
 		ax.set_thetamax(180)
+
+		# setting the outer grid max
+		ax.set_rmax(1.0)
+
+		# removing axis labels and most grids
 		ax.set_yticklabels([])
 		ax.set_xticklabels([])
 		ax.grid(False, axis='y')
+
+		# setting spine color
 		ax.spines['polar'].set_color('#F9A438')
 
 		# plotting only 2 theta grids
