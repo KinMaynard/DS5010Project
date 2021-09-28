@@ -1033,18 +1033,17 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 		# take absolute value of the array to flip all data into 180 degrees of polar plot
 		absarray = np.absolute(array)
 
-		# converting cartesian coordinates to polar (currently not using absarray)
+		# converting cartesian coordinates to polar
 		r = np.sqrt(np.sum(np.square(array), axis=1))
-		theta = np.arctan2(array[:,0], array[:,1])
+		theta = np.arctan2(array[:,0], array[:,1]) # currently not using absarray
 		
 		# plotting
-		title = '%s POLAR DOT PER SAMPLE VECTORSCOPE' % name
-		if sub:
-			title = 'POLAR DOT PER SAMPLE VECTORSCOPE'
 		ax.scatter(theta, r, s=0.25, c='#4B9D39')
 		
 		# set title & bring down close to top of plot
+		title = '%s POLAR DOT PER SAMPLE VECTORSCOPE' % name
 		if sub:
+			title = 'POLAR DOT PER SAMPLE VECTORSCOPE'
 			if channels == '1':
 				title_vec = ax.set_title(title, y=0.78, color='#F9A438', fontsize=10)
 			else:
