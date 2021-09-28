@@ -1070,6 +1070,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 		else:
 			if channels == '1':
 				ax.set_position([0.55, -0.735, 0.350, 2.023]) # left, bottom, width, height
+
 			else:
 				ax.set_position([0.6, -0.772, 0.245, 2])
 
@@ -1296,10 +1297,6 @@ if __name__ == '__main__':
 
 		if 'Vectorscope' in answers['tests']:
 			# vectorscope stereo test
-			vectorscope(data, name, False)
-
-			# Stereo test left channel only
-			data[:,1] = 0
 			vectorscope(data, name, False)
 
 		if 'Visualizer' in answers['tests']:
