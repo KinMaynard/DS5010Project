@@ -1030,8 +1030,10 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 		mpl.rcParams['font.family'] = 'sans-serif'
 		mpl.rcParams['font.sans-serif'] = 'Helvetica'
 
-		# converting cartesian coordinates to polar
+		# take absolute value of the array to flip all data into 180 degrees of polar plot
 		absarray = np.absolute(array)
+
+		# converting cartesian coordinates to polar
 		r = np.sqrt(np.sum(np.square(array), axis=1))
 		theta = np.arctan2(absarray[:,0], array[:,1])
 		
