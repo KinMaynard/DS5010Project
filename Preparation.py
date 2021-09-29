@@ -1035,7 +1035,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 
 		# converting cartesian coordinates to polar
 		r = np.sqrt(np.sum(np.square(array), axis=1))
-		theta = np.arctan2(array[:,0], array[:,1]) # currently not using absarray
+		theta = np.degrees(np.arctan2(array[:,0], array[:,1])) # currently not using absarray
 		
 		# plotting
 		ax.scatter(theta, r, s=0.25, c='#4B9D39')
@@ -1058,16 +1058,15 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 		extent = np.amax(array)
 		ax.set_rmax(extent)
 
-		# removing axis labels and most grids
+		# removing y axis labels and most grids
 		ax.set_yticklabels([])
-		ax.set_xticklabels([])
 		ax.grid(False, axis='y')
 
 		# setting spine color
 		ax.spines['polar'].set_color('#F9A438')
 
 		# plotting only 2 theta grids
-		ax.set_thetagrids((135.0, 45.0))
+		ax.set_thetagrids((135.0, 90.0, 45.0), labels=('L', 'C', 'R'), color='#F9A438', fontsize=7)
 
 		# thetagrid color
 		ax.xaxis.grid(color='#F9A438')
