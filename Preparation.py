@@ -999,6 +999,89 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		else:
 			return plt.show()
 
+def lissajous(array, name, channels):
+	'''
+	Lissajous vectorscope dot per sample plotting stereo width of the audio signal.
+	Mono signals show as straight lines down the center, stereo information is show with horizontal
+	deflection of the data. Phase issues show as INSERT PHASE EXPLANATION HERE.
+
+	array: array: array of audio data
+	name: name: audio datafile name
+	channels: channels: 1 mono or 2 stereo, number of channels in audio array
+
+	returns: a lissajouse dot per sample vectorscope plot of the audio array
+	'''
+	# double up mono signals to display them
+	# need better handling of mono data to not double up on amount plotted
+	if channels == '1':
+		array = np.stack((array, array), axis=-1)
+
+	# dark background white text
+	plt.style.use('dark_background')
+
+	# setting font
+	mpl.rcParams['font.family'] = 'sans-serif'
+	mpl.rcParams['font.sans-serif'] = 'Helvetica'
+
+	# initializing figure and axes
+	# fig, ax = plt.subplots()
+	fig = plt.figure()
+
+	# making floating axes and rotating it 45 degrees
+	extents = -1.0, 1.0, -1.0, 1.0
+	transform = mpl.transforms.Affine2D().rotate_deg(45)
+	helper = floating_axes.GridHelperCurveLinear(transform, extents)
+	ax = floating_axes.FloatingSubplot(fig, 111, grid_helper=helper)
+	fig.add_subplot(ax)
+
+	# turn off tick labels, ticks & axis labels
+	ax.axis['top', 'bottom', 'left', 'right'].toggle(all=False)
+
+	# disabling top and right spines
+	ax.axis['top', 'bottom', 'left', 'right'].line.set_visible(False)
+
+	# diagonal spine right
+	ax.axline((-1, -1), (1, 1), color='#F9A438', zorder=3)
+
+	# diagonal spine left
+	ax.axline((-1, 1), (1, -1), color='#F9A438', zorder=3)
+
+	# setting the title of the plot
+	ax.set_title('Lissajous Vectorscope', color='#F9A438', fontsize=10)
+	
+	# non floating axes api (use if floating axes doesn't work)
+		# adding coordinate plane spines (breaks with floating axes)
+		# Move the left and bottom spines to x = 0 and y = 0, respectively.
+		# ax.spines[['left', 'bottom']].set_position(('data', 0))
+		# ax.spines[['left', 'bottom']].set_color('#F9A438')
+		
+		# Hide the top and right spines. (breaks with floating axes)
+		# ax.spines[['top', 'right']].set_visible(False)
+
+		# diagonal spine right
+		# ax.axline((-0.5, -0.5), (0.5, 0.5), color='#F9A438', zorder=3)
+
+		# diagonal spine left
+		# ax.axline((-0.5, 0.5), (0.5, -0.5), color='#F9A438', zorder=3)
+
+		# hiding axis ticks & tick labels (breaks with floating axes)
+		# ax.tick_params(bottom=False, left=False, labelbottom=False, labelleft=False)
+
+	# base transformation of data
+	base = plt.gca().transData
+	rot = mpl.transforms.Affine2D().rotate_deg(45)
+
+	# add annotations for quadrants (axis labels)
+	ax.text(0, 1, '+L', color='#F9A438', fontsize=7, transform=ax.transAxes)
+	ax.text(1, 0, '-L', color='#F9A438', fontsize=7, transform=ax.transAxes)
+	ax.text(1, 1, '+R', color='#F9A438', fontsize=7, transform=ax.transAxes)
+	ax.text(0, 0, '-R', color='#F9A438', fontsize=7, transform=ax.transAxes)
+
+	# plotting data
+	ax.plot(array[:,0], array[:,1], 'o', color='#4B9D39', markersize=0.05, transform=rot + base)
+	
+	return plt.show()
+
 def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls=None):
 	'''
 	A stereo vectorscope polar sample plot of audio data
@@ -1088,6 +1171,38 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 			else:
 				ax.set_position([0.6, -0.772, 0.245, 2])
 
+		# polarlissa button axis.
+		# part of visualizer 
+		if not sub:
+			rax = plt.axes([0.43, 0.1, 0.13, 0.1], facecolor='black', frame_on=False) # left, bottom, width, height
+
+		# solo plot
+		else:
+			rax = plt.axes([0.69, 0.05, 0.06, 0.045], facecolor='black', frame_on=False)
+
+		# type callback function for polarlissa buttons
+		def type(label):
+			# clear previous data
+			state['line'].remove()
+			
+			# plot
+			sig, fq, line = ax.magnitude_spectrum(state[label], Fs=sample_rate, scale=state['scale'], color='#FB636F')
+			
+			# recompute axis limits
+			ax.relim()
+
+			# Set Labels
+			xlabel = ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
+			ylabel = ax.set_ylabel('MAGNITUDE (%s)' % state['scale'], color='#F9A438', fontsize=7)
+			
+			# update state variables to new line & data
+			state['line'] = line
+			state['data'] = state[label]
+			fig.canvas.draw_idle()
+
+		# polarlissa radio button
+		polarlissa = RadioButtons(rax, ('Polar', 'Lissajous'), activecolor='#5C8BC6')
+
 		# store text to be resized
 		if resize_ls is not None:
 			resize_ls.append(title_vec)
@@ -1102,89 +1217,6 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 	# 	# midside encoding
 	# 	msarray, ms = midside(array, channels, name)
 	# 	return vectorscope(msarray, name, True, fig, sub, gridspec, resize_ls)
-
-def lissajous(array, name, channels):
-	'''
-	Lissajous vectorscope dot per sample plotting stereo width of the audio signal.
-	Mono signals show as straight lines down the center, stereo information is show with horizontal
-	deflection of the data. Phase issues show as INSERT PHASE EXPLANATION HERE.
-
-	array: array: array of audio data
-	name: name: audio datafile name
-	channels: channels: 1 mono or 2 stereo, number of channels in audio array
-
-	returns: a lissajouse dot per sample vectorscope plot of the audio array
-	'''
-	# double up mono signals to display them
-	# need better handling of mono data to not double up on amount plotted
-	if channels == '1':
-		array = np.stack((array, array), axis=-1)
-
-	# dark background white text
-	plt.style.use('dark_background')
-
-	# setting font
-	mpl.rcParams['font.family'] = 'sans-serif'
-	mpl.rcParams['font.sans-serif'] = 'Helvetica'
-
-	# initializing figure and axes
-	# fig, ax = plt.subplots()
-	fig = plt.figure()
-
-	# making floating axes and rotating it 45 degrees
-	extents = -1.0, 1.0, -1.0, 1.0
-	transform = mpl.transforms.Affine2D().rotate_deg(45)
-	helper = floating_axes.GridHelperCurveLinear(transform, extents)
-	ax = floating_axes.FloatingSubplot(fig, 111, grid_helper=helper)
-	fig.add_subplot(ax)
-
-	# turn off tick labels, ticks & axis labels
-	ax.axis['top', 'bottom', 'left', 'right'].toggle(all=False)
-
-	# disabling top and right spines
-	ax.axis['top', 'bottom', 'left', 'right'].line.set_visible(False)
-
-	# diagonal spine right
-	ax.axline((-1, -1), (1, 1), color='#F9A438', zorder=3)
-
-	# diagonal spine left
-	ax.axline((-1, 1), (1, -1), color='#F9A438', zorder=3)
-
-	# setting the title of the plot
-	ax.set_title('Lissajous Vectorscope', color='#F9A438', fontsize=10)
-	
-	# non floating axes api (use if floating axes doesn't work)
-		# adding coordinate plane spines (breaks with floating axes)
-		# Move the left and bottom spines to x = 0 and y = 0, respectively.
-		# ax.spines[['left', 'bottom']].set_position(('data', 0))
-		# ax.spines[['left', 'bottom']].set_color('#F9A438')
-		
-		# Hide the top and right spines. (breaks with floating axes)
-		# ax.spines[['top', 'right']].set_visible(False)
-
-		# diagonal spine right
-		# ax.axline((-0.5, -0.5), (0.5, 0.5), color='#F9A438', zorder=3)
-
-		# diagonal spine left
-		# ax.axline((-0.5, 0.5), (0.5, -0.5), color='#F9A438', zorder=3)
-
-		# hiding axis ticks & tick labels (breaks with floating axes)
-		# ax.tick_params(bottom=False, left=False, labelbottom=False, labelleft=False)
-
-	# base transformation of data
-	base = plt.gca().transData
-	rot = mpl.transforms.Affine2D().rotate_deg(45)
-
-	# add annotations for quadrants (axis labels)
-	ax.text(0, 1, '+L', color='#F9A438', fontsize=7, transform=ax.transAxes)
-	ax.text(1, 0, '-L', color='#F9A438', fontsize=7, transform=ax.transAxes)
-	ax.text(1, 1, '+R', color='#F9A438', fontsize=7, transform=ax.transAxes)
-	ax.text(0, 0, '-R', color='#F9A438', fontsize=7, transform=ax.transAxes)
-
-	# plotting data
-	ax.plot(array[:,0], array[:,1], 'o', color='#4B9D39', markersize=0.05, transform=rot + base)
-	
-	return plt.show()
 
 def visualizer(array, name, channels, sample_rate, code):
 	'''
