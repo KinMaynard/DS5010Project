@@ -1136,32 +1136,44 @@ def lissajous(array, name, channels):
 	transform = mpl.transforms.Affine2D().rotate_deg(45)
 	helper = floating_axes.GridHelperCurveLinear(transform, extents)
 	ax = floating_axes.FloatingSubplot(fig, 111, grid_helper=helper)
-
 	fig.add_subplot(ax)
+
+	# turn off tick labels, ticks & axis labels
+	ax.axis['top', 'bottom', 'left', 'right'].toggle(all=False)
+
+	# disabling top and right spines
+	ax.axis['top', 'bottom', 'left', 'right'].line.set_visible(False)
+
+	# diagonal spine right
+	ax.axline((-1, -1), (1, 1), color='#F9A438', zorder=3)
+
+	# diagonal spine left
+	ax.axline((-1, 1), (1, -1), color='#F9A438', zorder=3)
 
 	# setting the title of the plot
 	ax.set_title('Lissajous Vectorscope', color='#F9A438', fontsize=10)
 	
-	# adding coordinate plane spines
-	# Move the left and bottom spines to x = 0 and y = 0, respectively.
-	# ax.spines[['left', 'bottom']].set_position(('data', 0))
-	# ax.spines[['left', 'bottom']].set_color('#F9A438')
-	
-	# Hide the top and right spines.
-	# ax.spines[['top', 'right']].set_visible(False)
+	# non floating axes api (use if floating axes doesn't work)
+		# adding coordinate plane spines (breaks with floating axes)
+		# Move the left and bottom spines to x = 0 and y = 0, respectively.
+		# ax.spines[['left', 'bottom']].set_position(('data', 0))
+		# ax.spines[['left', 'bottom']].set_color('#F9A438')
+		
+		# Hide the top and right spines. (breaks with floating axes)
+		# ax.spines[['top', 'right']].set_visible(False)
 
-	# diagonal spine right
-	# ax.axline((-0.5, -0.5), (0.5, 0.5), color='#F9A438', zorder=3)
+		# diagonal spine right
+		# ax.axline((-0.5, -0.5), (0.5, 0.5), color='#F9A438', zorder=3)
 
-	# diagonal spine left
-	# ax.axline((-0.5, 0.5), (0.5, -0.5), color='#F9A438', zorder=3)
+		# diagonal spine left
+		# ax.axline((-0.5, 0.5), (0.5, -0.5), color='#F9A438', zorder=3)
 
-	# hiding axis ticks & tick labels
-	ax.tick_params(bottom=False, left=False, labelbottom=False, labelleft=False)
+		# hiding axis ticks & tick labels (breaks with floating axes)
+		# ax.tick_params(bottom=False, left=False, labelbottom=False, labelleft=False)
 
 	# base transformation of data
-	# base = plt.gca().transData
-	# rot = mpl.transforms.Affine2D().rotate_deg(45)
+	base = plt.gca().transData
+	rot = mpl.transforms.Affine2D().rotate_deg(45)
 
 	# add annotations for quadrants (axis labels)
 	ax.text(0, 1, '+L', color='#F9A438', fontsize=7, transform=ax.transAxes)
@@ -1170,7 +1182,7 @@ def lissajous(array, name, channels):
 	ax.text(0, 0, '-R', color='#F9A438', fontsize=7, transform=ax.transAxes)
 
 	# plotting data
-	ax.plot(array[:,0], array[:,1], 'o', color='#4B9D39', markersize=0.05) #  transform=rot + base
+	ax.plot(array[:,0], array[:,1], 'o', color='#4B9D39', markersize=0.05, transform=rot + base)
 	
 	return plt.show()
 
