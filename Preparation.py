@@ -10,6 +10,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.widgets import MultiCursor, RadioButtons, Button
 import matplotlib.gridspec as gridspec
+import mpl_toolkits.axisartist.floating_axes as floating_axes
 
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
@@ -1013,7 +1014,8 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 	
 	returns: a vectorscope polar dot per sample plot of audio data
 	'''
-	if code:
+	# turn off midside encoding
+	if not code:
 		# dark background white text, initilize polar figure and axes
 		plt.style.use('dark_background')
 
@@ -1033,9 +1035,13 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 		# take absolute value of the array to flip all data into 180 degrees of polar plot
 		absarray = np.absolute(array)
 
+		# currently deciding what transformation to use
 		# converting cartesian coordinates to polar
-		r = np.sqrt(np.sum(np.square(array), axis=1))
-		theta = np.degrees(np.arctan2(array[:,0], array[:,1])) # currently not using absarray
+		# r = np.sqrt(np.sum(np.square(array), axis=1))
+		# theta = np.degrees(np.arctan2(array[:,0], array[:,1])) # currently not using absarray
+		left, right = np.split(array, 2, axis=1)
+		r = left
+		theta = (right + 1.0) * (np.pi / 2)
 		
 		# plotting
 		ax.scatter(theta, r, s=0.25, c='#4B9D39')
@@ -1092,10 +1098,81 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 		else:
 			return plt.show()
 
-	else:
-		# midside encoding
-		msarray, ms = midside(array, channels, name)
-		return vectorscope(msarray, name, True, fig, sub, gridspec, resize_ls)
+	# else:
+	# 	# midside encoding
+	# 	msarray, ms = midside(array, channels, name)
+	# 	return vectorscope(msarray, name, True, fig, sub, gridspec, resize_ls)
+
+def lissajous(array, name, channels):
+	'''
+	Lissajous vectorscope dot per sample plotting stereo width of the audio signal.
+	Mono signals show as straight lines down the center, stereo information is show with horizontal
+	deflection of the data. Phase issues show as INSERT PHASE EXPLANATION HERE.
+
+	array: array: array of audio data
+	name: name: audio datafile name
+	channels: channels: 1 mono or 2 stereo, number of channels in audio array
+
+	returns: a lissajouse dot per sample vectorscope plot of the audio array
+	'''
+	# double up mono signals to display them
+	# need better handling of mono data to not double up on amount plotted
+	if channels == '1':
+		array = np.stack((array, array), axis=-1)
+
+	# dark background white text
+	plt.style.use('dark_background')
+
+	# setting font
+	mpl.rcParams['font.family'] = 'sans-serif'
+	mpl.rcParams['font.sans-serif'] = 'Helvetica'
+
+	# initializing figure and axes
+	# fig, ax = plt.subplots()
+	fig = plt.figure()
+
+	# making floating axes and rotating it 45 degrees
+	extents = -1.0, 1.0, -1.0, 1.0
+	transform = mpl.transforms.Affine2D().rotate_deg(45)
+	helper = floating_axes.GridHelperCurveLinear(transform, extents)
+	ax = floating_axes.FloatingSubplot(fig, 111, grid_helper=helper)
+
+	fig.add_subplot(ax)
+
+	# setting the title of the plot
+	ax.set_title('Lissajous Vectorscope', color='#F9A438', fontsize=10)
+	
+	# adding coordinate plane spines
+	# Move the left and bottom spines to x = 0 and y = 0, respectively.
+	# ax.spines[['left', 'bottom']].set_position(('data', 0))
+	# ax.spines[['left', 'bottom']].set_color('#F9A438')
+	
+	# Hide the top and right spines.
+	# ax.spines[['top', 'right']].set_visible(False)
+
+	# diagonal spine right
+	# ax.axline((-0.5, -0.5), (0.5, 0.5), color='#F9A438', zorder=3)
+
+	# diagonal spine left
+	# ax.axline((-0.5, 0.5), (0.5, -0.5), color='#F9A438', zorder=3)
+
+	# hiding axis ticks & tick labels
+	ax.tick_params(bottom=False, left=False, labelbottom=False, labelleft=False)
+
+	# base transformation of data
+	# base = plt.gca().transData
+	# rot = mpl.transforms.Affine2D().rotate_deg(45)
+
+	# add annotations for quadrants (axis labels)
+	ax.text(0, 1, '+L', color='#F9A438', fontsize=7, transform=ax.transAxes)
+	ax.text(1, 0, '-L', color='#F9A438', fontsize=7, transform=ax.transAxes)
+	ax.text(1, 1, '+R', color='#F9A438', fontsize=7, transform=ax.transAxes)
+	ax.text(0, 0, '-R', color='#F9A438', fontsize=7, transform=ax.transAxes)
+
+	# plotting data
+	ax.plot(array[:,0], array[:,1], 'o', color='#4B9D39', markersize=0.05) #  transform=rot + base
+	
+	return plt.show()
 
 def visualizer(array, name, channels, sample_rate, code):
 	'''
@@ -1171,7 +1248,7 @@ if __name__ == '__main__':
 	# Test selector
 	questions = [inquirer.Checkbox('tests', message='Which tests to run?', 
 		choices=['Mono', 'Stereo', 'Downsample', 'Bins', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 
-		'Vectorscope', 'Visualizer'],),]
+		'Vectorscope', 'Lissajous', 'Visualizer'],),]
 
 	answers = inquirer.prompt(questions)
 
@@ -1238,6 +1315,10 @@ if __name__ == '__main__':
 			# vectorscope mono test
 			vectorscope(data, name, False)
 
+		if 'Lissajous' in answers['tests']:
+			# vectorscope mono test
+			lissajous(data, name, channels)
+
 		if 'Visualizer' in answers['tests']:
 			# visualizer mono plot
 			visualizer(data, name, channels, sample_rate, code=False)
@@ -1247,7 +1328,7 @@ if __name__ == '__main__':
 		questions2 = [inquirer.List('waves', message='Which stereo wave to test?', 
 			choices=[('Silence Stereo', '../binaries/silence_44100_-infdBFS_Stereo.aiff'), ('White Noise Stereo', '../binaries/whitenoise_44100_0dBFS_Stereo.aiff'), 
 			('Chirp Stereo', '../binaries/hdchirp_88k_-3dBFS_lin_Stereo.aiff'), ('Sin 440Hz Stereo', '../binaries/sin_44100_440Hz_-.8dBFS_Stereo.aiff'), 
-			('Lopez Song Stereo', '../binaries/Saija Original Mix.aiff')],
+			('Sin Out Phase', '../binaries/Sinoutphase.wav'), ('Lopez Song Stereo', '../binaries/Saija Original Mix.aiff')],
 			default=('White Noise Stereo', '../binaries/whitenoise_44100_0dBFS_Stereo.aiff')),]
 
 		answers2 = inquirer.prompt(questions2)
@@ -1306,6 +1387,10 @@ if __name__ == '__main__':
 		if 'Vectorscope' in answers['tests']:
 			# vectorscope stereo test
 			vectorscope(data, name, False)
+
+		if 'Lissajous' in answers['tests']:
+			# vectorscope mono test
+			lissajous(data, name, channels)
 
 		if 'Visualizer' in answers['tests']:
 			# visualizer stereo plot
