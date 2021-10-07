@@ -1028,28 +1028,32 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 	mpl.rcParams['font.family'] = 'sans-serif'
 	mpl.rcParams['font.sans-serif'] = 'Helvetica'
 
-	# initilize polar figure and axes
-	if fig is None:
-		fig, pol_ax = plt.subplots(subplot_kw={'projection': 'polar'})
-
-	else:
-		if channels == '1':
-			pol_ax = fig.add_subplot(224, polar=True)
-		else:
-			pol_ax = fig.add_subplot(gridspec[0, 1], polar=True)
-
-	##############LISSAJOUS START##################
-	# double up mono signals to display them
-	if channels == '1':
-		array = .5 * array
-		array = np.stack((array, array), axis=-1)
-
 	# making floating axes and rotating it 45 degrees
 	extents = -1.0, 1.0, -1.0, 1.0
 	transform = mpl.transforms.Affine2D().rotate_deg(45)
 	helper = floating_axes.GridHelperCurveLinear(transform, extents)
-	float_ax = floating_axes.FloatingSubplot(fig, 111, grid_helper=helper)
-	fig.add_subplot(float_ax)
+
+	# initilize polar & lissajous figure and axes
+	if fig is None:
+		fig, pol_ax = plt.subplots(subplot_kw={'projection': 'polar'})
+		float_ax = floating_axes.FloatingSubplot(fig, 111, grid_helper=helper)
+		fig.add_subplot(float_ax)
+
+	else:
+		if channels == '1':
+			pol_ax = fig.add_subplot(224, polar=True)
+			float_ax = floating_axes.FloatingSubplot(fig, 224, grid_helper=helper)
+			fig.add_subplot(float_ax)
+
+		else:
+			pol_ax = fig.add_subplot(gridspec[0, 1], polar=True)
+			float_ax = floating_axes.FloatingSubplot(fig, gridspec[0, 1], grid_helper=helper)
+			fig.add_subplot(float_ax)
+
+	# double up mono signals to display them
+	if channels == '1':
+		array = .5 * array
+		array = np.stack((array, array), axis=-1)
 
 	# turn off tick labels, ticks & axis labels
 	float_ax.axis['top', 'bottom', 'left', 'right'].toggle(all=False)
@@ -1081,8 +1085,6 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 
 	# initially hide lissajous vectorscope
 	float_ax.set_visible(False)
-	
-	########LISSAJOUS END###########
 
 	# take absolute value of the array to flip all data into 180 degrees of polar plot
 	absarray = np.absolute(array)
