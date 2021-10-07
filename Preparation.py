@@ -1040,8 +1040,8 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 
 	##############LISSAJOUS START##################
 	# double up mono signals to display them
-	# need better handling of mono data to not double up on amount plotted
 	if channels == '1':
+		array = .5 * array
 		array = np.stack((array, array), axis=-1)
 
 	# making floating axes and rotating it 45 degrees
@@ -1168,9 +1168,22 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 		label.set_fontsize(8)
 		label.set_color('#F9A438')
 
+	# dynamically resize radio button height with figure size & setting color and width of button edges
+	rpos = rax.get_position().get_points()
+	fig_height = fig.get_figheight()
+	fig_width = fig.get_figwidth()
+	rscale = (rpos[:,1].ptp() / rpos[:,0].ptp()) * (fig_height / fig_width)
+	for circ in polarlissa.circles:
+		circ.height /= rscale
+		circ.set_edgecolor('#F9A438')
+		circ.set_lw(0.5)
+
 	# store text to be resized
 	if resize_ls is not None:
-		resize_ls.append([title_vec, theta_labels, float_title, l_pos, l_neg, r_pos, r_neg])
+		for label in theta_labels:
+			resize_ls.append(label)
+		
+		resize_ls.extend([title_vec, float_title, l_pos, l_neg, r_pos, r_neg])
 
 	# individual figure or as part of larger figure
 	if sub:
@@ -1237,6 +1250,9 @@ def visualizer(array, name, channels, sample_rate, code):
 
 	# enabling mag buttons
 	lindB.on_clicked(scale)
+
+	# enabling vectorscope buttons
+	polarlissa.on_clicked(chooseplot)
 
 	# enabling view reset buttons
 	reset_wav.on_clicked(reset_wav_click)
