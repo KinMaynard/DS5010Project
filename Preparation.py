@@ -1028,8 +1028,10 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 	mpl.rcParams['font.family'] = 'sans-serif'
 	mpl.rcParams['font.sans-serif'] = 'Helvetica'
 
+	# setting axis limits to data peaks
+	extents = np.min(array), np.max(array), np.min(array), np.max(array)
+
 	# making floating axes and rotating it 45 degrees
-	extents = -1.0, 1.0, -1.0, 1.0
 	transform = mpl.transforms.Affine2D().rotate_deg(45)
 	helper = floating_axes.GridHelperCurveLinear(transform, extents)
 
@@ -1087,7 +1089,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 	r_neg = float_ax.text(0.22, 0.225, '-R', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
 
 	# plotting data
-	float_ax.plot(array[:,0], array[:,1], 'o', color='#4B9D39', markersize=0.05, transform=rot + base)
+	float_ax.plot(array[:,1], array[:,0], 'o', color='#4B9D39', markersize=0.05, transform=rot + base)
 
 	# initially hide lissajous vectorscope
 	float_ax.set_visible(False)
