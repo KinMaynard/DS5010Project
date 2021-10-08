@@ -1096,9 +1096,11 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 	absarray = np.absolute(array)
 
 	# currently deciding what transformation to use
-	left, right = np.split(absarray, 2, axis=1)
+	left, right = np.split(array, 2, axis=1)
+	left = np.absolute(left)
+	right = np.negative(right)
 	r = left
-	theta = right * np.pi
+	theta = (right + 1.0) * (np.pi / 2)
 	
 	# plotting
 	plot = pol_ax.plot(theta, r, 'o', color='#4B9D39', markersize=0.05)
