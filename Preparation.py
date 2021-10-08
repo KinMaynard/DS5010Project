@@ -1033,22 +1033,20 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 	transform = mpl.transforms.Affine2D().rotate_deg(45)
 	helper = floating_axes.GridHelperCurveLinear(transform, extents)
 
-	# initilize polar & lissajous figure and axes
+	# initilize polar & lissajous figure and axes for solo plot
 	if fig is None:
 		fig, pol_ax = plt.subplots(subplot_kw={'projection': 'polar'})
-		float_ax = floating_axes.FloatingSubplot(fig, 111, grid_helper=helper)
-		fig.add_subplot(float_ax)
+		float_ax = fig.add_subplot(axes_class=floating_axes.FloatingAxes, grid_helper=helper)
 
+	# initilize polar & lissajous figure and axes for subplotting inside visualizer
 	else:
 		if channels == '1':
 			pol_ax = fig.add_subplot(224, polar=True)
-			float_ax = floating_axes.FloatingSubplot(fig, 224, grid_helper=helper)
-			fig.add_subplot(float_ax)
+			float_ax = fig.add_subplot(224, axes_class=floating_axes.FloatingAxes, grid_helper=helper)
 
 		else:
 			pol_ax = fig.add_subplot(gridspec[0, 1], polar=True)
-			float_ax = floating_axes.FloatingSubplot(fig, gridspec[0, 1], grid_helper=helper)
-			fig.add_subplot(float_ax)
+			float_ax = fig.add_subplot(gridspec[0, 1], axes_class=floating_axes.FloatingAxes, grid_helper=helper)
 
 	# double up mono signals to display them
 	if channels == '1':
@@ -1058,27 +1056,35 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 	# turn off tick labels, ticks & axis labels
 	float_ax.axis['top', 'bottom', 'left', 'right'].toggle(all=False)
 
-	# disabling top and right spines
-	float_ax.axis['top', 'bottom', 'left', 'right'].line.set_visible(False)
+	# setting spine color
+	float_ax.axis['top', 'bottom', 'left', 'right'].line.set_color('#F9A438')
 
 	# diagonal spine right
-	float_ax.axline((-1, -1), (1, 1), color='#F9A438', zorder=3)
+	float_ax.axline((-1, -1), (1, 1), color='#F9A438', lw=1, zorder=3)
 
 	# diagonal spine left
-	float_ax.axline((-1, 1), (1, -1), color='#F9A438', zorder=3)
+	float_ax.axline((-1, 1), (1, -1), color='#F9A438', lw=1, zorder=3)
 
 	# setting the title of the plot
-	float_title = float_ax.set_title('Lissajous Vectorscope', color='#F9A438', fontsize=10)
+	title = '%s LISSAJOUS VECTORSCOPE' % name
+	if sub:
+		title = 'LISSAJOUS VECTORSCOPE'
+		if channels == '1':
+			float_title = float_ax.set_title(title, y=0.78, color='#F9A438', fontsize=10, pad=80)
+		else:
+			float_title = float_ax.set_title(title, y=.78, color='#F9A438', fontsize=10, pad=55)
+	else:
+		float_title = float_ax.set_title(title, color='#F9A438', fontsize=10)
 
 	# base transformation of data
 	base = plt.gca().transData
 	rot = mpl.transforms.Affine2D().rotate_deg(45)
 
 	# add annotations for quadrants (axis labels)
-	l_pos = float_ax.text(0, 1, '+L', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
-	l_neg = float_ax.text(1, 0, '-L', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
-	r_pos = float_ax.text(1, 1, '+R', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
-	r_neg = float_ax.text(0, 0, '-R', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
+	l_pos = float_ax.text(0.22, .76, '+L', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
+	l_neg = float_ax.text(.75, 0.225, '-L', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
+	r_pos = float_ax.text(.75, .75, '+R', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
+	r_neg = float_ax.text(0.22, 0.225, '-R', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
 
 	# plotting data
 	float_ax.plot(array[:,0], array[:,1], 'o', color='#4B9D39', markersize=0.05, transform=rot + base)
@@ -1090,12 +1096,12 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 	absarray = np.absolute(array)
 
 	# currently deciding what transformation to use
-	left, right = np.split(array, 2, axis=1)
+	left, right = np.split(absarray, 2, axis=1)
 	r = left
-	theta = (right + 1.0) * (np.pi / 2)
+	theta = right * np.pi
 	
 	# plotting
-	plot = pol_ax.scatter(theta, r, s=0.25, c='#4B9D39')
+	plot = pol_ax.plot(theta, r, 'o', color='#4B9D39', markersize=0.05)
 	
 	# set title & bring down close to top of plot
 	title = '%s POLAR DOT PER SAMPLE VECTORSCOPE' % name
@@ -1106,21 +1112,24 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 		else:
 			title_vec = pol_ax.set_title(title, y=.78, color='#F9A438', fontsize=10)
 	else:
-		title_vec = pol_ax.set_title(title, color='#F9A438', fontsize='medium', pad=-70)
+		title_vec = pol_ax.set_title(title, color='#F9A438', fontsize='medium', pad=-60)
 
 	# plotting 180 degrees
 	pol_ax.set_thetamax(180)
 
 	# setting the outer grid max to the max of the array
-	extent = np.amax(array)
-	pol_ax.set_rmax(extent)
+	peak = np.amax(array)
+	pol_ax.set_rmax(peak)
 
 	# removing y axis labels and most grids
 	pol_ax.set_yticklabels([])
 	pol_ax.grid(False, axis='y')
 
-	# setting spine color
-	pol_ax.spines['polar'].set_color('#F9A438')
+	# setting spine color, no api for the bottom spines so need to use get_children
+	artists = pol_ax.get_children()
+	pol_spines = [i for i in artists[1:4]]
+	for s in pol_spines:
+		s.set_color('#F9A438')
 
 	# plotting only 2 theta grids
 	theta_lines, theta_labels = pol_ax.set_thetagrids((135.0, 90.0, 45.0), labels=('L', 'C', 'R'), color='#F9A438', fontsize=7)
@@ -1140,13 +1149,13 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 			pol_ax.set_position([0.6, -0.772, 0.245, 2])
 
 	# polarlissa button axis.
-	# part of visualizer 
-	if not sub:
-		rax = plt.axes([0.43, 0.1, 0.13, 0.1], facecolor='black', frame_on=False) # left, bottom, width, height
-
 	# solo plot
+	if not sub:
+		rax = plt.axes([0.05, 0.7, 0.13, 0.1], facecolor='black', frame_on=False) # left, bottom, width, height
+
+	# part of visualizer
 	else:
-		rax = plt.axes([0.69, 0.05, 0.06, 0.045], facecolor='black', frame_on=False)
+		rax = plt.axes([0.71, 0.05, 0.06, 0.045], facecolor='black', frame_on=False)
 
 	# polarlissa radio button
 	polarlissa = RadioButtons(rax, ('Polar', 'Lissajous'), activecolor='#5C8BC6')
