@@ -232,13 +232,49 @@ def invert(array):
 	# inverts polarity of audio data
 	return array * -1
 
-def reverse(array):
+def reverse(array, channels, subdivision=1, every=1):
 	'''
-	Reverses an array of audio data
+	Reverses an array of audio data by every nth subdivision
 	array: a numpy array of audio data
-	returns: a reversed version of array
+	channels: mono (1) or stereo (2) file
+	subdivision: int, amount of subarrays to create default: 1
+	every: which subdivions to reverse default: 1
+	returns: a reversed version of array by every nth subdivision
 	'''
-	return np.flip(array, 0)
+	# check if array.shape divisible by subdivision and every
+	# if not error
+	if len(array) % subdivision != 0:
+		print('Error: array size not divisible by subdivision.')
+	
+	elif subdivision % every != 0:
+		print('Error: array size not divisible by every.')
+	
+	# subdivide array
+	else:
+		# mono
+		if channels == '1':
+			view_ls = np.split(array, subdivision)
+		
+		else:
+			view_ls = np.split(array, subdivision, axis=1)
+	
+		# reverse every nth subarray
+		for subarray in view_ls[::every]:
+			if channels == '1':
+				np.flip(subarray)
+		
+			else:
+				np.flip(subarray, 1)
+		
+		# combine all arrays (track original order)
+		if channels == '1':
+			rev_array = np.concatenate(view_ls)
+		
+		else:
+			rev_array = np.concatenate(view_ls, 1)
+		
+		# return combined array
+		return rev_array
 
 def export_array(name, array, sample_rate, subtype):
 	'''
@@ -1332,9 +1368,21 @@ if __name__ == '__main__':
 			print(invert(data))
 
 		if 'Reverse' in answers['tests']:
-			# Reverse array test
+			# Reverse whole array test
 			print(data)
-			print(reverse(data))
+			print(reverse(data, channels))
+
+			# Reverse both halves
+			print(data)
+			print(reverse(data, channels, 2))
+
+			# Reverse second half
+			print(data)
+			print(reverse(data, channels, 2, 2))
+
+			# Reverse last third
+			print(data)
+			print(reverse(data, channels, 3, 3))
 
 		if 'Downsample' in answers['tests']:
 			# downsampling for visualization
@@ -1401,9 +1449,21 @@ if __name__ == '__main__':
 			print(invert(data))
 
 		if 'Reverse' in answers['tests']:
-			# Reverse array test
+			# Reverse whole array test
 			print(data)
-			print(reverse(data))
+			print(reverse(data, channels))
+
+			# Reverse both halves
+			print(data)
+			print(reverse(data, channels, 2))
+
+			# Reverse second half
+			print(data)
+			print(reverse(data, channels, 2, 2))
+
+			# Reverse last third
+			print(data)
+			print(reverse(data, channels, 3, 3))
 
 		if 'Downsample' in answers['tests']:
 			# downsampling for visualization
