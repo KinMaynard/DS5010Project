@@ -999,7 +999,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		else:
 			return plt.show()
 
-def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls=None):
+def vectorscope(array, name, sample_rate, code, fig=None, sub=False, gridspec=None, resize_ls=None):
 	'''
 	A stereo vectorscope plot of audio data in either polar dot per sample or lissajous modes
 	Left/Right amplitudes as coordinates on X/Y 180 degree polar plot or coordinate plane lissajous plot
@@ -1012,6 +1012,7 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 
 	array: array of audio data
 	name: audio datafile name
+	sample_rate: sampling rate of audio file
 	code: boolean True if array is encoded as mid/side, false if encoded as L/R
 	fig: external figure to plot onto if provided, default = None
 	sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
@@ -1088,21 +1089,23 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 	r_pos = float_ax.text(.75, .75, '+R', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
 	r_neg = float_ax.text(0.22, 0.225, '-R', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
 
+	# making lissajous lines
+	x = array[:,1] * np.sin(array[:,1] * (array.size / sample_rate))
+	y = array[:,0] * np.sin(array[:,0] * (array.size / sample_rate))
+
 	# plotting data
 	float_ax.plot(array[:,1], array[:,0], 'o', color='#4B9D39', markersize=0.05, transform=rot + base)
 
 	# initially hide lissajous vectorscope
-	float_ax.set_visible(False)
+	# float_ax.set_visible(False)
 
-	# take absolute value of the array to flip all data into 180 degrees of polar plot
-	absarray = np.absolute(array)
-
-	# currently deciding what transformation to use
+	# new transform attempt
+	mask = array < 0
+	mask2 = np.stack((mask[:,0] == mask[:,1], mask[:,0] == mask[:,1]), axis=1)
+	array = np.where(mask2, np.absolute(array), np.negative(array))
 	left, right = np.split(array, 2, axis=1)
-	left = np.absolute(left)
-	right = np.negative(right)
 	r = left
-	theta = (right + 1.0) * (np.pi / 2)
+	theta = right
 	
 	# plotting
 	plot = pol_ax.plot(theta, r, 'o', color='#4B9D39', markersize=0.05)
@@ -1151,6 +1154,9 @@ def vectorscope(array, name, code, fig=None, sub=False, gridspec=None, resize_ls
 
 		else:
 			pol_ax.set_position([0.6, -0.772, 0.245, 2])
+
+	# initially hide lissajous vectorscope
+	pol_ax.set_visible(False)
 
 	# polarlissa button axis.
 	# solo plot
@@ -1348,7 +1354,7 @@ if __name__ == '__main__':
 
 		if 'Vectorscope' in answers['tests']:
 			# vectorscope mono test
-			vectorscope(data, name, False)
+			vectorscope(data, name, sample_rate, False)
 
 		if 'Visualizer' in answers['tests']:
 			# visualizer mono plot
@@ -1417,7 +1423,7 @@ if __name__ == '__main__':
 
 		if 'Vectorscope' in answers['tests']:
 			# vectorscope stereo test
-			vectorscope(data, name, False)
+			vectorscope(data, name, sample_rate, False)
 
 		if 'Visualizer' in answers['tests']:
 			# visualizer stereo plot
