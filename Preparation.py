@@ -1064,6 +1064,7 @@ def vectorscope(array, name, sample_rate, code, fig=None, sub=False, gridspec=No
 	# setting font
 	mpl.rcParams['font.family'] = 'sans-serif'
 	mpl.rcParams['font.sans-serif'] = 'Helvetica'
+	# mpl.rcParams['agg.path.chunksize'] = 20000
 
 	# setting axis limits to data peaks
 	extents = np.min(array), np.max(array), np.min(array), np.max(array)
@@ -1139,12 +1140,15 @@ def vectorscope(array, name, sample_rate, code, fig=None, sub=False, gridspec=No
 	r_pos = float_ax.text(.75, .75, '+R', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
 	r_neg = float_ax.text(0.22, 0.225, '-R', color='#F9A438', fontsize=7, transform=float_ax.transAxes)
 
-	# making lissajous lines
-	x = array[:,1] * np.sin(array[:,1] * (array.size / sample_rate))
-	y = array[:,0] * np.sin(array[:,0] * (array.size / sample_rate))
+	# making lissajous lines (doesn't work)
+	# x = array[:,1] * np.sin(np.fft.fft(array[:,1]) * (array.size / sample_rate))
+	# y = array[:,0] * np.sin(np.fft.fft(array[:,0]) * (array.size / sample_rate))
 
 	# plotting data
 	float_ax.plot(array[:,1], array[:,0], 'o', color='#4B9D39', markersize=0.05, transform=rot + base)
+
+	# lissajous curve plotting
+	# float_ax.plot(x, y, color='#4B9D39', markersize=0.05, transform=rot + base)
 
 	# initially hide lissajous vectorscope
 	# float_ax.set_visible(False)
