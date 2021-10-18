@@ -260,11 +260,7 @@ def reverse(array, channels, subdivision=1, every=1):
 	
 		# reverse every nth subarray
 		for subarray in view_ls[::every]:
-			if channels == '1':
-				np.flip(subarray)
-		
-			else:
-				np.flip(subarray, 1)
+			view_ls[subarray] = np.flip(subarray, 0)
 		
 		# combine all arrays (track original order)
 		if channels == '1':
@@ -356,7 +352,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 	# Font
 	mpl.rcParams['font.family'] = 'sans-serif'
 	mpl.rcParams['font.sans-serif'] = 'Helvetica'
-
+	mpl.rcParams['agg.path.chunksize'] = 20000
+	
 	# mono
 	if channels == '1':
 		# dark background white text, initilize figure and axes
@@ -390,9 +387,10 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# plot signal amplitude/time
 		time = array.size / sample_rate # seconds in file
-		line = np.stack((np.linspace(0.0, time, array.size), array), axis=-1)
-		col = mpl.collections.LineCollection([line], color='#16F9DA')
-		ax.add_collection(col, autolim=True)
+		# line = np.stack((np.linspace(0.0, time, array.size), array), axis=-1)
+		# col = mpl.collections.LineCollection([line], color='#16F9DA')
+		# ax.add_collection(col, autolim=True)
+		ax.plot(np.linspace(0.0, time, array.size), array, color='#16F9DA')
 
 		ax.margins(0.001)
 
@@ -490,12 +488,14 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
 		# plot signal amplitude/time
 		time = left.size / sample_rate # only left size because otherwise will be double the amount of time
-		line1 = np.stack((np.linspace(0.0, time, left.size), left), axis=-1)
-		line2 = np.stack((np.linspace(0.0, time, left.size), right), axis=-1)
-		col1 = mpl.collections.LineCollection([line1], color='#16F9DA')
-		col2 = mpl.collections.LineCollection([line2], color='#16F9DA')
-		ax1.add_collection(col1, autolim=True)
-		ax2.add_collection(col2, autolim=True)
+		# line1 = np.stack((np.linspace(0.0, time, left.size), left), axis=-1)
+		# line2 = np.stack((np.linspace(0.0, time, left.size), right), axis=-1)
+		# col1 = mpl.collections.LineCollection([line1], color='#16F9DA')
+		# col2 = mpl.collections.LineCollection([line2], color='#16F9DA')
+		# ax1.add_collection(col1, autolim=True)
+		# ax2.add_collection(col2, autolim=True)
+		ax1.plot(np.linspace(0.0, time, left.size), left, color='#16F9DA')
+		ax2.plot(np.linspace(0.0, time, right.size), right, color='#16F9DA')
 
 		ax1.margins(0.001)
 		ax2.margins(0.001)
@@ -1076,21 +1076,35 @@ def vectorscope(array, name, sample_rate, code, fig=None, sub=False, gridspec=No
 	if fig is None:
 		fig, pol_ax = plt.subplots(subplot_kw={'projection': 'polar'})
 		float_ax = fig.add_subplot(axes_class=floating_axes.FloatingAxes, grid_helper=helper)
+		# phase_ax = fig.add_subplot() #polar=True
 
 	# initilize polar & lissajous figure and axes for subplotting inside visualizer
 	else:
 		if channels == '1':
 			pol_ax = fig.add_subplot(224, polar=True)
 			float_ax = fig.add_subplot(224, axes_class=floating_axes.FloatingAxes, grid_helper=helper)
+			# phase_ax = fig.add_subplot(224)
 
 		else:
 			pol_ax = fig.add_subplot(gridspec[0, 1], polar=True)
 			float_ax = fig.add_subplot(gridspec[0, 1], axes_class=floating_axes.FloatingAxes, grid_helper=helper)
+			# phase_ax = fig.add_subplot(gridspec[0, 1])
+
+	# phase spectrum plot
+	# set phase spectrum title
+	# phase_ax.set_title('Phase Spectrum', color='#F9A438', fontsize=10)
+
+	# plotting phase spectrum
+	# spectrum, freqs, line = phase_ax.phase_spectrum(array, Fs=sample_rate)
+	# spectrum, freqs, line = phase_ax.angle_spectrum(array, Fs=sample_rate)
 
 	# double up mono signals to display them
 	if channels == '1':
 		array = .5 * array
 		array = np.stack((array, array), axis=-1)
+
+	# plotting coherence
+	# Cxy, freqs = phase_ax.cohere(array[:,1], array[:,0], NFFT=128, Fs=sample_rate)
 
 	# turn off tick labels, ticks & axis labels
 	float_ax.axis['top', 'bottom', 'left', 'right'].toggle(all=False)
@@ -1191,7 +1205,7 @@ def vectorscope(array, name, sample_rate, code, fig=None, sub=False, gridspec=No
 		else:
 			pol_ax.set_position([0.6, -0.772, 0.245, 2])
 
-	# initially hide lissajous vectorscope
+	# hide polar vectorscope
 	pol_ax.set_visible(False)
 
 	# polarlissa button axis.
@@ -1234,6 +1248,9 @@ def vectorscope(array, name, sample_rate, code, fig=None, sub=False, gridspec=No
 		circ.height /= rscale
 		circ.set_edgecolor('#F9A438')
 		circ.set_lw(0.5)
+
+	# hide button axes
+	rax.set_visible(False)
 
 	# store text to be resized
 	if resize_ls is not None:
@@ -1303,7 +1320,7 @@ def visualizer(array, name, channels, sample_rate, code):
 	# subplots currently multi_spec only shows
 	fig, reset_wav, reset_wav_click, resize_ls = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1, resize_ls=resize_ls)
 	fig, reset_spec, reset_spec_click, resize_ls = spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1, resize_ls=resize_ls)
-	fig, resize_ls, polarlissa, chooseplot = vectorscope(array, name, code, fig=fig, sub=True, gridspec=gs2, resize_ls=resize_ls)
+	fig, resize_ls, polarlissa, chooseplot = vectorscope(array, name, sample_rate, code, fig=fig, sub=True, gridspec=gs2, resize_ls=resize_ls)
 
 	# enabling mag buttons
 	lindB.on_clicked(scale)
@@ -1334,7 +1351,7 @@ if __name__ == '__main__':
 		questions2 = [inquirer.List('waves', message='Which mono wave to test?', 
 			choices=[('Silence', '../binaries/silence_44100_-infdBFS_Mono.aiff'), ('White Noise', '../binaries/white_88k_-3dBFS.wav'), 
 			('Linear Chirp', '../binaries/hdchirp_88k_-3dBFS_lin.wav'), ('Sin 100Hz', '../binaries/sin_44100_100Hz_-3dBFS_1s.wav'), 
-			('Sweep 1-44kHz', '../binaries/hdsweep_1Hz_44000Hz_-3dBFS_30s.wav')],
+			('Sweep 1-44kHz', '../binaries/hdsweep_1Hz_44000Hz_-3dBFS_30s.wav'), ('Sin Out', '../binaries/sin100hz_180out.aiff')],
 			default=('White Noise', '../binaries/white_88k_-3dBFS.wav')),]
 
 		answers2 = inquirer.prompt(questions2)
