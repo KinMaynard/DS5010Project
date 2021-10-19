@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-import TextResizer
+import text_resizer
 import waveform
 import magnitude
 import spectrogram
