@@ -159,21 +159,15 @@ def split(array, channels, name):
 def normalize(array):
 	'''
 	Performs peak normalization on array of audio data
+
 	array: array of audio data 64 bit floating point
+
 	returns: normalized version of array
 	'''
-	# FAILS BECAUSE FLOATS CANNOT BE INTERPRETED AS AN INTEGER
-	peak = np.amax(np.abs(array))
-	#int64
-	if -2**31 <= peak <= 2**31-1:
-		return ((2.0**31-1.0) / peak) * array
-	# int32
-	elif -2**15 <= peak <= 2**15-1:
-		return ((2.0**15-1.0) / peak) * array
-	# float
-	elif -1.0 <= peak <= 1.0:
-		# factors an array of audio data by the difference between 0 dbfs and the peak signal
-		return (1 / peak) * array
+	# normalize data between -1 and 1
+	array = 2 * ((array - np.min(array)) / (np.max(array) - np.min(array))) - 1
+	normal = True
+	return array, normal
 
 def midside(array, channels, name, code=True):
 	'''
@@ -258,7 +252,7 @@ def reverse(array, channels, subdivision=1):
 		# return combined array
 		return rev_array
 
-def export_array(name, array, sample_rate, subtype):
+def export_array(name, array, sample_rate, subtype, normal=False):
 	'''
 	Export numpy array as audio file
 	
@@ -268,6 +262,10 @@ def export_array(name, array, sample_rate, subtype):
 	subtype: subtype of the audio data
 	returns: none
 	'''
+	# if the data has been normalized then set the subtype to 64 bit float
+	if normal == True:
+		subtype = 'Double'
+
 	sf.write(name, array, sample_rate, subtype)
 	return None
 
@@ -1359,7 +1357,7 @@ if __name__ == '__main__':
 			# before normalization
 			print('Waveform before normalization.')
 			waveform(data, name, channels, sample_rate)
-			data = normalize(data)
+			data, normal = normalize(data)
 			# after normalization
 			print('Waveform after normalization.')
 			waveform(data, name, channels, sample_rate)
@@ -1433,7 +1431,7 @@ if __name__ == '__main__':
 		if 'Normalize' in answers['tests']:
 			# before normalization
 			waveform(data, name, channels, sample_rate)
-			data = normalize(data)
+			dat, normal = normalize(data)
 			# after normalization
 			waveform(data, name, channels, sample_rate)
 
