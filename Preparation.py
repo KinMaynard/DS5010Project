@@ -1019,7 +1019,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 		else:
 			return plt.show()
 
-def vectorscope(array, name, sample_rate, code, fig=None, sub=False, gridspec=None, resize_ls=None):
+def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
 	'''
 	A stereo vectorscope plot of audio data in either polar dot per sample or lissajous modes
 	Left/Right amplitudes as coordinates on X/Y 180 degree polar plot or coordinate plane lissajous plot
@@ -1033,7 +1033,6 @@ def vectorscope(array, name, sample_rate, code, fig=None, sub=False, gridspec=No
 	array: array of audio data
 	name: audio datafile name
 	sample_rate: sampling rate of audio file
-	code: boolean True if array is encoded as mid/side, false if encoded as L/R
 	fig: external figure to plot onto if provided, default = None
 	sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
 	gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
@@ -1253,13 +1252,12 @@ def vectorscope(array, name, sample_rate, code, fig=None, sub=False, gridspec=No
 	else:
 		return plt.show()
 
-def visualizer(array, name, channels, sample_rate, code):
+def visualizer(array, name, channels, sample_rate):
 	'''
 	array: numpy array of audio data
 	name: file name
 	channels: mono (1) or stereo (2) file
 	sample_rate: sampling rate of audio file
-	code: boolean True if array is encoded as mid/side, false if encoded as L/R
 	
 	returns: fasceted subplots of waveform, magnitude, spectrogram & vectorscope
 	'''
@@ -1308,7 +1306,7 @@ def visualizer(array, name, channels, sample_rate, code):
 	# subplots currently multi_spec only shows
 	fig, reset_wav, reset_wav_click, resize_ls = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1, resize_ls=resize_ls)
 	fig, reset_spec, reset_spec_click, resize_ls = spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1, resize_ls=resize_ls)
-	fig, resize_ls, polarlissa, chooseplot = vectorscope(array, name, sample_rate, code, fig=fig, sub=True, gridspec=gs2, resize_ls=resize_ls)
+	fig, resize_ls, polarlissa, chooseplot = vectorscope(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2, resize_ls=resize_ls)
 
 	# enabling mag buttons
 	lindB.on_clicked(scale)
@@ -1403,11 +1401,11 @@ if __name__ == '__main__':
 
 		if 'Vectorscope' in answers['tests']:
 			# vectorscope mono test
-			vectorscope(data, name, sample_rate, False)
+			vectorscope(data, name, channels, sample_rate)
 
 		if 'Visualizer' in answers['tests']:
 			# visualizer mono plot
-			visualizer(data, name, channels, sample_rate, code=False)
+			visualizer(data, name, channels, sample_rate)
 
 	if 'Stereo' in answers['tests']:
 		# Waveform to perform tests on
@@ -1441,7 +1439,7 @@ if __name__ == '__main__':
 			print(encoded, ms)
 
 			# midside decoding test stereo
-			decoded, ms = midside(encoded, channels, name, code=False)
+			decoded, ms = midside(encoded, channels, name)
 			print(decoded, ms)
 
 		if 'Invert' in answers['tests']:
@@ -1480,9 +1478,9 @@ if __name__ == '__main__':
 
 		if 'Vectorscope' in answers['tests']:
 			# vectorscope stereo test
-			vectorscope(data, name, sample_rate, False)
+			vectorscope(data, name, channels, sample_rate)
 
 		if 'Visualizer' in answers['tests']:
 			# visualizer stereo plot
-			visualizer(data, name, channels, sample_rate, code=False)
+			visualizer(data, name, channels, sample_rate)
 
