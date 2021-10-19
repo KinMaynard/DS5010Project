@@ -1327,7 +1327,7 @@ def visualizer(array, name, channels, sample_rate):
 if __name__ == '__main__':
 	# Test selector
 	questions = [inquirer.Checkbox('tests', message='Which tests to run?', 
-		choices=['Mono', 'Stereo', 'Downsample', 'Bins', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Waveform', 'Magnitude', 'Spectrogram', 
+		choices=['Mono', 'Stereo', 'Downsample', 'Bins', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Export', 'Waveform', 'Magnitude', 'Spectrogram', 
 		'Vectorscope', 'Visualizer'],),]
 
 	answers = inquirer.prompt(questions)
@@ -1382,6 +1382,22 @@ if __name__ == '__main__':
 			# Reverse last third
 			print(data[:12])
 			print(reverse(data[:12], channels, 3))
+
+		if 'Export' in answers['tests']:
+			# import array
+			# check min max median mean
+			stats = (np.min(data), np.median(data), np.max(data), np.mean(data))
+			print(stats)
+			# normalize
+			data, normal = normalize(data)
+			# export
+			export_array('../binaries/test.aiff', data, sample_rate, subtype, normal)
+			# import
+			name, channels, data, subtype, sample_rate = import_array('../binaries/test.aiff')
+			# check min max median mean
+			n_stats = (np.min(data), np.median(data), np.max(data), np.mean(data))
+			print(n_stats)
+			# if measurements different then works
 
 		if 'Downsample' in answers['tests']:
 			# downsampling for visualization
@@ -1459,6 +1475,22 @@ if __name__ == '__main__':
 			# Reverse last third
 			print(data[:12])
 			print(reverse(data[:12], channels, 3))
+		
+		if 'Export' in answers['tests']:
+			# import array
+			# check min max median mean
+			stats = (np.min(data), np.median(data), np.max(data), np.mean(data))
+			print(stats)
+			# normalize
+			data, normal = normalize(data)
+			# export
+			export_array('../binaries/test.aiff', data, sample_rate, subtype, normal)
+			# import
+			name, channels, data, subtype, sample_rate = import_array('../binaries/test.aiff')
+			# check min max median mean
+			n_stats = (np.min(data), np.median(data), np.max(data), np.mean(data))
+			print(n_stats)
+			# if measurements different then works
 
 		if 'Downsample' in answers['tests']:
 			# downsampling for visualization
