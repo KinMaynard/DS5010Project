@@ -7,20 +7,20 @@ Unit Tests
 import numpy as np
 import inquirer
 import matplotlib as mpl
-from import_array import import_array
-from bins import bins
-from trim import trim
-from split import split
-from normalize import normalize
-from midside import midside
-from invert import invert
-from reverse import reverse
-from export_array import export_array
-from waveform import waveform
-from magnitude import magnitude
-from spectrogram import spectrogram
-from vectorscope import vectorscope
-from visualizer import visualizer
+from DS5010Project.io.import_array import import_array
+from DS5010Project.vis.bins import bins
+from DS5010Project.util.trim import trim
+from DS5010Project.util.split import split
+from DS5010Project.dsp.normalize import normalize
+from DS5010Project.dsp.midside import midside
+from DS5010Project.util.invert import invert
+from DS5010Project.util.reverse import reverse
+from DS5010Project.io.export_array import export_array
+from DS5010Project.vis.waveform import waveform
+from DS5010Project.vis.magnitude import magnitude
+from DS5010Project.vis.spectrogram import spectrogram
+from DS5010Project.vis.vectorscope import vectorscope
+from DS5010Project.vis.visualizer import visualizer
 
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
