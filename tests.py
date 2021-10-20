@@ -7,20 +7,20 @@ Unit Tests
 import numpy as np
 import inquirer
 import matplotlib as mpl
-import import_array
-import bins
-import trim
-import split
-import normalize
-import midside
-import invert
-import reverse
-import export_array
-import waveform
-import magnitude
-import spectrogram
-import vectorscope
-import visualizer
+from import_array import import_array
+from bins import bins
+from trim import trim
+from split import split
+from normalize import normalize
+from midside import midside
+from invert import invert
+from reverse import reverse
+from export_array import export_array
+from waveform import waveform
+from magnitude import magnitude
+from spectrogram import spectrogram
+from vectorscope import vectorscope
+from visualizer import visualizer
 
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')

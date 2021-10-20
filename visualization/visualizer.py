@@ -6,11 +6,11 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-import text_resizer
-import waveform
-import magnitude
-import spectrogram
-import vectorscope
+from text_resizer import text_resizer
+from waveform import waveform
+from magnitude import magnitude
+from spectrogram import spectrogram
+from vectorscope import vectorscope
 
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')

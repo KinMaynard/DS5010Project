@@ -7,7 +7,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.widgets import MultiCursor, RadioButtons, Button
 import matplotlib.gridspec as gridspec
-import split
+from split import split
 import midside
 
 # use backend that supports animation, blitting & figure window resizing
