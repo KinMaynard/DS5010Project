@@ -7,7 +7,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.widgets import MultiCursor, Button
 import matplotlib.gridspec as gridspec
-from DS5010Project.util.split import split
+from subpackages.util.split import split
 
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
