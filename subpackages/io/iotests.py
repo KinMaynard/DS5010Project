@@ -10,12 +10,6 @@ import inquirer
 from subpackages.io.import_array import import_array
 from subpackages.io.export_array import export_array
 
-# use backend that supports animation, blitting & figure window resizing
-mpl.use('Qt5Agg')
-
-# ignore divide by 0 error in log
-np.seterr(divide = 'ignore')
-
 if __name__ == '__main__':
 	# Test selector
 	questions = [inquirer.Checkbox('tests', message='Which tests to run?', 
