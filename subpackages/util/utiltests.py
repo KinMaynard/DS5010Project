@@ -12,3 +12,5 @@ from subpackages.util.split import split
 from subpackages.util.invert import invert
 from subpackages.util.reverse import reverse
 
+class TestInvert(unittest.TestCase):
+	
