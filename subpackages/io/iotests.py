@@ -13,8 +13,7 @@ from subpackages.io.export_array import export_array
 if __name__ == '__main__':
 	# Test selector
 	questions = [inquirer.Checkbox('tests', message='Which tests to run?', 
-		choices=['Mono', 'Stereo', 'Downsample', 'Bins', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Export', 'Waveform', 'Magnitude', 'Spectrogram', 
-		'Vectorscope', 'Visualizer'],),]
+		choices=['Mono', 'Stereo', 'Export'],),]
 
 	answers = inquirer.prompt(questions)
 
