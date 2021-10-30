@@ -6,6 +6,9 @@ Unit Tests
 
 import unittest
 import numpy as np
+from subpackages.util.trim import mask
+from subpackages.util.trim import last_nonzero
+from subpackages.util.trim import first_nonzero
 from subpackages.util.trim import trim
 from subpackages.util.split import split
 from subpackages.util.invert import invert
@@ -36,3 +39,16 @@ class TestUtil(unittest.TestCase):
 
 	def test_split(self):
 		self.assertEqual(split(dub_n_arr), (np.array([-4, -2]), np.array([-3, -1])))
+
+	def test_mask(self):
+		self.assertEqual(mask(sign_arr), np.array([True, False, True]))
+
+	def test_lastnonzero(self):
+		self.assertEqual(last_nonzero(sign_arr, 0, mask(sign_arr)), 2)
+
+	def test_firstnonzero(self):
+		self.assertEqual(first_nonzero(sign_arr, 0, mask(sign_arr)), 0)
+
+	def test_trim(self):
+		self.assertEqual(trim(np.array([0, 1, 0])), np.array([1]))
+		self.assertEqual(trim(np.array([0, 1], [1, 0])), np.array([1], [1]))
