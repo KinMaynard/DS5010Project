@@ -11,5 +11,9 @@ from subpackages.util.split import split
 from subpackages.util.invert import invert
 from subpackages.util.reverse import reverse
 
-class TestInvert(unittest.TestCase):
+array = np.arange(-1, 1)
+
+class TestUtil(unittest.TestCase):
 	
+	def test_invert(self):
+		self.assertEqual(invert(array), np.array([1, 0, 1]))
