@@ -14,11 +14,7 @@ def split(array, channels, name):
 	name: audio filename
 	returns: Left and Right channels (or M/S)
 	'''
-	# mono case
-	if channels == '1':
-		return ('%s is mono, import 2 channel audio array for splitting.' % name)
-	else:
-		# divide array into stereo components
-		array_list = np.hsplit(array, 2)
-		left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
-		return left, right
+	# divide array into stereo components
+	array_list = np.hsplit(array, 2)
+	left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
+	return left, right

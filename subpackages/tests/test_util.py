@@ -15,7 +15,7 @@ sign_arr = np.arange(-1, 2)
 p_arr = np.arange(6)
 n_arr = np.arange(-4, 0)
 dub_sign_arr = np.arange(-1, 3).reshape(2, 2)
-dub_p_arr = p_arr.reshape(2, 2)
+dub_p_arr = p_arr.reshape(3, 2)
 dub_n_arr = n_arr.reshape(2, 2)
 
 class TestUtil(unittest.TestCase):
@@ -32,4 +32,7 @@ class TestUtil(unittest.TestCase):
 		self.assertEqual(reverse(p_arr, channels='1'), p_arr[::-1])
 		self.assertEqual(reverse(n_arr, channels='1', subdivision=2), np.array([-3, -4, -1, -2]))
 		self.assertEqual(reverse(p_arr, channels='1', subdivision=3), np.array([1, 0, 3, 2, 5, 4]))
-		
+		self.assertEqual(reverse(dub_p_arr, channels='2'), np.array([[4, 5], [2, 3], [0, 1]]))
+
+	def test_split(self):
+		self.assertEqual(split(dub_n_arr), (np.array([-4, -2]), np.array([-3, -1])))
