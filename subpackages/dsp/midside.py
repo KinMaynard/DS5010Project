@@ -7,7 +7,7 @@ Encodes a L/R audio array as Midside or decodes a midside array as L/R
 import numpy as np
 from subpackages.util.split import split
 
-def midside(array, channels, name, code=True):
+def midside(array, channels, code=True):
 	'''
 	Encodes a stereo array of L/R audio data as mid/side data or mid/side data as L/R
 
@@ -20,7 +20,6 @@ def midside(array, channels, name, code=True):
 
 	array: 2d numpy array of audio data (L/R, or M/S)
 	channels: # of channels in audio signal (must be 2)
-	name: name of audio signal
 	code: True when encoding Mid/Side, False when decoding Mid/Side (default True)
 	returns: given L/R: a 2d array of audio data encoded as mid/side, given M/S: a 2d array of audio data encoded as L/R
 	'''
@@ -31,7 +30,7 @@ def midside(array, channels, name, code=True):
 
 	else:
 		# divide array into stereo components
-		left, right = split(array, channels, name)
+		left, right = split(array, channels)
 
 	if code:
 		# Mid/Side encoding
