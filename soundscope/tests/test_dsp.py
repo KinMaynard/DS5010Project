@@ -6,8 +6,8 @@ Unit Tests
 
 import unittest
 import numpy as np
-from subpackages.dsp.normalize import normalize
-from subpackages.dsp.midside import midside
+from soundscope.dsp.normalize import normalize
+from soundscope.dsp.midside import midside
 
 encoded = np.array([[ 0.5,  0.5], [ 0.5, -0.5]])
 
