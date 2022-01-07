@@ -6,7 +6,7 @@ Unit Tests
 
 import unittest
 import numpy as np
-from subpackages.vis.bins import bins
+from soundscope.vis.bins import bins
 
 class TestBins(unittest.TestCase):
 	
