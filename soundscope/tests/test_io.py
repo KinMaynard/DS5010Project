@@ -7,8 +7,8 @@ Unit Tests
 import unittest
 import tempfile
 import numpy as np
-from subpackages.io.import_array import import_array
-from subpackages.io.export_array import export_array
+from soundfile.io.import_array import import_array
+from soundfile.io.export_array import export_array
 
 class TestIO(unittest.TestCase):
 	def setup(self):
