@@ -6,13 +6,13 @@ Unit Tests
 
 import unittest
 import numpy as np
-from subpackages.util.trim import mask
-from subpackages.util.trim import last_nonzero
-from subpackages.util.trim import first_nonzero
-from subpackages.util.trim import trim
-from subpackages.util.split import split
-from subpackages.util.invert import invert
-from subpackages.util.reverse import reverse
+from soundscope.util.trim import mask
+from soundscope.util.trim import last_nonzero
+from soundscope.util.trim import first_nonzero
+from soundscope.util.trim import trim
+from soundscope.util.split import split
+from soundscope.util.invert import invert
+from soundscope.util.reverse import reverse
 
 sign_arr = np.arange(-1, 2)
 p_arr = np.arange(6)
