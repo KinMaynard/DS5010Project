@@ -10,13 +10,6 @@ import inquirer
 import matplotlib as mpl
 from subpackages.io.import_array import import_array
 from subpackages.vis.bins import bins
-from subpackages.util.trim import trim
-from subpackages.util.split import split
-from subpackages.dsp.normalize import normalize
-from subpackages.dsp.midside import midside
-from subpackages.util.invert import invert
-from subpackages.util.reverse import reverse
-from subpackages.io.export_array import export_array
 from subpackages.vis.waveform import waveform
 from subpackages.vis.magnitude import magnitude
 from subpackages.vis.spectrogram import spectrogram
@@ -32,8 +25,7 @@ np.seterr(divide = 'ignore')
 if __name__ == '__main__':
 	# Test selector
 	questions = [inquirer.Checkbox('tests', message='Which tests to run?', 
-		choices=['Mono', 'Stereo', 'Downsample', 'Bins', 'Normalize', 'Midside', 'Invert', 'Reverse', 'Export', 'Waveform', 'Magnitude', 'Spectrogram', 
-		'Vectorscope', 'Visualizer'],),]
+		choices=['Mono', 'Stereo', 'Downsample', 'Bins', 'Waveform', 'Magnitude', 'Spectrogram', 'Vectorscope', 'Visualizer'],),]
 
 	answers = inquirer.prompt(questions)
 
@@ -55,54 +47,6 @@ if __name__ == '__main__':
 			# downsampling test mono
 			binned, bin_sample_rate = bins(data, channels, sample_rate)
 			print(binned, bin_sample_rate)
-		
-		if 'Normalize' in answers['tests']:
-			# before normalization
-			print('Waveform before normalization.')
-			waveform(data, name, channels, sample_rate)
-			data, normal = normalize(data)
-			# after normalization
-			print('Waveform after normalization.')
-			waveform(data, name, channels, sample_rate)
-
-		if 'Midside' in answers['tests']:
-			# midside encoding test mono
-			encoded, ms = midside(data, channels, name)
-			print(encoded, ms)
-
-		if 'Invert' in answers['tests']:
-			# Polarity inversion test
-			print(data)
-			print(invert(data))
-
-		if 'Reverse' in answers['tests']:
-			# Reverse whole array test
-			print(data[:10])
-			print(reverse(data[:10], channels))
-
-			# Reverse both halves
-			print(data[:10])
-			print(reverse(data[:10], channels, 2))
-
-			# Reverse last third
-			print(data[:12])
-			print(reverse(data[:12], channels, 3))
-
-		if 'Export' in answers['tests']:
-			# import array
-			# check min max median mean
-			stats = (np.min(data), np.median(data), np.max(data), np.mean(data))
-			print(stats)
-			# normalize
-			data, normal = normalize(data)
-			# export
-			export_array('../binaries/test.aiff', data, sample_rate, subtype, normal)
-			# import
-			name, channels, data, subtype, sample_rate = import_array('../binaries/test.aiff')
-			# check min max median mean
-			n_stats = (np.min(data), np.median(data), np.max(data), np.mean(data))
-			print(n_stats)
-			# if measurements different then works
 
 		if 'Downsample' in answers['tests']:
 			# downsampling for visualization
@@ -146,56 +90,6 @@ if __name__ == '__main__':
 			# downsampling test stereo
 			binned, bin_sample_rate = bins(data, channels, sample_rate)
 			print(binned, bin_sample_rate)
-
-		if 'Normalize' in answers['tests']:
-			# before normalization
-			waveform(data, name, channels, sample_rate)
-			dat, normal = normalize(data)
-			# after normalization
-			waveform(data, name, channels, sample_rate)
-
-		if 'Midside' in answers['tests']:
-			# midside encoding test stereo
-			encoded, ms = midside(data, channels, name)
-			print(encoded, ms)
-
-			# midside decoding test stereo
-			decoded, ms = midside(encoded, channels, name)
-			print(decoded, ms)
-
-		if 'Invert' in answers['tests']:
-			# Polarity inversion test
-			print(data)
-			print(invert(data))
-
-		if 'Reverse' in answers['tests']:
-			# Reverse whole array test
-			print(data[:10])
-			print(reverse(data[:10], channels))
-
-			# Reverse both halves
-			print(data[:10])
-			print(reverse(data[:10], channels, 2))
-
-			# Reverse last third
-			print(data[:12])
-			print(reverse(data[:12], channels, 3))
-		
-		if 'Export' in answers['tests']:
-			# import array
-			# check min max median mean
-			stats = (np.min(data), np.median(data), np.max(data), np.mean(data))
-			print(stats)
-			# normalize
-			data, normal = normalize(data)
-			# export
-			export_array('../binaries/test.aiff', data, sample_rate, subtype, normal)
-			# import
-			name, channels, data, subtype, sample_rate = import_array('../binaries/test.aiff')
-			# check min max median mean
-			n_stats = (np.min(data), np.median(data), np.max(data), np.mean(data))
-			print(n_stats)
-			# if measurements different then works
 
 		if 'Downsample' in answers['tests']:
 			# downsampling for visualization
