@@ -19,7 +19,6 @@ suite.addTest(loader.loadTestsFromModule(test_util))
 suite.addTest(loader.loadTestsFromModule(test_bins))
 suite.addTest(loader.loadTestsFromModule(test_io))
 suite.addTest(loader.loadTestsFromModule(test_dsp))
-suite.addTest(loader.loadTestsFromModule(test_plot))
 
 # initialize test runner, run the suite
 
