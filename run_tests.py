@@ -6,7 +6,6 @@ from soundscope.tests import test_util
 from soundscope.tests import test_bins
 from soundscope.tests import test_dsp
 from soundscope.tests import test_io
-from soundscope.tests import test_plot
 
 # initialize test suite
 
