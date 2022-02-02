@@ -2,11 +2,11 @@ import unittest
 
 # import test modules
 
-from subpackages.tests import test_util
-from subpackages.tests import test_bins
-from subpackages.tests import test_dsp
-from subpackages.tests import test_io
-from subpackages.tests import test_plot
+from soundscope.tests import test_util
+from soundscope.tests import test_bins
+from soundscope.tests import test_dsp
+from soundscope.tests import test_io
+from soundscope.tests import test_plot
 
 # initialize test suite
 
