@@ -1,7 +1,5 @@
 '''
-Audio processing & visualization library
-
-Unit Tests
+Visual tests requiring user.
 '''
 
 import unittest
