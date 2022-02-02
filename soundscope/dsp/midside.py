@@ -5,7 +5,7 @@ Encodes a L/R audio array as Midside or decodes a midside array as L/R
 '''
 
 import numpy as np
-from subpackages.util.split import split
+from soundscope.util.split import split
 
 def midside(array, channels, code=True):
 	'''
