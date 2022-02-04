@@ -24,12 +24,12 @@ dub_n_arr = n_arr.reshape(2, 2)
 class TestUtil(unittest.TestCase):
 	
 	def test_invert(self):
-		self.assertEqual(invert(sign_arr), np.negative(sign_arr))
-		self.assertEqual(invert(p_arr, np.negative(p_arr)))
-		self.assertEqual(invert(n_arr, np.negative(n_arr)))
-		self.assertEqual(invert(dub_sign_arr), np.negative(dub_sign_arr))
-		self.assertEqual(invert(dub_p_arr, np.negative(dub_p_arr)))
-		self.assertEqual(invert(dub_n_arr, np.negative(dub_n_arr)))
+		self.assertTrue((invert(sign_arr) == np.negative(sign_arr)).all())
+		self.assertTrue((invert(p_arr) == np.negative(p_arr)).all())
+		self.assertTrue((invert(n_arr) == np.negative(n_arr)).all())
+		self.assertTrue((invert(dub_sign_arr) == np.negative(dub_sign_arr)).all())
+		self.assertTrue((invert(dub_p_arr) == np.negative(dub_p_arr)).all())
+		self.assertTrue((invert(dub_n_arr) == np.negative(dub_n_arr)).all())
 
 	def test_reverse(self):
 		self.assertEqual(reverse(p_arr, channels='1'), p_arr[::-1])
