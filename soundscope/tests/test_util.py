@@ -53,4 +53,4 @@ class TestUtil(unittest.TestCase):
 
 	def test_trim(self):
 		self.assertEqual(trim(np.array([0, 1, 0])), np.array([1]))
-		self.assertTrue((trim(np.array([[0, 1], [1, 0]])) == np.array([[1], [1]])).all())
+		self.assertTrue((trim(np.array([[0, 0], [1, 0]])) == np.array([[1, 0]])).all())
