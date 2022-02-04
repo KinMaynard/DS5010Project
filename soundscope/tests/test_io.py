@@ -20,7 +20,7 @@ class TestIO(unittest.TestCase):
 		self.assertEqual(import_array('tmp.wav'), metadata)
 
 	def test_export_array(self):
-		export_array('tmp.wav', array([[-1. , -0.5], [ 0. ,  0.5]]), 48000, '[PCM_24]')
+		export_array('tmp.wav', np.array([[-1. , -0.5], [ 0. ,  0.5]]), 48000, 'PCM_24')
 		name, channels, data, subtype, sample_rate = import_array('tmp.wav')
 		self.assertEqual(sample_rate, 48000)
 
