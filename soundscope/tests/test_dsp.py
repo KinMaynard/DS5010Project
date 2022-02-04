@@ -19,4 +19,6 @@ class TestDsp(unittest.TestCase):
 		self.assertEqual(midside(encoded, '2', False), np.identity(2), False)
 
 	def test_normalize(self):
-		self.assertEqual(normalize(np.arange(-50, 75, 25)), (np.array(-1., -0.5, 0., 0.5, 1.), True))
+		array, normal = normalize(np.arange(-50, 75, 25))
+		self.assertTrue((array == np.array([-1., -0.5, 0., 0.5, 1.])).all())
+		self.assertEqual(normal, True)
