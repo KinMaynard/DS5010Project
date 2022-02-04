@@ -6,13 +6,13 @@ import unittest
 import numpy as np
 import inquirer
 import matplotlib as mpl
-from subpackages.io.import_array import import_array
-from subpackages.vis.bins import bins
-from subpackages.vis.waveform import waveform
-from subpackages.vis.magnitude import magnitude
-from subpackages.vis.spectrogram import spectrogram
-from subpackages.vis.vectorscope import vectorscope
-from subpackages.vis.visualizer import visualizer
+from soundscope.io.import_array import import_array
+from soundscope.vis.bins import bins
+from soundscope.vis.waveform import waveform
+from soundscope.vis.magnitude import magnitude
+from soundscope.vis.spectrogram import spectrogram
+from soundscope.vis.vectorscope import vectorscope
+from soundscope.vis.visualizer import visualizer
 
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
