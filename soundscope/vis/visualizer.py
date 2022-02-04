@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from soundscope.vis.text_resizer import text_resizer
+from soundscope.vis.text_resizer import TextResizer
 from soundscope.vis.waveform import waveform
 from soundscope.vis.magnitude import magnitude
 from soundscope.vis.spectrogram import spectrogram
