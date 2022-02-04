@@ -7,8 +7,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.widgets import MultiCursor, RadioButtons, Button
 import matplotlib.gridspec as gridspec
-from subpackages.util.split import split
-from subpackages.dsp.midside import midside
+from soundscope.util.split import split
+from soundscope.dsp.midside import midside
 
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
