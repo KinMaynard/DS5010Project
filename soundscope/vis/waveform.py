@@ -122,7 +122,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 	# stereo
 	elif channels == '2':
 		# divide array into stereo components
-		left, right = split(array, channels, name)
+		left, right = split(array, channels)
 
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')

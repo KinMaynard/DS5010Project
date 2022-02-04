@@ -134,7 +134,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 	# Stereo subplots fasceted
 	elif channels == '2':
 		# divide array into stereo components
-		left, right = split(array, channels, name)
+		left, right = split(array, channels)
 		
 		# dark background white text, initilize figure and axes
 		plt.style.use('dark_background')

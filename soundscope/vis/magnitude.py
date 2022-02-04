@@ -87,7 +87,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 	# Stereo
 	if channels == '2':
 		# divide array into stereo components
-		left, right = split(array, channels, name)
+		left, right = split(array, channels)
 
 		# sum stereo channels
 		sumsig = np.sum(array, axis=1)
@@ -96,7 +96,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
 		msarray, code = midside(array, channels, name)
 
 		# splitting midside array into mid and side components
-		mid, side = split(msarray, channels, name)
+		mid, side = split(msarray, channels)
 
 		# initial axis
 		sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate, color='#FB636F')
