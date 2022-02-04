@@ -20,4 +20,6 @@ class TestBins(unittest.TestCase):
 		self.assertTrue((down == np.array([7.5, 23.5, 39.5, 55.5, 71.5, 87.5, 103.5, 115.75])).all())
 		self.assertEqual(rate, 8.0)
 		# len indivisible by bin, 2d
-		self.assertEqual(bins(np.arange(120).reshape(-1, 2), '2', 128), np.array([[15., 16.], [47., 48.], [79., 80.], [107., 108.]]), 8.0)
+		dwn, rte = bins(np.arange(120).reshape(-1, 2), '2', 128)
+		self.assertTrue((dwn == np.array([[15., 16.], [47., 48.], [79., 80.], [107., 108.]])).all())
+		self.assertEqual(rte, 8.0)
