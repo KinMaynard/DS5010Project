@@ -32,13 +32,13 @@ class TestUtil(unittest.TestCase):
 		self.assertTrue((invert(dub_n_arr) == np.negative(dub_n_arr)).all())
 
 	def test_reverse(self):
-		self.assertEqual(reverse(p_arr, channels='1'), p_arr[::-1])
-		self.assertEqual(reverse(n_arr, channels='1', subdivision=2), np.array([-3, -4, -1, -2]))
-		self.assertEqual(reverse(p_arr, channels='1', subdivision=3), np.array([1, 0, 3, 2, 5, 4]))
-		self.assertEqual(reverse(dub_p_arr, channels='2'), np.array([[4, 5], [2, 3], [0, 1]]))
+		self.assertTrue((reverse(p_arr, channels='1') == p_arr[::-1]).all())
+		self.assertTrue((reverse(n_arr, channels='1', subdivision=2) == np.array([-3, -4, -1, -2])).all())
+		self.assertTrue((reverse(p_arr, channels='1', subdivision=3) == np.array([1, 0, 3, 2, 5, 4])).all())
+		self.assertTrue((reverse(dub_p_arr, channels='2') == np.array([[4, 5], [2, 3], [0, 1]])).all())
 
 	def test_split(self):
-		self.assertEqual(split(dub_n_arr), (np.array([-4, -2]), np.array([-3, -1])))
+		self.assertTrue((split(dub_n_arr, channels='2') == (np.array([-4, -2]), np.array([-3, -1]))).all())
 
 	def test_mask(self):
 		self.assertTrue((mask(sign_arr) == np.array([True, False, True])).all())
