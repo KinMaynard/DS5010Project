@@ -6,11 +6,11 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from soundscope.text_resizer import text_resizer
-from soundscope.waveform import waveform
-from soundscope.magnitude import magnitude
-from soundscope.spectrogram import spectrogram
-from soundscope.vectorscope import vectorscope
+from soundscope.vis.text_resizer import text_resizer
+from soundscope.vis.waveform import waveform
+from soundscope.vis.magnitude import magnitude
+from soundscope.vis.spectrogram import spectrogram
+from soundscope.vis.vectorscope import vectorscope
 
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
