@@ -41,7 +41,7 @@ class TestUtil(unittest.TestCase):
 		self.assertEqual(split(dub_n_arr), (np.array([-4, -2]), np.array([-3, -1])))
 
 	def test_mask(self):
-		self.assertEqual(mask(sign_arr), np.array([True, False, True]))
+		self.assertTrue((mask(sign_arr) == np.array([True, False, True])).all())
 
 	def test_lastnonzero(self):
 		self.assertEqual(last_nonzero(sign_arr, 0, mask(sign_arr)), 2)
