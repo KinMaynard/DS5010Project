@@ -38,7 +38,9 @@ class TestUtil(unittest.TestCase):
 		self.assertTrue((reverse(dub_p_arr, channels='2') == np.array([[4, 5], [2, 3], [0, 1]])).all())
 
 	def test_split(self):
-		self.assertTrue((split(dub_n_arr, channels='2') == (np.array([-4, -2]), np.array([-3, -1]))).all())
+		left, right = split(dub_n_arr, channels='2')
+		self.assertTrue((left == np.array([-4, -2])).all())
+		self.assertTrue((right == np.array([-3, -1])).all())
 
 	def test_mask(self):
 		self.assertTrue((mask(sign_arr) == np.array([True, False, True])).all())
