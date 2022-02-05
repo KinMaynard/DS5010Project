@@ -128,4 +128,3 @@ if __name__ == '__main__':
         if 'Visualizer' in answers['tests']:
             # visualizer stereo plot
             visualizer(data, name, channels, sample_rate)
-

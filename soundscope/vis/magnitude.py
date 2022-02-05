@@ -23,28 +23,28 @@ def magnitude(
     array, name, channels, sample_rate, fig=None,
     sub=False, gridspec=None, resize_ls=None):
     """
-    plots the log magnitude spectrum of an audio signal magnitude 
+    plots the log magnitude spectrum of an audio signal magnitude
     dB/frequency
-    
+
     array: array of audio data
     name: audio file name
     channels: 1 mono or 2 stereo
     sample_rate: sampling rate of audio file
     fig: external figure to plot onto if provided, default = None
-    sub: boolean, True: plotting as subplot of larger figure, 
+    sub: boolean, True: plotting as subplot of larger figure,
         False: otherwise, default False
-    gridspec: gridspec to plot onto if part of a larger figure 
+    gridspec: gridspec to plot onto if part of a larger figure
         otherwise None, default None
-    resize_ls: list of text objects to be resized on window resize 
+    resize_ls: list of text objects to be resized on window resize
         events when plotting inside visualizer, default None
 
-    Radio buttons: 
-        L: plots left channel, R: plots right channel, Sum: plots L+R, 
+    Radio buttons:
+        L: plots left channel, R: plots right channel, Sum: plots L+R,
         Mid: plots mid channel, Side: plots side channel
-        Lin: plot with linear or or no scaling, 
+        Lin: plot with linear or or no scaling,
         dB: plot with dB scaling: amplitude (20 * log10)
-    
-    returns: a plot of the log magnitude spectrum of an audio array 
+
+    returns: a plot of the log magnitude spectrum of an audio array
     with radio buttons for signal array & fq scale
     """
     # dictionary of state variables
@@ -97,7 +97,7 @@ def magnitude(
 
     # facecolor for button widgets
     button_face_color = 'black'
-    
+
     # Stereo
     if channels == '2':
         # divide array into stereo components
@@ -116,7 +116,7 @@ def magnitude(
         sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate,
                                               color='#FB636F')
 
-        # state variable dictionary to keep track of plot status 
+        # state variable dictionary to keep track of plot status
         # for button changes
         state.update({'L': left, 'R': right, 'SUM': sumsig, 'MID': mid,
                       'SIDE': side, 'data': left, 'line': line})
@@ -137,12 +137,12 @@ def magnitude(
         def side(label):
             # clear previous data
             state['line'].remove()
-            
+
             # plot
             sig, fq, line = ax.magnitude_spectrum(
                 state[label], Fs=sample_rate, scale=state['scale'],
                 color='#FB636F')
-            
+
             # recompute axis limits
             ax.relim()
 
@@ -151,12 +151,12 @@ def magnitude(
                                    fontsize=7)
             ylabel = ax.set_ylabel('MAGNITUDE (%s)' % state['scale'],
                                    color='#F9A438', fontsize=7)
-            
+
             # update state variables to new line & data
             state['line'] = line
             state['data'] = state[label]
             fig.canvas.draw_idle()
-        
+
         # connect button click event to side callback function
         lrsums.on_clicked(side)
 
@@ -166,15 +166,15 @@ def magnitude(
             label.set_color('#F9A438')
 
             if resize_ls is not None:
-                # add to resize list for resizing in visualizer 
+                # add to resize list for resizing in visualizer
                 resize_ls.append(label)
 
-        # dynamically resize radio button height with figure size 
+        # dynamically resize radio button height with figure size
         # & setting color and width of button edges
         rpos = rax.get_position().get_points()
         fig_height = fig.get_figheight()
         fig_width = fig.get_figwidth()
-        rscale = (rpos[:,1].ptp() / rpos[:,0].ptp()) * (fig_height / fig_width)
+        rscale = (rpos[:,1].ptp()/rpos[:,0].ptp()) * (fig_height/fig_width)
         for circ in lrsums.circles:
             circ.height /= rscale
             circ.set_edgecolor('#F9A438')
@@ -201,11 +201,11 @@ def magnitude(
     def scale(label):
         # clear data
         state['line'].remove()
-        
+
         # plot
         sig, fq, line = ax.magnitude_spectrum(
             state['data'], Fs=sample_rate, scale=state[label], color='#FB636F')
-        
+
         # recompute axis limits
         ax.relim()
 
@@ -216,7 +216,7 @@ def magnitude(
         xlabel = ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
         ylabel = ax.set_ylabel('MAGNITUDE (%s)' % label, color='#F9A438',
                                fontsize=7)
-        
+
         # update state variables to new line & scale
         state['line'] = line
         state['scale'] = state[label]
@@ -231,14 +231,14 @@ def magnitude(
         label.set_color('#F9A438')
 
         if resize_ls is not None:
-            # add to resize list for resizing in visualizer 
+            # add to resize list for resizing in visualizer
             resize_ls.append(label)
 
     # dynamically resize radio button height with figure size
     rpos = rax.get_position().get_points()
     fh = fig.get_figheight()
     fw = fig.get_figwidth()
-    rscale = (rpos[:,1].ptp() / rpos[:,0].ptp()) * (fh / fw)
+    rscale = (rpos[:,1].ptp()/rpos[:,0].ptp()) * (fh/fw)
     for circ in lindB.circles:
         circ.height /= rscale
         circ.set_edgecolor('#F9A438')
@@ -253,7 +253,7 @@ def magnitude(
         # store initial figure dimesions
         fig_width, fig_height = fig.get_size_inches() * fig.dpi
 
-        # reset button axis size based on figure size to look 
+        # reset button axis size based on figure size to look
         # correct on multiple screens
         if fig_height <= 1700:
             reset_button_ax = fig.add_axes([0.455, 0.07, 0.022, 0.015])
@@ -265,7 +265,7 @@ def magnitude(
         # zoom reset view button
         reset_button = Button(reset_button_ax, 'RESET', color='black',
                               hovercolor='#7E0000')
-        
+
         # small screen, smaller label
         if fig_height <= 1700:
             reset_button.label.set_size(6)
@@ -273,7 +273,7 @@ def magnitude(
         # big screen, big label
         else:
             reset_button.label.set_size(7)
-        
+
         reset_button.label.set_color('#F0191C')
         for spine in spine_ls:
             reset_button_ax.spines[spine].set_color('#F0191C')

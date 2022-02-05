@@ -22,7 +22,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
                 gridspec=None, resize_ls=None):
     """
     Creates a spectrogram given an array of audio data
-    
+
     array: 1 or 2d numpy array of audio data
     channels: 1 mono or 2 stereo, number of channels in audio array
     name: name of the audio file
@@ -45,7 +45,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
     if channels == '1':
         # dark background white text, initilize figure and axes
         plt.style.use('dark_background')
-        
+
         # figure and axes init in case of subplot or singular
         if fig is None:
             fig, ax = plt.subplots()
@@ -69,11 +69,11 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
         spine_ls = ['top', 'bottom', 'left', 'right']
         for spine in ['top', 'bottom', 'left', 'right']:
             ax.spines[spine].set_color('#F9A438')
-        
+
         # plot spectrogram (only im is used for colorbar)
         spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma',
                                       vmin=-120, vmax=0)
-        
+
         # make space for colorbar
         if not sub:
             fig.subplots_adjust(right=0.84)
@@ -91,7 +91,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
 
         # get colorbar label for resizing
         cbarlabel = cbar_ax.get_yaxis().get_label()
-        
+
         # limit y axis to human hearing range
         ax.set_ylim([0, 20000])
 
@@ -106,8 +106,8 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
         if sub:
             # store initial figure dimesions
             fig_width, fig_height = fig.get_size_inches() * fig.dpi
-            
-            # reset button axis size based on figure size to look 
+
+            # reset button axis size based on figure size to look
             # correct on multiple screens
             if fig_height <= 1700:
                 reset_button_ax = fig.add_axes([0.878, 0.49, 0.022, 0.015])
@@ -119,7 +119,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
             # reset button
             reset_button = Button(reset_button_ax, 'RESET', color='black',
                                   hovercolor='#7E0000')
-            
+
             # small screen, smaller label
             if fig_height <= 1700:
                 reset_button.label.set_size(6)
@@ -127,11 +127,11 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
             # big screen, big label
             else:
                 reset_button.label.set_size(7)
-            
+
             reset_button.label.set_color('#F0191C')
             for spine in spine_ls:
                 reset_button_ax.spines[spine].set_color('#F0191C')
-            
+
             # callback function for zoom reset button
             def reset_button_on_clicked(mouse_event):
                 ax.set_xlim(state['start_xlim'])
@@ -153,7 +153,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
     elif channels == '2':
         # divide array into stereo components
         left, right = split(array, channels)
-        
+
         # dark background white text, initilize figure and axes
         plt.style.use('dark_background')
 
@@ -165,7 +165,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
         else:
             ax1 = fig.add_subplot(gridspec[0, 1])
             ax2 = fig.add_subplot(gridspec[1, 1], sharex=ax1, sharey=ax1)
-        
+
         # labeling axes & title
         title = '%s SPECTROGRAM' % name
         if sub:
@@ -190,17 +190,17 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
         spine_ls = ['top', 'bottom', 'left', 'right']
         for ax, spine in zip([ax1, ax2], spine_ls):
             plt.setp(ax.spines.values(), color='#F9A438')
-        
+
         # plot spectrograms
         specl, fql, tl, iml = ax1.specgram(left, Fs=sample_rate, cmap='magma',
                                            vmin=-120, vmax=0)
         specr, fqr, tr, imr = ax2.specgram(right, Fs=sample_rate, cmap='magma',
                                            vmin=-120, vmax=0)
-        
+
         # make space for colorbar & stack plots snug
         if not sub:
             fig.subplots_adjust(right=0.84, hspace=0)
-        
+
         # colorbar
         if not sub:
             # left, bottom, width, height
@@ -215,7 +215,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
         cbar_ax.tick_params(color='#F9A438', labelsize=6, labelcolor='#F9A438')
         # get colorbar label for resizing
         cbarlabel = cbar_ax.get_yaxis().get_label()
-        
+
         # limit y axes to human hearing range
         ax1.set_ylim([0, 20000])
         ax2.set_ylim([0, 20000])
@@ -238,7 +238,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
             # store initial figure dimesions
             fig_width, fig_height = fig.get_size_inches() * fig.dpi
 
-            # reset button axis size based on figure size to look 
+            # reset button axis size based on figure size to look
             # correct on multiple screens
             if fig_height <= 1700:
                 reset_button_ax = fig.add_axes([0.878, 0.373, 0.022, 0.015])
@@ -246,11 +246,11 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
             else:
                 # axes left, bottom, width, height
                 reset_button_ax = fig.add_axes([0.886, 0.373, 0.0145, 0.01])
-            
+
             # reset button
             reset_button = Button(reset_button_ax, 'RESET', color='black',
                                   hovercolor='#7E0000')
-            
+
             # small screen, smaller label
             if fig_height <= 1700:
                 reset_button.label.set_size(6)
@@ -258,11 +258,11 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
             # big screen, big label
             else:
                 reset_button.label.set_size(7)
-            
+
             reset_button.label.set_color('#F0191C')
             for spine in spine_ls:
                 reset_button_ax.spines[spine].set_color('#F0191C')
-            
+
             # callback function for zoom reset button
             def reset_button_on_clicked(mouse_event):
                 ax1.set_xlim(state['start_xlim1'])

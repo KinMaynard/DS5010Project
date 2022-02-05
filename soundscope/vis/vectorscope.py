@@ -23,7 +23,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     A stereo vectorscope plot of audio data in either polar dot per
     sample or lissajous modes Left/Right amplitudes as coordinates on
     X/Y 180 degree polar plot or coordinate plane lissajous plot
-    
+
     Lissajous vectorscope dot per sample plotting stereo width of the
     audio signal.
     Mono signals show as straight lines down the center, stereo
@@ -42,7 +42,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
         otherwise None, default None
     resize_ls: list of text objects to be resized on window resize
         events when plotting inside visualizer, default None
-    
+
     returns: a vectorscope polar dot per sample plot of audio data
         or a lissajouse dot per sample vectorscope plot of the audio
         array
@@ -73,7 +73,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     else:
         if channels == '1':
             pol_ax = fig.add_subplot(224, polar=True)
-            float_ax = fig.add_subplot(224, 
+            float_ax = fig.add_subplot(224,
                                        axes_class=floating_axes.FloatingAxes,
                                        grid_helper=helper)
             # phase_ax = fig.add_subplot(224)
@@ -99,7 +99,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
         array = np.stack((array, array), axis=-1)
 
     # plotting coherence
-    # Cxy, freqs = phase_ax.cohere(array[:,1], array[:,0], NFFT=128, 
+    # Cxy, freqs = phase_ax.cohere(array[:,1], array[:,0], NFFT=128,
                                   #Fs=sample_rate)
 
     # turn off tick labels, ticks & axis labels
@@ -165,10 +165,10 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     left, right = np.split(array, 2, axis=1)
     r = left
     theta = right
-    
+
     # plotting
     plot = pol_ax.plot(theta, r, 'o', color='#4B9D39', markersize=0.05)
-    
+
     # set title & bring down close to top of plot
     title = '%s POLAR DOT PER SAMPLE VECTORSCOPE' % name
     if sub:
@@ -194,7 +194,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     pol_ax.set_yticklabels([])
     pol_ax.grid(False, axis='y')
 
-    # setting spine color, no api for the bottom spines so need to use 
+    # setting spine color, no api for the bottom spines so need to use
     # get_children
     artists = pol_ax.get_children()
     pol_spines = [i for i in artists[1:4]]
@@ -210,7 +210,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     # thetagrid color
     pol_ax.xaxis.grid(color='#F9A438')
 
-    # compensating for partial polar plot extra whitespace: 
+    # compensating for partial polar plot extra whitespace:
     # left, bottom, width, height
     if sub is False:
         pol_ax.set_position([0.1, 0.05, 0.8, 1])
@@ -262,12 +262,12 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
         label.set_fontsize(8)
         label.set_color('#F9A438')
 
-    # dynamically resize radio button height with figure size 
+    # dynamically resize radio button height with figure size
     # & setting color and width of button edges
     rpos = rax.get_position().get_points()
     fig_height = fig.get_figheight()
     fig_width = fig.get_figwidth()
-    rscale = (rpos[:,1].ptp() / rpos[:,0].ptp()) * (fig_height / fig_width)
+    rscale = (rpos[:,1].ptp()/rpos[:,0].ptp()) * (fig_height/fig_width)
     for circ in polarlissa.circles:
         circ.height /= rscale
         circ.set_edgecolor('#F9A438')
@@ -280,7 +280,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     if resize_ls is not None:
         for label in theta_labels:
             resize_ls.append(label)
-        
+
         resize_ls.extend([title_vec, float_title, l_pos, l_neg, r_pos, r_neg])
 
     # individual figure or as part of larger figure

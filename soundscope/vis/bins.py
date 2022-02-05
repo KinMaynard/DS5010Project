@@ -12,11 +12,11 @@ def bins(array, channels, sample_rate, bin_size=16):
     array: numpy array of audio data
     channels: 1 mono, 2 stereo
     sample_rate: sampling rate of the audio file
-    bin_size: [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384], 
+    bin_size: [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384],
         default 32
     returns: downsampled array
     """
-    # either of len bin_size if array divisible by bin_size or length 
+    # either of len bin_size if array divisible by bin_size or length
     #of the partial bin
     partial_bin = len(array) % bin_size
     to_fill = bin_size - partial_bin
@@ -24,14 +24,14 @@ def bins(array, channels, sample_rate, bin_size=16):
 
     # array didn't need padding
     if partial_bin == 0:
-        # separate array into bins of size bin_size, average the bins 
+        # separate array into bins of size bin_size, average the bins
         # into new array return array
         # populate new array with averages of every (bin_size) samples
         return np.mean(array.reshape(-1, bin_size), axis=1), sample_rate
 
     # array needed padding for last bin
     else:
-        # pad end of array with mean of last bin so array size divisible 
+        # pad end of array with mean of last bin so array size divisible
         # by bin_size
         if channels == '1':
             width = ((0, to_fill),)

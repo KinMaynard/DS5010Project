@@ -40,12 +40,12 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
     mpl.rcParams['font.family'] = 'sans-serif'
     mpl.rcParams['font.sans-serif'] = 'Helvetica'
     mpl.rcParams['agg.path.chunksize'] = 20000
-    
+
     # mono
     if channels == '1':
         # dark background white text, initilize figure and axes
         plt.style.use('dark_background')
-        
+
         # initializing figure and axes
         if fig is None:
             fig, ax = plt.subplots()
@@ -91,7 +91,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
             # store initial figure dimesions
             fig_width, fig_height = fig.get_size_inches() * fig.dpi
 
-            # reset button axis size based on figure size 
+            # reset button axis size based on figure size
             # to look correct on multiple screens
             if fig_height <= 1700:
                 # left, bottom, width, height
@@ -104,7 +104,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
             # reset button
             reset_button = Button(reset_button_ax, 'RESET', color='black',
                                   hovercolor='#7E0000')
-            
+
             # small screen, smaller label
             if fig_height <= 1700:
                 reset_button.label.set_size(6)
@@ -141,7 +141,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
 
         # dark background white text, initilize figure and axes
         plt.style.use('dark_background')
-        
+
         # initializing figure and axes
         if fig is None:
             fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex=True,
@@ -221,11 +221,11 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
             else:
                 # axes left, bottom, width, height
                 reset_button_ax = fig.add_axes([0.463, 0.373, 0.0145, 0.01])
-            
+
             # reset button
             reset_button = Button(reset_button_ax, 'RESET', color='black',
                                   hovercolor='#7E0000')
-            
+
             # small screen, smaller label
             if fig_height <= 1700:
                 reset_button.label.set_size(6)
@@ -233,7 +233,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
             # big screen, big label
             else:
                 reset_button.label.set_size(7)
-            
+
             reset_button.label.set_color('#F0191C')
             for spine in spine_ls:
                 reset_button_ax.spines[spine].set_color('#F0191C')

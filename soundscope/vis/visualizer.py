@@ -27,8 +27,8 @@ def visualizer(array, name, channels, sample_rate):
     name: file name
     channels: mono (1) or stereo (2) file
     sample_rate: sampling rate of audio file
-    
-    returns: fasceted subplots of waveform, magnitude, 
+
+    returns: fasceted subplots of waveform, magnitude,
         spectrogram & vectorscope
     """
     # initialize figure with dark background and title
@@ -42,7 +42,7 @@ def visualizer(array, name, channels, sample_rate):
     # Font
     mpl.rcParams['font.family'] = 'sans-serif'
     mpl.rcParams['font.sans-serif'] = 'Helvetica'
-    
+
     # Title
     title = plt.suptitle('%s VISUALIZATION' % name, color='#F9A438',
                          fontsize=17.5, fontweight=900)
@@ -50,7 +50,7 @@ def visualizer(array, name, channels, sample_rate):
     # store text objects for later resizing when window resized
     resize_ls = [title]
 
-    # gridspec to snugly fascet only stereo 
+    # gridspec to snugly fascet only stereo
     # spectrogram and waveform plots
     # initialize for mono case
     gs1, gs2 = None, None
@@ -58,7 +58,7 @@ def visualizer(array, name, channels, sample_rate):
         # snugly fascet stereo subplots
         fig.subplots_adjust(hspace=0)
 
-        # outer gridspec, hspace separates waveform & spectrogram plots 
+        # outer gridspec, hspace separates waveform & spectrogram plots
         # from magnitude & vectorscope
         outer = gridspec.GridSpec(nrows=2, ncols=1, figure=fig, hspace = 0.2,
                                   height_ratios = [2, 1])
@@ -71,7 +71,7 @@ def visualizer(array, name, channels, sample_rate):
         fig, lrsums, side, lindB, scale, reset_mag, reset_mag_click, \
         resize_ls = magnitude(array, name, channels, sample_rate, fig=fig,
                               sub=True, gridspec=gs2, resize_ls=resize_ls)
-        
+
         # enabling mag buttons
         lrsums.on_clicked(side)
 
@@ -80,7 +80,7 @@ def visualizer(array, name, channels, sample_rate):
         fig, lindB, scale, reset_mag, reset_mag_click, resize_ls = magnitude(
             array, name, channels, sample_rate, fig=fig, sub=True,
             gridspec=gs2, resize_ls=resize_ls)
-    
+
     # subplots currently multi_spec only shows
     fig, reset_wav, reset_wav_click, resize_ls = waveform(
         array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1,
