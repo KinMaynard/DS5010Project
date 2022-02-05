@@ -13,11 +13,13 @@ from soundscope.vis.magnitude import magnitude
 from soundscope.vis.spectrogram import spectrogram
 from soundscope.vis.vectorscope import vectorscope
 
+
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
 
 # ignore divide by 0 error in log
 np.seterr(divide = 'ignore')
+
 
 def visualizer(array, name, channels, sample_rate):
     '''

@@ -11,11 +11,13 @@ import matplotlib.gridspec as gridspec
 from soundscope.util.split import split
 from soundscope.dsp.midside import midside
 
+
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
 
 # ignore divide by 0 error in log
 np.seterr(divide = 'ignore')
+
 
 def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
     '''

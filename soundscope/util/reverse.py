@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def reverse(array, channels, subdivision=1):
     '''
     Reverses subdivisions of an array of audio data

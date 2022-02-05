@@ -6,6 +6,7 @@ Handles the importing of audio files to numpy arrays via the soundfile dependanc
 
 import soundfile as sf
 
+
 def import_array(file):
     '''
     Import audio file as 64 bit float array

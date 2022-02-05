@@ -10,11 +10,13 @@ import matplotlib.gridspec as gridspec
 
 from soundscope.util.split import split
 
+
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
 
 # ignore divide by 0 error in log
 np.seterr(divide = 'ignore')
+
 
 def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
     '''

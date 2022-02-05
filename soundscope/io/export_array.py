@@ -5,6 +5,7 @@ Audio processing & visualization library
 import numpy as np
 import soundfile as sf
 
+
 def export_array(name, array, sample_rate, subtype, normal=False):
     '''
     Export numpy array as audio file

@@ -9,6 +9,7 @@ import sys
 
 import numpy as np
 
+
 def mask(array):
     '''
     calculates a boolean mask of non zeros (values greater than positive epsilon smaller
@@ -19,6 +20,7 @@ def mask(array):
     epsilon = sys.float_info.epsilon
     mask = abs(array) > epsilon
     return mask
+
 
 def first_nonzero(array, axis, mask, invalid_val=-1):
     '''
@@ -39,6 +41,7 @@ def first_nonzero(array, axis, mask, invalid_val=-1):
     # boolean array of True where element of original array is nonzero false otherwise (if zero)
     return np.where(mask.any(axis=axis), mask.argmax(axis=axis), invalid_val)
 
+
 def last_nonzero(array, axis, mask, invalid_val=-1):
     '''
     Helper function for trim function that gets the index of the last non_zero element in an array
@@ -58,6 +61,7 @@ def last_nonzero(array, axis, mask, invalid_val=-1):
     # boolean array of True where element of original array is nonzero false otherwise (if zero)
     dex_last_occur = array.shape[axis] - np.flip(mask, axis=axis).argmax(axis=axis) - 1
     return np.where(mask.any(axis=axis), dex_last_occur, invalid_val)
+
 
 def trim(array):
     '''

@@ -16,11 +16,13 @@ from soundscope.vis.spectrogram import spectrogram
 from soundscope.vis.vectorscope import vectorscope
 from soundscope.vis.visualizer import visualizer
 
+
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
 
 # ignore divide by 0 error in log
 np.seterr(divide = 'ignore')
+
 
 if __name__ == '__main__':
     # Test selector

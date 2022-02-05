@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+
 class TextResizer():
     '''
     Handles resizing text in plots by a factor of the scale of a window resize event. 

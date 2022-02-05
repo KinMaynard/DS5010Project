@@ -9,11 +9,13 @@ from matplotlib.widgets import RadioButtons
 import matplotlib.gridspec as gridspec
 import mpl_toolkits.axisartist.floating_axes as floating_axes
 
+
 # use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
 
 # ignore divide by 0 error in log
 np.seterr(divide = 'ignore')
+
 
 def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
     '''

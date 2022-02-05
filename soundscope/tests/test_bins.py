@@ -10,6 +10,7 @@ import numpy as np
 
 from soundscope.vis.bins import bins
 
+
 class TestBins(unittest.TestCase):
     
     def test_bins(self):

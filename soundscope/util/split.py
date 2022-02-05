@@ -6,6 +6,7 @@ Splits stereo audio arrays into 2 mono arrays
 
 import numpy as np
 
+
 def split(array, channels):
     '''
     splits 2d array of audio data into Left and Right or Mid and Side channels

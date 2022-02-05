@@ -7,6 +7,7 @@ from soundscope.tests import test_bins
 from soundscope.tests import test_dsp
 from soundscope.tests import test_io
 
+
 # initialize test suite
 
 loader = unittest.TestLoader()

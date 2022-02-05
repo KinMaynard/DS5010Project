@@ -6,6 +6,7 @@ Handles downsampling arrays of audio data by the given bin size
 
 import numpy as np
 
+
 def bins(array, channels, sample_rate, bin_size=16):
     '''
     array: numpy array of audio data

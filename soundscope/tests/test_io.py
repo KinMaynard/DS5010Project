@@ -13,6 +13,7 @@ import soundfile as sf
 from soundscope.io.import_array import import_array
 from soundscope.io.export_array import export_array
 
+
 class TestIO(unittest.TestCase):
     # def setup(self):
     def test_import_array(self):

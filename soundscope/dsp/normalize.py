@@ -6,6 +6,7 @@ normalizes audio files
 
 import numpy as np
 
+
 def normalize(array):
     '''
     Performs peak normalization on array of audio data
