@@ -2,6 +2,7 @@
 Visual tests requiring user.
 """
 
+import os
 import unittest
 
 import numpy as np
