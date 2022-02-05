@@ -35,11 +35,14 @@ def bins(array, channels, sample_rate, bin_size=16):
         # by bin_size
         if channels == '1':
             width = ((0, to_fill), )
-            padded = np.pad(array, pad_width=width, mode='mean', stat_length=(partial_bin,))
+            padded = np.pad(array, pad_width=width, mode='mean', stat_length=(
+                partial_bin,))
             downsampled = np.mean(padded.reshape(-1, bin_size), axis=1)
 
         else:
             width = ((0, to_fill), (0, 0))
-            padded = np.pad(array, pad_width=width, mode='mean', stat_length=(partial_bin,))
-            downsampled = padded.reshape(-1, bin_size, padded.shape[1]).mean(axis=1)
+            padded = np.pad(array, pad_width=width, mode='mean', stat_length=(
+                partial_bin,))
+            downsampled = padded.reshape(-1, bin_size, padded.shape[1]).mean(
+                axis=1)
         return downsampled, sample_rate

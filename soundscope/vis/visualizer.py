@@ -44,7 +44,8 @@ def visualizer(array, name, channels, sample_rate):
     mpl.rcParams['font.sans-serif'] = 'Helvetica'
     
     # Title
-    title = plt.suptitle('%s VISUALIZATION' % name, color='#F9A438', fontsize=17.5, fontweight=900)
+    title = plt.suptitle('%s VISUALIZATION' % name, color='#F9A438', 
+                         fontsize=17.5, fontweight=900)
 
     # store text objects for later resizing when window resized
     resize_ls = [title]
@@ -59,26 +60,37 @@ def visualizer(array, name, channels, sample_rate):
 
         # outer gridspec, hspace separates waveform & spectrogram plots 
         # from magnitude & vectorscope
-        outer = gridspec.GridSpec(nrows=2, ncols=1, figure=fig, hspace = 0.2, height_ratios = [2, 1])
+        outer = gridspec.GridSpec(nrows=2, ncols=1, figure=fig, hspace = 0.2, 
+                                  height_ratios = [2, 1])
 
         # nested gridspecs
         gs1 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec = outer[0])
         gs2 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec = outer[1])
 
         # stereo mag plot with side button
-        fig, lrsums, side, lindB, scale, reset_mag, reset_mag_click, resize_ls = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2, resize_ls=resize_ls)
+        fig, lrsums, side, lindB, scale, reset_mag, reset_mag_click, \
+        resize_ls = magnitude(array, name, channels, sample_rate, fig=fig, 
+                              sub=True, gridspec=gs2, resize_ls=resize_ls)
         
         # enabling mag buttons
         lrsums.on_clicked(side)
 
     else:
         # mono mag plot without side button
-        fig, lindB, scale, reset_mag, reset_mag_click, resize_ls = magnitude(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2, resize_ls=resize_ls)
+        fig, lindB, scale, reset_mag, reset_mag_click, resize_ls = magnitude(
+            array, name, channels, sample_rate, fig=fig, sub=True, 
+            gridspec=gs2, resize_ls=resize_ls)
     
     # subplots currently multi_spec only shows
-    fig, reset_wav, reset_wav_click, resize_ls = waveform(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1, resize_ls=resize_ls)
-    fig, reset_spec, reset_spec_click, resize_ls = spectrogram(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1, resize_ls=resize_ls)
-    fig, resize_ls, polarlissa, chooseplot = vectorscope(array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2, resize_ls=resize_ls)
+    fig, reset_wav, reset_wav_click, resize_ls = waveform(
+        array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1, 
+        resize_ls=resize_ls)
+    fig, reset_spec, reset_spec_click, resize_ls = spectrogram(
+        array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1, 
+        resize_ls=resize_ls)
+    fig, resize_ls, polarlissa, chooseplot = vectorscope(
+        array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2, 
+        resize_ls=resize_ls)
 
     # enabling mag buttons
     lindB.on_clicked(scale)

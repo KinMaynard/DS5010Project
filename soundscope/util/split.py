@@ -17,5 +17,6 @@ def split(array, channels):
     """
     # divide array into stereo components
     array_list = np.hsplit(array, 2)
-    left, right = array_list[0].flatten(order='F'), array_list[1].flatten(order='F')
+    left = array_list[0].flatten(order='F')
+    right = array_list[1].flatten(order='F')
     return left, right

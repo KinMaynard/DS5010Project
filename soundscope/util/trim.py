@@ -69,7 +69,8 @@ def last_nonzero(array, axis, mask, invalid_val=-1):
     """
     # boolean array of True where element of original array is nonzero 
     # false otherwise (if zero)
-    dex_last_occur = array.shape[axis] - np.flip(mask, axis=axis).argmax(axis=axis) - 1
+    dex_last_occur = array.shape[axis] - np.flip(
+        mask, axis=axis).argmax(axis=axis) - 1
     return np.where(mask.any(axis=axis), dex_last_occur, invalid_val)
 
 
@@ -90,4 +91,5 @@ def trim(array):
     # return a copy of array sliced from first nonzero element to 
     # last nonzero element
     # adds 1 to compensate for indexing from zero
-    return array[np.amin(first_nonzero(array, 0, mask1)):np.amax(last_nonzero(array, 0, mask1)) + 1].copy()
+    return array[np.amin(first_nonzero(array, 0, mask1)):np.amax(last_nonzero(
+        array, 0, mask1)) + 1].copy()

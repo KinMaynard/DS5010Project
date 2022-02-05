@@ -18,7 +18,8 @@ mpl.use('Qt5Agg')
 np.seterr(divide = 'ignore')
 
 
-def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
+def waveform(array, name, channels, sample_rate, fig=None, sub=False, 
+    gridspec=None, resize_ls=None):
     """
     array: array of audio data
     name: file name
@@ -61,7 +62,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
         xlabel_mono = ax.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
         ylabel_mono = ax.set_ylabel('AMPLITUDE', color='#F9A438', fontsize=7)
         ax.minorticks_on()
-        ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
+        ax.tick_params(axis='both', which='both', color='#F9A438', labelsize=6,
+                       labelcolor='#F9A438')
 
         # spine coloring
         spine_ls = ['top', 'bottom', 'left', 'right']
@@ -99,7 +101,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
                 reset_button_ax = fig.add_axes([0.463, 0.49, 0.0145, 0.01])
 
             # reset button
-            reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
+            reset_button = Button(reset_button_ax, 'RESET', color='black', 
+                                  hovercolor='#7E0000')
             
             # small screen, smaller label
             if fig_height <= 1700:
@@ -121,7 +124,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
         if resize_ls is not None:
             # store text to be resized
-            resize_ls.extend([title_mono, xlabel_mono, ylabel_mono, reset_button.label])
+            resize_ls.extend([title_mono, xlabel_mono, ylabel_mono, 
+                             reset_button.label])
 
         # individual figure or as part of larger figure
         if sub:
@@ -139,7 +143,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
         
         # initializing figure and axes
         if fig is None:
-            fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True)
+            fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex=True, 
+                                           sharey=True)
 
         # if plotting on external figure only adding subplots
         else:
@@ -152,12 +157,16 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
             title = 'WAVEFORM'
         title_stereo = ax1.set_title(title, color='#F9A438', fontsize=10)
         xlabel = ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
-        ylabel_L = ax1.set_ylabel('AMPLITUDE LEFT', color='#F9A438', fontsize=7)
-        ylabel_R = ax2.set_ylabel('AMPLITUDE RIGHT', color='#F9A438', fontsize=7)
+        ylabel_L = ax1.set_ylabel('AMPLITUDE LEFT', color='#F9A438', 
+                                  fontsize=7)
+        ylabel_R = ax2.set_ylabel('AMPLITUDE RIGHT', color='#F9A438', 
+                                  fontsize=7)
         ax1.minorticks_on()
         ax2.minorticks_on()
-        ax1.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
-        ax2.tick_params(axis='both', which='both', color='#F9A438', labelsize=6, labelcolor='#F9A438')
+        ax1.tick_params(axis='both', which='both', color='#F9A438', 
+                        labelsize=6, labelcolor='#F9A438')
+        ax2.tick_params(axis='both', which='both', color='#F9A438', 
+                        labelsize=6, labelcolor='#F9A438')
 
         # adding gridline on 0 above data
         ax1.axhline(0, color='#F9A438', linewidth=0.5, zorder=3)
@@ -191,11 +200,12 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
         ax2.margins(0.001)
 
         # Multicursor
-        multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, color='blueviolet', lw=0.5)
+        multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, 
+                            color='blueviolet', lw=0.5)
 
         # state variable dictionary for starting axis limits
-        state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 'start_xlim2': ax2.get_xlim(), 
-                'start_ylim2': ax2.get_ylim()}
+        state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 
+                 'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
 
         # zoom reset view button
         if sub: 
@@ -212,7 +222,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
                 reset_button_ax = fig.add_axes([0.463, 0.373, 0.0145, 0.01])
             
             # reset button
-            reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
+            reset_button = Button(reset_button_ax, 'RESET', color='black', 
+                                  hovercolor='#7E0000')
             
             # small screen, smaller label
             if fig_height <= 1700:
@@ -236,7 +247,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
 
         if resize_ls is not None:
             # store text to be resized
-            resize_ls.extend([title_stereo, xlabel, ylabel_L, ylabel_R, reset_button.label])
+            resize_ls.extend([title_stereo, xlabel, ylabel_L, ylabel_R, 
+                              reset_button.label])
 
         # individual figure or as part of larger figure
         if sub:
