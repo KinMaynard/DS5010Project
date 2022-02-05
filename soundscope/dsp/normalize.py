@@ -17,5 +17,4 @@ def normalize(array):
     """
     # Normalize data between -1 and 1
     array = 2 * ((array-np.min(array)) / (np.max(array)-np.min(array))) - 1
-    normal = True
-    return array, normal
+    return array, True
