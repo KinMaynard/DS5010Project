@@ -18,7 +18,7 @@ def export_array(name, array, sample_rate, subtype, normal=False):
     returns: none
     """
     # If data normalized then set the subtype to 64 bit float
-    if normal == True:
+    if normal:
         subtype = 'Double'
 
     sf.write(name, array, sample_rate, subtype)

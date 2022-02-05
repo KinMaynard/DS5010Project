@@ -212,7 +212,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
 
     # Compensating for partial polar plot extra whitespace:
     # Left, bottom, width, height
-    if sub is False:
+    if not sub:
         pol_ax.set_position([0.1, 0.05, 0.8, 1])
 
     else:
