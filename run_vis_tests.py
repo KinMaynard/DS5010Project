@@ -17,13 +17,6 @@ from soundscope.vis.vectorscope import vectorscope
 from soundscope.vis.visualizer import visualizer
 
 
-# Use backend that supports animation, blitting & figure window resizing
-mpl.use('Qt5Agg')
-
-# Ignore divide by 0 error in log
-np.seterr(divide = 'ignore')
-
-
 if __name__ == '__main__':
     # Test selector
     questions = [inquirer.Checkbox('tests', message='Which tests to run?',
