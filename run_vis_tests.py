@@ -29,10 +29,12 @@ if __name__ == '__main__':
 
     if 'Mono' in answers['tests']:
         # Create test files
-        sf.write('silence.aiff', np.zeros(4), 44100, 'PCM_16')
-        sf.write('white.aiff', 2 * np.random.default_rng(42).random((44)) - 1,
-                 88200, 'PCM_16')
-        sf.write('sin.aiff', np.sin(np.linspace(-np.pi, np.pi, 44)), 44100,
+        # Random to simulate dither
+        sf.write('silence.aiff', (2*np.random.default_rng(42).random((4410))
+                 - 1) / 10000, 44100, 'PCM_16')
+        sf.write('white.aiff', 2 * np.random.default_rng(42).random((4410))
+                 - 1, 88200, 'PCM_16')
+        sf.write('sin.aiff', np.sin(np.linspace(-np.pi, np.pi, 4410)), 44100,
                  'PCM_16')
 
         # Waveform to perform tests on
