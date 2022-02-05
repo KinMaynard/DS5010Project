@@ -1,7 +1,8 @@
 """
 Audio processing & visualization library
 
-Handles the importing of audio files to numpy arrays via the soundfile dependancy
+Handles the importing of audio files to numpy arrays 
+via the soundfile dependancy
 """
 
 import soundfile as sf
@@ -11,7 +12,8 @@ def import_array(file):
     """
     Import audio file as 64 bit float array
     file: audio file
-    returns: a filename, number of channels, data (a 64 bit float numpy array of audio data), 
+    returns: a filename, number of channels, 
+            data (a 64 bit float numpy array of audio data), 
             the files subtype and sample rate of the file.
     """
     # extracting the filename and subtype from soundfile's info object

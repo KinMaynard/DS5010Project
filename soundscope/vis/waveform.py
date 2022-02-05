@@ -25,11 +25,15 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
     channels: mono (1) or stereo (2) file
     sample_rate: sampling rate of audio file
     fig: external figure to plot onto if provided, default = None
-    sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
-    gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
-    resize_ls: list of text objects to be resized on window resize events when plotting inside visualizer, default None
+    sub: boolean, True: plotting as subplot of larger figure, 
+        False: otherwise, default False
+    gridspec: gridspec to plot onto if part of a larger figure 
+        otherwise None, default None
+    resize_ls: list of text objects to be resized on window resize 
+        events when plotting inside visualizer, default None
 
-    returns: waveform plot of intensity/time either alone or as part of provided fig
+    returns: waveform plot of intensity/time either alone 
+        or as part of provided fig
     """
     # Font
     mpl.rcParams['font.family'] = 'sans-serif'
@@ -84,12 +88,15 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
             # store initial figure dimesions
             fig_width, fig_height = fig.get_size_inches() * fig.dpi
 
-            # reset button axis size based on figure size to look correct on multiple screens
+            # reset button axis size based on figure size 
+            # to look correct on multiple screens
             if fig_height <= 1700:
-                reset_button_ax = fig.add_axes([0.455, 0.49, 0.022, 0.015]) # left, bottom, width, height
+                # left, bottom, width, height
+                reset_button_ax = fig.add_axes([0.455, 0.49, 0.022, 0.015])
 
             else:
-                reset_button_ax = fig.add_axes([0.463, 0.49, 0.0145, 0.01]) # left, bottom, width, height
+                # left, bottom, width, height
+                reset_button_ax = fig.add_axes([0.463, 0.49, 0.0145, 0.01])
 
             # reset button
             reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
@@ -169,7 +176,8 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
         ax1.xaxis.tick_top()
 
         # plot signal amplitude/time
-        time = left.size / sample_rate # only left size because otherwise will be double the amount of time
+        # only left size otherwise will be double the amount of time
+        time = left.size / sample_rate
         # line1 = np.stack((np.linspace(0.0, time, left.size), left), axis=-1)
         # line2 = np.stack((np.linspace(0.0, time, left.size), right), axis=-1)
         # col1 = mpl.collections.LineCollection([line1], color='#16F9DA')
@@ -194,12 +202,14 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
             # store initial figure dimesions
             fig_width, fig_height = fig.get_size_inches() * fig.dpi
 
-            # reset button axis size based on figure size to look correct on multiple screens
+            # reset button axis size based on figure size 
+            # to look correct on multiple screens
             if fig_height <= 1700:
                 reset_button_ax = fig.add_axes([0.455, 0.373, 0.022, 0.015])
 
             else:
-                reset_button_ax = fig.add_axes([0.463, 0.373, 0.0145, 0.01]) # axes left, bottom, width, height
+                # axes left, bottom, width, height
+                reset_button_ax = fig.add_axes([0.463, 0.373, 0.0145, 0.01])
             
             # reset button
             reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')

@@ -19,12 +19,15 @@ np.seterr(divide = 'ignore')
 
 def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
     """
-    A stereo vectorscope plot of audio data in either polar dot per sample or lissajous modes
-    Left/Right amplitudes as coordinates on X/Y 180 degree polar plot or coordinate plane lissajous plot
+    A stereo vectorscope plot of audio data in either polar dot per 
+    sample or lissajous modes Left/Right amplitudes as coordinates on 
+    X/Y 180 degree polar plot or coordinate plane lissajous plot
     
-    Lissajous vectorscope dot per sample plotting stereo width of the audio signal.
-    Mono signals show as straight lines down the center, stereo information is show with horizontal
-    deflection of the data. Phase issues show as INSERT PHASE EXPLANATION HERE.
+    Lissajous vectorscope dot per sample plotting stereo width of the 
+    audio signal.
+    Mono signals show as straight lines down the center, stereo 
+    information is show with horizontal deflection of the data. 
+    Phase issues show as INSERT PHASE EXPLANATION HERE.
 
     the Polar/Lissajous radio button chooses which plot to show
 
@@ -32,12 +35,16 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspe
     name: audio datafile name
     sample_rate: sampling rate of audio file
     fig: external figure to plot onto if provided, default = None
-    sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
-    gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
-    resize_ls: list of text objects to be resized on window resize events when plotting inside visualizer, default None
+    sub: boolean, True: plotting as subplot of larger figure, 
+        False: otherwise, default False
+    gridspec: gridspec to plot onto if part of a larger figure 
+        otherwise None, default None
+    resize_ls: list of text objects to be resized on window resize 
+        events when plotting inside visualizer, default None
     
     returns: a vectorscope polar dot per sample plot of audio data 
-        or a lissajouse dot per sample vectorscope plot of the audio array
+        or a lissajouse dot per sample vectorscope plot of the audio 
+        array
     """
     # dark background white text
     plt.style.use('dark_background')
@@ -60,7 +67,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspe
         float_ax = fig.add_subplot(axes_class=floating_axes.FloatingAxes, grid_helper=helper)
         # phase_ax = fig.add_subplot() #polar=True
 
-    # initilize polar & lissajous figure and axes for subplotting inside visualizer
+    # polar & lissajous figure + axes for subplotting inside visualizer
     else:
         if channels == '1':
             pol_ax = fig.add_subplot(224, polar=True)
@@ -167,7 +174,8 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspe
     pol_ax.set_yticklabels([])
     pol_ax.grid(False, axis='y')
 
-    # setting spine color, no api for the bottom spines so need to use get_children
+    # setting spine color, no api for the bottom spines so need to use 
+    # get_children
     artists = pol_ax.get_children()
     pol_spines = [i for i in artists[1:4]]
     for s in pol_spines:
@@ -179,13 +187,15 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspe
     # thetagrid color
     pol_ax.xaxis.grid(color='#F9A438')
 
-    # compensating for partial polar plot extra whitespace: left, bottom, width, height
+    # compensating for partial polar plot extra whitespace: 
+    # left, bottom, width, height
     if sub is False:
         pol_ax.set_position([0.1, 0.05, 0.8, 1])
 
     else:
         if channels == '1':
-            pol_ax.set_position([0.55, -0.735, 0.350, 2.023]) # left, bottom, width, height
+            # left, bottom, width, height
+            pol_ax.set_position([0.55, -0.735, 0.350, 2.023])
 
         else:
             pol_ax.set_position([0.6, -0.772, 0.245, 2])
@@ -196,7 +206,8 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspe
     # polarlissa button axis.
     # solo plot
     if not sub:
-        rax = plt.axes([0.05, 0.7, 0.13, 0.1], facecolor='black', frame_on=False) # left, bottom, width, height
+        # left, bottom, width, height
+        rax = plt.axes([0.05, 0.7, 0.13, 0.1], facecolor='black', frame_on=False)
 
     # part of visualizer
     else:
@@ -216,7 +227,8 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspe
             float_ax.set_visible(False)
         fig.canvas.draw_idle()
 
-    # connect button click event to callback function to switch between plots
+    # connect button click event to callback function
+    # to switch between plots
     polarlissa.on_clicked(chooseplot)
 
     # labelsize & color for polarlissa buttons
@@ -224,7 +236,8 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspe
         label.set_fontsize(8)
         label.set_color('#F9A438')
 
-    # dynamically resize radio button height with figure size & setting color and width of button edges
+    # dynamically resize radio button height with figure size 
+    # & setting color and width of button edges
     rpos = rax.get_position().get_points()
     fig_height = fig.get_figheight()
     fig_width = fig.get_figwidth()

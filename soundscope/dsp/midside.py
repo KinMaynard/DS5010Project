@@ -11,7 +11,8 @@ from soundscope.util.split import split
 
 def midside(array, channels, code=True):
     """
-    Encodes a stereo array of L/R audio data as mid/side data or mid/side data as L/R
+    Encodes a stereo array of L/R audio data as mid/side data or 
+    mid/side data as L/R
 
     sum and difference matrix:
     mid: (L+R)-3dB or 1/2(L+R)
@@ -22,12 +23,15 @@ def midside(array, channels, code=True):
 
     array: 2d numpy array of audio data (L/R, or M/S)
     channels: # of channels in audio signal (must be 2)
-    code: True when encoding Mid/Side, False when decoding Mid/Side (default True)
-    returns: given L/R: a 2d array of audio data encoded as mid/side, given M/S: a 2d array of audio data encoded as L/R
+    code: True when encoding Mid/Side, False when decoding Mid/Side 
+        (default True)
+    returns: given L/R: a 2d array of audio data encoded as mid/side, 
+        given M/S: a 2d array of audio data encoded as L/R
     """
     # check for stereo or mid/side array
     if channels == '1':
-        # treat mono array as stereo array of 2 mono components (will sum to only mid data no side)
+        # treat mono array as stereo array of 2 mono components 
+        #(will sum to only mid data no side)
         left, right = array, array
 
     else:

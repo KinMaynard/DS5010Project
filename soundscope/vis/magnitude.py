@@ -21,22 +21,29 @@ np.seterr(divide = 'ignore')
 
 def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
     """
-    plots the log magnitude spectrum of an audio signal magnitude dB/frequency
+    plots the log magnitude spectrum of an audio signal magnitude 
+    dB/frequency
     
     array: array of audio data
     name: audio file name
     channels: 1 mono or 2 stereo
     sample_rate: sampling rate of audio file
     fig: external figure to plot onto if provided, default = None
-    sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
-    gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
-    resize_ls: list of text objects to be resized on window resize events when plotting inside visualizer, default None
+    sub: boolean, True: plotting as subplot of larger figure, 
+        False: otherwise, default False
+    gridspec: gridspec to plot onto if part of a larger figure 
+        otherwise None, default None
+    resize_ls: list of text objects to be resized on window resize 
+        events when plotting inside visualizer, default None
 
     Radio buttons: 
-        L: plots left channel, R: plots right channel, Sum: plots L+R, Mid: plots mid channel, Side: plots side channel
-        Lin: plot with linear or or no scaling, dB: plot with dB scaling: amplitude (20 * log10)
+        L: plots left channel, R: plots right channel, Sum: plots L+R, 
+        Mid: plots mid channel, Side: plots side channel
+        Lin: plot with linear or or no scaling, 
+        dB: plot with dB scaling: amplitude (20 * log10)
     
-    returns: a plot of the log magnitude spectrum of an audio array with radio buttons for signal array & fq scale
+    returns: a plot of the log magnitude spectrum of an audio array 
+    with radio buttons for signal array & fq scale
     """
     # dictionary of state variables
     state = {'LIN': 'linear', 'dB': 'dB', 'scale': 'linear'}
@@ -104,7 +111,8 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
         # initial axis
         sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate, color='#FB636F')
 
-        # state variable dictionary to keep track of plot status for button changes
+        # state variable dictionary to keep track of plot status 
+        # for button changes
         state.update({'L': left, 'R': right, 'SUM': sumsig, 'MID': mid, 'SIDE': side, 'data': left, 'line': line})
 
         # LRSUM button axis (left, bottom, width, height)
@@ -148,7 +156,8 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
                 # add to resize list for resizing in visualizer 
                 resize_ls.append(label)
 
-        # dynamically resize radio button height with figure size & setting color and width of button edges
+        # dynamically resize radio button height with figure size 
+        # & setting color and width of button edges
         rpos = rax.get_position().get_points()
         fig_height = fig.get_figheight()
         fig_width = fig.get_figwidth()
@@ -226,12 +235,14 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
         # store initial figure dimesions
         fig_width, fig_height = fig.get_size_inches() * fig.dpi
 
-        # reset button axis size based on figure size to look correct on multiple screens
+        # reset button axis size based on figure size to look 
+        # correct on multiple screens
         if fig_height <= 1700:
             reset_button_ax = fig.add_axes([0.455, 0.07, 0.022, 0.015])
 
         else:
-            reset_button_ax = fig.add_axes([0.463, 0.07, 0.0145, 0.01]) # left, bottom, width, height
+            # left, bottom, width, height
+            reset_button_ax = fig.add_axes([0.463, 0.07, 0.0145, 0.01])
 
         # zoom reset view button
         reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')

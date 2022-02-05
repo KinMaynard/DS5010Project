@@ -26,11 +26,15 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
     channels: 1 mono or 2 stereo, number of channels in audio array
     name: name of the audio file
     fig: external figure to plot onto if provided, default = None
-    sub: boolean, True: plotting as subplot of larger figure, False: otherwise, default False
-    gridspec: gridspec to plot onto if part of a larger figure otherwise None, default None
-    resize_ls: list of text objects to be resized on window resize events when plotting inside visualizer, default None
+    sub: boolean, True: plotting as subplot of larger figure, 
+        False: otherwise, default False
+    gridspec: gridspec to plot onto if part of a larger figure otherwise
+        None, default None
+    resize_ls: list of text objects to be resized on window resize 
+        events when plotting inside visualizer, default None
 
-    returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
+    returns a spectrogram with y: frequency decibel scale logarithmic, 
+        x: time (seconds)
     """
     # Font
     mpl.rcParams['font.family'] = 'sans-serif'
@@ -72,9 +76,10 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
 
         # colorbar
         if not sub:
-            cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768]) # left, bottom, width, height
+            # left, bottom, width, height
+            cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768])
         else:
-            cbar_ax = fig.add_axes([0.905, 0.53, 0.003, 0.35])  # left, bottom, width, height
+            cbar_ax = fig.add_axes([0.905, 0.53, 0.003, 0.35])
         fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', fontsize=7)
         cbar_ax.tick_params(color='#F9A438', labelsize=5, labelcolor='#F9A438')
 
@@ -96,12 +101,14 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
             # store initial figure dimesions
             fig_width, fig_height = fig.get_size_inches() * fig.dpi
             
-            # reset button axis size based on figure size to look correct on multiple screens
+            # reset button axis size based on figure size to look 
+            # correct on multiple screens
             if fig_height <= 1700:
                 reset_button_ax = fig.add_axes([0.878, 0.49, 0.022, 0.015])
 
             else:
-                reset_button_ax = fig.add_axes([0.886, 0.49, 0.0145, 0.01]) # left, bottom, width, height
+                # left, bottom, width, height
+                reset_button_ax = fig.add_axes([0.886, 0.49, 0.0145, 0.01])
 
             # reset button
             reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')
@@ -181,9 +188,11 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
         
         # colorbar
         if not sub:
-            cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77]) # left, bottom, width, height
+            # left, bottom, width, height
+            cbar_ax = fig.add_axes([0.845, 0.11, 0.007, 0.77])
         else:
-            cbar_ax = fig.add_axes([0.905, 0.414, 0.003, 0.466]) # left, bottom, width, height
+            # left, bottom, width, height
+            cbar_ax = fig.add_axes([0.905, 0.414, 0.003, 0.466])
         colorbar = fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', fontsize='x-small')
         cbar_ax.tick_params(color='#F9A438', labelsize=6, labelcolor='#F9A438')
         # get colorbar label for resizing
@@ -209,12 +218,14 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
             # store initial figure dimesions
             fig_width, fig_height = fig.get_size_inches() * fig.dpi
 
-            # reset button axis size based on figure size to look correct on multiple screens
+            # reset button axis size based on figure size to look 
+            # correct on multiple screens
             if fig_height <= 1700:
                 reset_button_ax = fig.add_axes([0.878, 0.373, 0.022, 0.015])
 
             else:
-                reset_button_ax = fig.add_axes([0.886, 0.373, 0.0145, 0.01]) # axes left, bottom, width, height
+                # axes left, bottom, width, height
+                reset_button_ax = fig.add_axes([0.886, 0.373, 0.0145, 0.01])
             
             # reset button
             reset_button = Button(reset_button_ax, 'RESET', color='black', hovercolor='#7E0000')

@@ -20,7 +20,8 @@ def reverse(array, channels, subdivision=1):
         # reverse every nth subarray
         rev_array = np.row_stack(np.flip(np.split(array, subdivision), axis=1))
 
-        # mono case for removing extra dimension from np.split on mono arrays
+        # mono case for removing extra dimension from np.split 
+        # on mono arrays
         if channels == '1':
             rev_array = rev_array.reshape(array.size)
         

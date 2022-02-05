@@ -28,7 +28,8 @@ def visualizer(array, name, channels, sample_rate):
     channels: mono (1) or stereo (2) file
     sample_rate: sampling rate of audio file
     
-    returns: fasceted subplots of waveform, magnitude, spectrogram & vectorscope
+    returns: fasceted subplots of waveform, magnitude, 
+        spectrogram & vectorscope
     """
     # initialize figure with dark background and title
     plt.style.use('dark_background')
@@ -48,14 +49,16 @@ def visualizer(array, name, channels, sample_rate):
     # store text objects for later resizing when window resized
     resize_ls = [title]
 
-    # gridspec to snugly fascet only stereo spectrogram and waveform plots
+    # gridspec to snugly fascet only stereo 
+    # spectrogram and waveform plots
     # initialize for mono case
     gs1, gs2 = None, None
     if channels == '2':
         # snugly fascet stereo subplots
         fig.subplots_adjust(hspace=0)
 
-        # outer gridspec, hspace separates waveform & spectrogram plots from magnitude & vectorscope
+        # outer gridspec, hspace separates waveform & spectrogram plots 
+        # from magnitude & vectorscope
         outer = gridspec.GridSpec(nrows=2, ncols=1, figure=fig, hspace = 0.2, height_ratios = [2, 1])
 
         # nested gridspecs
@@ -88,7 +91,8 @@ def visualizer(array, name, channels, sample_rate):
     reset_spec.on_clicked(reset_spec_click)
     reset_mag.on_clicked(reset_mag_click)
 
-    # connect the figure resize events to the font resizing callback function
+    # connect the figure resize events 
+    # to the font resizing callback function
     cid = plt.gcf().canvas.mpl_connect("resize_event", TextResizer(resize_ls))
 
     plt.show()
