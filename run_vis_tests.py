@@ -7,6 +7,7 @@ import unittest
 
 import numpy as np
 import matplotlib as mpl
+import soundfile as sf
 import inquirer
 
 from soundscope.io.import_array import import_array
@@ -27,17 +28,19 @@ if __name__ == '__main__':
     answers = inquirer.prompt(questions)
 
     if 'Mono' in answers['tests']:
+        # Create test files
+        sf.write('silence.aiff', np.zeros(4), 44100, 'PCM_16')
+        sf.write('white.aiff', 2 * np.random.default_rng(42).random((44)) - 1,
+                 88200, 'PCM_16')
+        sf.write('sin.aiff', np.sin(np.linspace(-np.pi, np.pi, 44)), 44100,
+                 'PCM_16')
+
         # Waveform to perform tests on
-        questions2 = [inquirer.List('waves', message=
-            'Which mono wave to test?',
-            choices=[
-            ('Silence', '../binaries/silence_44100_-infdBFS_Mono.aiff'),
-            ('White Noise', '../binaries/white_88k_-3dBFS.wav'),
-            ('Linear Chirp', '../binaries/hdchirp_88k_-3dBFS_lin.wav'),
-            ('Sin 100Hz', '../binaries/sin_44100_100Hz_-3dBFS_1s.wav'),
-            ('Sweep', '../binaries/hdsweep_1Hz_44000Hz_-3dBFS_30s.wav'),
-            ('Sin Out', '../binaries/sin100hz_180out.aiff')],
-            default=('White Noise', '../binaries/white_88k_-3dBFS.wav')),]
+        questions2 = [inquirer.List('waves', message='Which test wave?',
+            choices=[('Silence', 'silence.aiff'),
+                     ('White Noise', 'white.aiff'),
+                     ('Sin', 'sin.aiff')],
+            default=('Sin', 'sin.aiff')),]
 
         answers2 = inquirer.prompt(questions2)
 
@@ -74,10 +77,14 @@ if __name__ == '__main__':
             # Visualizer mono plot
             visualizer(data, name, channels, sample_rate)
 
+        # Delete Test Files
+        os.remove('silence.aiff')
+        os.remove('white.aiff')
+        os.remove('sin.aiff')
+
     if 'Stereo' in answers['tests']:
         # Waveform to perform tests on
-        questions2 = [inquirer.List('waves', message=
-                'Which stereo wave to test?',
+        questions2 = [inquirer.List('waves', message='Which test wave?',
             choices=[
             ('Silence', '../binaries/silence_44100_-infdBFS_Stereo.aiff'),
             ('White Noise', '../binaries/whitenoise_44100_0dBFS_Stereo.aiff'),
