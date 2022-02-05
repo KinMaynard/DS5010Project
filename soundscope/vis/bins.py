@@ -34,7 +34,7 @@ def bins(array, channels, sample_rate, bin_size=16):
         # pad end of array with mean of last bin so array size divisible 
         # by bin_size
         if channels == '1':
-            width = ((0, to_fill), )
+            width = ((0, to_fill),)
             padded = np.pad(array, pad_width=width, mode='mean', stat_length=(
                 partial_bin,))
             downsampled = np.mean(padded.reshape(-1, bin_size), axis=1)
