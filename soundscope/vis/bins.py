@@ -16,22 +16,22 @@ def bins(array, channels, sample_rate, bin_size=16):
         default 32
     returns: downsampled array
     """
-    # either of len bin_size if array divisible by bin_size or length
-    #of the partial bin
+    # Either of len bin_size if array divisible by bin_size or length
+    # of the partial bin
     partial_bin = len(array) % bin_size
     to_fill = bin_size - partial_bin
     sample_rate = sample_rate / bin_size
 
-    # array didn't need padding
+    # Array didn't need padding
     if partial_bin == 0:
-        # separate array into bins of size bin_size, average the bins
+        # Separate array into bins of size bin_size, average the bins
         # into new array return array
-        # populate new array with averages of every (bin_size) samples
+        # Populate new array with averages of every (bin_size) samples
         return np.mean(array.reshape(-1, bin_size), axis=1), sample_rate
 
-    # array needed padding for last bin
+    # Array needed padding for last bin
     else:
-        # pad end of array with mean of last bin so array size divisible
+        # Pad end of array with mean of last bin so array size divisible
         # by bin_size
         if channels == '1':
             width = ((0, to_fill),)

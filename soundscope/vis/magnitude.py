@@ -12,10 +12,10 @@ from soundscope.util.split import split
 from soundscope.dsp.midside import midside
 
 
-# use backend that supports animation, blitting & figure window resizing
+# Use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
 
-# ignore divide by 0 error in log
+# Ignore divide by 0 error in log
 np.seterr(divide='ignore')
 
 
@@ -23,7 +23,7 @@ def magnitude(
     array, name, channels, sample_rate, fig=None,
     sub=False, gridspec=None, resize_ls=None):
     """
-    plots the log magnitude spectrum of an audio signal magnitude
+    Plots the log magnitude spectrum of an audio signal magnitude
     dB/frequency
 
     array: array of audio data
@@ -47,13 +47,13 @@ def magnitude(
     returns: a plot of the log magnitude spectrum of an audio array
     with radio buttons for signal array & fq scale
     """
-    # dictionary of state variables
+    # Dictionary of state variables
     state = {'LIN': 'linear', 'dB': 'dB', 'scale': 'linear'}
 
-    # dark background white text, initilize figure and axes
+    # Dark background white text, initilize figure and axes
     plt.style.use('dark_background')
 
-    # figure and axes init in case of subplot or singular
+    # Figure and axes init in case of subplot or singular
     if fig is None:
         fig, ax = plt.subplots()
 
@@ -67,7 +67,7 @@ def magnitude(
     mpl.rcParams['font.family'] = 'sans-serif'
     mpl.rcParams['font.sans-serif'] = 'Helvetica'
 
-    # labeling axes & title
+    # Labeling axes & title
     title = '%s MAGNITUDE SPECTRUM' % name
     if sub:
         title = 'MAGNITUDE SPECTRUM'
@@ -76,47 +76,47 @@ def magnitude(
     ax.tick_params(axis='both', which='both', color='#F9A438',
                    labelsize=6, labelcolor='#F9A438')
 
-    # spine coloring
+    # Spine coloring
     spine_ls = ['top', 'bottom', 'left', 'right']
     for spine in spine_ls:
         ax.spines[spine].set_color('#F9A438')
 
-    # mono
+    # Mono
     if channels == '1':
         # initial ax
         sig, fq, line = ax.magnitude_spectrum(
             array, Fs=sample_rate, color='#FB636F')
         state['line'] = line
 
-    # making room for LRSUM &/or Lindb button axes
+    # Making room for LRSUM &/or Lindb button axes
     if not sub:
         plt.subplots_adjust(left=0.225)
 
-    # adding data & ax state variables
+    # Adding data & ax state variables
     state.update({'ax': ax, 'data': array})
 
-    # facecolor for button widgets
+    # Facecolor for button widgets
     button_face_color = 'black'
 
     # Stereo
     if channels == '2':
-        # divide array into stereo components
+        # Divide array into stereo components
         left, right = split(array, channels)
 
-        # sum stereo channels
+        # Sum stereo channels
         sumsig = np.sum(array, axis=1)
 
-        # encoding as midside
+        # Encoding as midside
         msarray, code = midside(array, channels, name)
 
-        # splitting midside array into mid and side components
+        # Splitting midside array into mid and side components
         mid, side = split(msarray, channels)
 
-        # initial axis
+        # Initial axis
         sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate,
                                               color='#FB636F')
 
-        # state variable dictionary to keep track of plot status
+        # State variable dictionary to keep track of plot status
         # for button changes
         state.update({'L': left, 'R': right, 'SUM': sumsig, 'MID': mid,
                       'SIDE': side, 'data': left, 'line': line})
@@ -135,15 +135,15 @@ def magnitude(
 
         # Side callback function for lrsums buttons
         def side(label):
-            # clear previous data
+            # Clear previous data
             state['line'].remove()
 
-            # plot
+            # Plot
             sig, fq, line = ax.magnitude_spectrum(
                 state[label], Fs=sample_rate, scale=state['scale'],
                 color='#FB636F')
 
-            # recompute axis limits
+            # Recompute axis limits
             ax.relim()
 
             # Set Labels
@@ -152,24 +152,24 @@ def magnitude(
             ylabel = ax.set_ylabel('MAGNITUDE (%s)' % state['scale'],
                                    color='#F9A438', fontsize=7)
 
-            # update state variables to new line & data
+            # Update state variables to new line & data
             state['line'] = line
             state['data'] = state[label]
             fig.canvas.draw_idle()
 
-        # connect button click event to side callback function
+        # Connect button click event to side callback function
         lrsums.on_clicked(side)
 
-        # labelsize & color for LRSUM buttons
+        # Labelsize & color for LRSUM buttons
         for label in lrsums.labels:
             label.set_fontsize(8)
             label.set_color('#F9A438')
 
             if resize_ls is not None:
-                # add to resize list for resizing in visualizer
+                # Add to resize list for resizing in visualizer
                 resize_ls.append(label)
 
-        # dynamically resize radio button height with figure size
+        # Dynamically resize radio button height with figure size
         # & setting color and width of button edges
         rpos = rax.get_position().get_points()
         fig_height = fig.get_figheight()
@@ -191,7 +191,7 @@ def magnitude(
     # Linear dB buttons
     lindB = RadioButtons(rax, ('LIN', 'dB'), activecolor='#5C8BC6')
 
-    # state variable dictionary of starting axis limits
+    # State variable dictionary of starting axis limits
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
     state.update({'lin_xlim': xlim, 'lin_ylim': ylim, 'dB_xlim': xlim,
@@ -199,17 +199,17 @@ def magnitude(
 
     # scale callback function for lindB buttons
     def scale(label):
-        # clear data
+        # Clear data
         state['line'].remove()
 
-        # plot
+        # Plot
         sig, fq, line = ax.magnitude_spectrum(
             state['data'], Fs=sample_rate, scale=state[label], color='#FB636F')
 
-        # recompute axis limits
+        # Recompute axis limits
         ax.relim()
 
-        # scale the ax
+        # Scale the ax
         ax.autoscale()
 
         # Set Labels
@@ -217,24 +217,24 @@ def magnitude(
         ylabel = ax.set_ylabel('MAGNITUDE (%s)' % label, color='#F9A438',
                                fontsize=7)
 
-        # update state variables to new line & scale
+        # Update state variables to new line & scale
         state['line'] = line
         state['scale'] = state[label]
         fig.canvas.draw_idle()
 
-    # connect button click event to scale callback function
+    # Connect button click event to scale callback function
     lindB.on_clicked(scale)
 
-    # labelsize & color
+    # Labelsize & color
     for label in lindB.labels:
         label.set_fontsize(8)
         label.set_color('#F9A438')
 
         if resize_ls is not None:
-            # add to resize list for resizing in visualizer
+            # Add to resize list for resizing in visualizer
             resize_ls.append(label)
 
-    # dynamically resize radio button height with figure size
+    # Dynamically resize radio button height with figure size
     rpos = rax.get_position().get_points()
     fh = fig.get_figheight()
     fw = fig.get_figwidth()
@@ -248,29 +248,29 @@ def magnitude(
     xlabel = ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
     ylabel = ax.set_ylabel('MAGNITUDE (LIN)', color='#F9A438', fontsize=7)
 
-    # zoom reset view button & axes
+    # Zoom reset view button & axes
     if sub:
-        # store initial figure dimesions
+        # Store initial figure dimesions
         fig_width, fig_height = fig.get_size_inches() * fig.dpi
 
-        # reset button axis size based on figure size to look
+        # Reset button axis size based on figure size to look
         # correct on multiple screens
         if fig_height <= 1700:
             reset_button_ax = fig.add_axes([0.455, 0.07, 0.022, 0.015])
 
         else:
-            # left, bottom, width, height
+            # Left, bottom, width, height
             reset_button_ax = fig.add_axes([0.463, 0.07, 0.0145, 0.01])
 
-        # zoom reset view button
+        # Zoom reset view button
         reset_button = Button(reset_button_ax, 'RESET', color='black',
                               hovercolor='#7E0000')
 
-        # small screen, smaller label
+        # Small screen, smaller label
         if fig_height <= 1700:
             reset_button.label.set_size(6)
 
-        # big screen, big label
+        # Big screen, big label
         else:
             reset_button.label.set_size(7)
 
@@ -278,22 +278,22 @@ def magnitude(
         for spine in spine_ls:
             reset_button_ax.spines[spine].set_color('#F0191C')
 
-        # callback function for zoom reset button
+        # Callback function for zoom reset button
         def reset_button_on_clicked(mouse_event):
-            # recompute axis limits
+            # Recompute axis limits
             ax.relim()
 
-            # scale the ax
+            # Scale the ax
             ax.autoscale()
         reset_button.on_clicked(reset_button_on_clicked)
 
     if resize_ls is not None:
-        # store text to be resized
+        # Store text to be resized
         resize_ls.extend([title_mag, xlabel, ylabel, reset_button.label])
 
-    # individual figure or as part of larger figure
+    # Individual figure or as part of larger figure
     if sub:
-        # only return lrsums button if stereo array
+        # Only return lrsums button if stereo array
         if channels == '2':
             return fig, lrsums, side, lindB, scale, reset_button, \
                    reset_button_on_clicked, resize_ls

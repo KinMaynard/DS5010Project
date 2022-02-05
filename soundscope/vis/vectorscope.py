@@ -10,10 +10,10 @@ import matplotlib.gridspec as gridspec
 import mpl_toolkits.axisartist.floating_axes as floating_axes
 
 
-# use backend that supports animation, blitting & figure window resizing
+# Use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
 
-# ignore divide by 0 error in log
+# Ignore divide by 0 error in log
 np.seterr(divide='ignore')
 
 
@@ -30,7 +30,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     information is show with horizontal deflection of the data.
     Phase issues show as INSERT PHASE EXPLANATION HERE.
 
-    the Polar/Lissajous radio button chooses which plot to show
+    The Polar/Lissajous radio button chooses which plot to show
 
     array: array of audio data
     name: audio datafile name
@@ -47,29 +47,29 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
         or a lissajouse dot per sample vectorscope plot of the audio
         array
     """
-    # dark background white text
+    # Dark background white text
     plt.style.use('dark_background')
 
-    # setting font
+    # Setting font
     mpl.rcParams['font.family'] = 'sans-serif'
     mpl.rcParams['font.sans-serif'] = 'Helvetica'
     # mpl.rcParams['agg.path.chunksize'] = 20000
 
-    # setting axis limits to data peaks
+    # Setting axis limits to data peaks
     extents = np.min(array), np.max(array), np.min(array), np.max(array)
 
-    # making floating axes and rotating it 45 degrees
+    # Making floating axes and rotating it 45 degrees
     transform = mpl.transforms.Affine2D().rotate_deg(45)
     helper = floating_axes.GridHelperCurveLinear(transform, extents)
 
-    # initilize polar & lissajous figure and axes for solo plot
+    # Initilize polar & lissajous figure and axes for solo plot
     if fig is None:
         fig, pol_ax = plt.subplots(subplot_kw={'projection': 'polar'})
         float_ax = fig.add_subplot(axes_class=floating_axes.FloatingAxes,
                                    grid_helper=helper)
         # phase_ax = fig.add_subplot() #polar=True
 
-    # polar & lissajous figure + axes for subplotting inside visualizer
+    # Polar & lissajous figure + axes for subplotting inside visualizer
     else:
         if channels == '1':
             pol_ax = fig.add_subplot(224, polar=True)
@@ -85,36 +85,36 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
                                        grid_helper=helper)
             # phase_ax = fig.add_subplot(gridspec[0, 1])
 
-    # phase spectrum plot
-    # set phase spectrum title
+    # Phase spectrum plot
+    # Set phase spectrum title
     # phase_ax.set_title('Phase Spectrum', color='#F9A438', fontsize=10)
 
-    # plotting phase spectrum
+    # Plotting phase spectrum
     # spectrum, freqs, line = phase_ax.phase_spectrum(array, Fs=sample_rate)
     # spectrum, freqs, line = phase_ax.angle_spectrum(array, Fs=sample_rate)
 
-    # double up mono signals to display them
+    # Double up mono signals to display them
     if channels == '1':
         array = .5 * array
         array = np.stack((array, array), axis=-1)
 
-    # plotting coherence
+    # Plotting coherence
     # Cxy, freqs = phase_ax.cohere(array[:,1], array[:,0], NFFT=128,
                                   #Fs=sample_rate)
 
-    # turn off tick labels, ticks & axis labels
+    # Turn off tick labels, ticks & axis labels
     float_ax.axis['top', 'bottom', 'left', 'right'].toggle(all=False)
 
-    # setting spine color
+    # Setting spine color
     float_ax.axis['top', 'bottom', 'left', 'right'].line.set_color('#F9A438')
 
-    # diagonal spine right
+    # Diagonal spine right
     float_ax.axline((-1, -1), (1, 1), color='#F9A438', lw=1, zorder=3)
 
-    # diagonal spine left
+    # Diagonal spine left
     float_ax.axline((-1, 1), (1, -1), color='#F9A438', lw=1, zorder=3)
 
-    # setting the title of the plot
+    # Setting the title of the plot
     title = '%s LISSAJOUS VECTORSCOPE' % name
     if sub:
         title = 'LISSAJOUS VECTORSCOPE'
@@ -127,11 +127,11 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     else:
         float_title = float_ax.set_title(title, color='#F9A438', fontsize=10)
 
-    # base transformation of data
+    # Base transformation of data
     base = plt.gca().transData
     rot = mpl.transforms.Affine2D().rotate_deg(45)
 
-    # add annotations for quadrants (axis labels)
+    # Add annotations for quadrants (axis labels)
     l_pos = float_ax.text(0.22, .76, '+L', color='#F9A438', fontsize=7,
                           transform=float_ax.transAxes)
     l_neg = float_ax.text(.75, 0.225, '-L', color='#F9A438', fontsize=7,
@@ -141,24 +141,24 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     r_neg = float_ax.text(0.22, 0.225, '-R', color='#F9A438', fontsize=7,
                           transform=float_ax.transAxes)
 
-    # making lissajous lines (doesn't work)
+    # Making lissajous lines (doesn't work)
     # x = array[:,1] * np.sin(np.fft.fft(array[:,1]) * (array.size
                                                       # / sample_rate))
     # y = array[:,0] * np.sin(np.fft.fft(array[:,0]) * (array.size
                                                       # / sample_rate))
 
-    # plotting data
+    # Plotting data
     float_ax.plot(array[:,1], array[:,0], 'o', color='#4B9D39',
                   markersize=0.05, transform=rot + base)
 
-    # lissajous curve plotting
+    # Lissajous curve plotting
     # float_ax.plot(x, y, color='#4B9D39', markersize=0.05,
                   # transform=rot + base)
 
-    # initially hide lissajous vectorscope
+    # Initially hide lissajous vectorscope
     # float_ax.set_visible(False)
 
-    # new transform attempt
+    # New transform attempt
     mask = array < 0
     mask2 = np.stack((mask[:,0] == mask[:,1], mask[:,0] == mask[:,1]), axis=1)
     array = np.where(mask2, np.absolute(array), np.negative(array))
@@ -166,10 +166,10 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     r = left
     theta = right
 
-    # plotting
+    # Plotting
     plot = pol_ax.plot(theta, r, 'o', color='#4B9D39', markersize=0.05)
 
-    # set title & bring down close to top of plot
+    # Set title & bring down close to top of plot
     title = '%s POLAR DOT PER SAMPLE VECTORSCOPE' % name
     if sub:
         title = 'POLAR DOT PER SAMPLE VECTORSCOPE'
@@ -183,66 +183,66 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
         title_vec = pol_ax.set_title(title, color='#F9A438', fontsize='medium',
                                      pad=-60)
 
-    # plotting 180 degrees
+    # Plotting 180 degrees
     pol_ax.set_thetamax(180)
 
-    # setting the outer grid max to the max of the array
+    # Setting the outer grid max to the max of the array
     peak = np.amax(array)
     pol_ax.set_rmax(peak)
 
-    # removing y axis labels and most grids
+    # Removing y axis labels and most grids
     pol_ax.set_yticklabels([])
     pol_ax.grid(False, axis='y')
 
-    # setting spine color, no api for the bottom spines so need to use
+    # Setting spine color, no api for the bottom spines so need to use
     # get_children
     artists = pol_ax.get_children()
     pol_spines = [i for i in artists[1:4]]
     for s in pol_spines:
         s.set_color('#F9A438')
 
-    # plotting only 2 theta grids
+    # Plotting only 2 theta grids
     theta_lines, theta_labels = pol_ax.set_thetagrids((135.0, 90.0, 45.0),
                                                       labels=('L', 'C', 'R'),
                                                       color='#F9A438',
                                                       fontsize=7)
 
-    # thetagrid color
+    # Thetagrid color
     pol_ax.xaxis.grid(color='#F9A438')
 
-    # compensating for partial polar plot extra whitespace:
-    # left, bottom, width, height
+    # Compensating for partial polar plot extra whitespace:
+    # Left, bottom, width, height
     if sub is False:
         pol_ax.set_position([0.1, 0.05, 0.8, 1])
 
     else:
         if channels == '1':
-            # left, bottom, width, height
+            # Left, bottom, width, height
             pol_ax.set_position([0.55, -0.735, 0.350, 2.023])
 
         else:
             pol_ax.set_position([0.6, -0.772, 0.245, 2])
 
-    # hide polar vectorscope
+    # Hide polar vectorscope
     pol_ax.set_visible(False)
 
-    # polarlissa button axis.
-    # solo plot
+    # Polarlissa button axis.
+    # Solo plot
     if not sub:
-        # left, bottom, width, height
+        # Left, bottom, width, height
         rax = plt.axes([0.05, 0.7, 0.13, 0.1], facecolor='black',
                        frame_on=False)
 
-    # part of visualizer
+    # Part of visualizer
     else:
         rax = plt.axes([0.71, 0.05, 0.06, 0.045], facecolor='black',
                        frame_on=False)
 
-    # polarlissa radio button
+    # Polarlissa radio button
     polarlissa = RadioButtons(rax, ('Polar', 'Lissajous'),
                               activecolor='#5C8BC6')
 
-    # chooseplot callback function for polarlissa buttons
+    # Chooseplot callback function for polarlissa buttons
     def chooseplot(label):
         if label == 'Lissajous':
             pol_ax.set_visible(False)
@@ -253,16 +253,16 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
             float_ax.set_visible(False)
         fig.canvas.draw_idle()
 
-    # connect button click event to callback function
+    # Connect button click event to callback function
     # to switch between plots
     polarlissa.on_clicked(chooseplot)
 
-    # labelsize & color for polarlissa buttons
+    # Labelsize & color for polarlissa buttons
     for label in polarlissa.labels:
         label.set_fontsize(8)
         label.set_color('#F9A438')
 
-    # dynamically resize radio button height with figure size
+    # Dynamically resize radio button height with figure size
     # & setting color and width of button edges
     rpos = rax.get_position().get_points()
     fig_height = fig.get_figheight()
@@ -273,17 +273,17 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
         circ.set_edgecolor('#F9A438')
         circ.set_lw(0.5)
 
-    # hide button axes
+    # Hide button axes
     rax.set_visible(False)
 
-    # store text to be resized
+    # Store text to be resized
     if resize_ls is not None:
         for label in theta_labels:
             resize_ls.append(label)
 
         resize_ls.extend([title_vec, float_title, l_pos, l_neg, r_pos, r_neg])
 
-    # individual figure or as part of larger figure
+    # Individual figure or as part of larger figure
     if sub:
         return fig, resize_ls, polarlissa, chooseplot
     else:

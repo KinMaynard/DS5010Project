@@ -10,20 +10,20 @@ def reverse(array, channels, subdivision=1):
     every: which subdivions to reverse default: 1
     returns: a reversed version of array by subdivision
     """
-    # check if array.shape divisible by subdivision
+    # Check if array.shape divisible by subdivision
     # if not error
     if len(array) % subdivision != 0:
         print('Error: array size not divisible by subdivision.')
     
-    # subdivide array
+    # Subdivide array
     else:
-        # reverse every nth subarray
+        # Reverse every nth subarray
         rev_array = np.row_stack(np.flip(np.split(array, subdivision), axis=1))
 
-        # mono case for removing extra dimension from np.split
+        # Mono case for removing extra dimension from np.split
         # on mono arrays
         if channels == '1':
             rev_array = rev_array.reshape(array.size)
         
-        # return combined array
+        # Return combined array
         return rev_array

@@ -13,7 +13,7 @@ import numpy as np
 
 def mask(array):
     """
-    calculates a boolean mask of non zeros (values greater than positive
+    Calculates a boolean mask of non zeros (values greater than positive
     epsilon smaller than negative epsilon)
 
     array: numpy array of audio data
@@ -43,7 +43,7 @@ def first_nonzero(array, axis, mask, invalid_val=-1):
 
     Column major order access.
     """
-    # boolean array of True where element of original array is nonzero
+    # Boolean array of True where element of original array is nonzero
     # false otherwise (if zero)
     return np.where(mask.any(axis=axis), mask.argmax(axis=axis), invalid_val)
 
@@ -67,7 +67,7 @@ def last_nonzero(array, axis, mask, invalid_val=-1):
 
     Accessing the array here in column major order.
     """
-    # boolean array of True where element of original array is nonzero
+    # Boolean array of True where element of original array is nonzero
     # false otherwise (if zero)
     dex_last_occur = array.shape[axis] - np.flip(
         mask, axis=axis).argmax(axis=axis) - 1
@@ -76,20 +76,20 @@ def last_nonzero(array, axis, mask, invalid_val=-1):
 
 def trim(array):
     """
-    truncates leading and trailing silence (0's) from audio array
+    Truncates leading and trailing silence (0's) from audio array
     array: numpy array created from an audio file
     returns: array without leading and trailing silence
 
-    want min index of any channel from first non zero and max index of
+    Want min index of any channel from first non zero and max index of
     any channel from last non zero to avoid 2 different sized channels
 
-    future features: definable noise floor to choose what to truncate
+    Future features: definable noise floor to choose what to truncate
         as silence
     """
-    # mask of absolute value of values > epsilon
+    # Mask of absolute value of values > epsilon
     mask1 = mask(array)
-    # return a copy of array sliced from first nonzero element to
+    # Return a copy of array sliced from first nonzero element to
     # last nonzero element
-    # adds 1 to compensate for indexing from zero
+    # Adds 1 to compensate for indexing from zero
     return array[np.amin(first_nonzero(array, 0, mask1)):np.amax(last_nonzero(
         array, 0, mask1)) + 1].copy()

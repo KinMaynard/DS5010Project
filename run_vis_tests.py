@@ -17,10 +17,10 @@ from soundscope.vis.vectorscope import vectorscope
 from soundscope.vis.visualizer import visualizer
 
 
-# use backend that supports animation, blitting & figure window resizing
+# Use backend that supports animation, blitting & figure window resizing
 mpl.use('Qt5Agg')
 
-# ignore divide by 0 error in log
+# Ignore divide by 0 error in log
 np.seterr(divide = 'ignore')
 
 
@@ -52,12 +52,12 @@ if __name__ == '__main__':
         name, channels, data, subtype, sample_rate = import_array(mono)
 
         if 'Bins' in answers['tests']:
-            # downsampling test mono
+            # Downsampling test mono
             binned, bin_sample_rate = bins(data, channels, sample_rate)
             print(binned, bin_sample_rate)
 
         if 'Downsample' in answers['tests']:
-            # downsampling for visualization
+            # Downsampling for visualization
             data, sample_rate = bins(data, channels, sample_rate)
 
         if 'Waveform' in answers['tests']:
@@ -65,19 +65,19 @@ if __name__ == '__main__':
             waveform(data, name, channels, sample_rate)
 
         if 'Magnitude' in answers['tests']:
-            # magnitude test mono file
+            # Magnitude test mono file
             magnitude(data, name, channels, sample_rate)
 
         if 'Spectrogram' in answers['tests']:
-            # spectrogram test case mono file
+            # Spectrogram test case mono file
             spectrogram(data, name, channels, sample_rate)
 
         if 'Vectorscope' in answers['tests']:
-            # vectorscope mono test
+            # Vectorscope mono test
             vectorscope(data, name, channels, sample_rate)
 
         if 'Visualizer' in answers['tests']:
-            # visualizer mono plot
+            # Visualizer mono plot
             visualizer(data, name, channels, sample_rate)
 
     if 'Stereo' in answers['tests']:
@@ -101,12 +101,12 @@ if __name__ == '__main__':
         name, channels, data, subtype, sample_rate = import_array(stereo)
 
         if 'Bins' in answers['tests']:
-            # downsampling test stereo
+            # Downsampling test stereo
             binned, bin_sample_rate = bins(data, channels, sample_rate)
             print(binned, bin_sample_rate)
 
         if 'Downsample' in answers['tests']:
-            # downsampling for visualization
+            # Downsampling for visualization
             data, sample_rate = bins(data, channels, sample_rate)
 
         if 'Waveform' in answers['tests']:
@@ -114,17 +114,17 @@ if __name__ == '__main__':
             waveform(data, name, channels, sample_rate)
 
         if 'Magnitude' in answers['tests']:
-            # magnitude test stereo file
+            # Magnitude test stereo file
             magnitude(data, name, channels, sample_rate)
 
         if 'Spectrogram' in answers['tests']:
-            # spectrogram test case stereo file
+            # Spectrogram test case stereo file
             spectrogram(data, name, channels, sample_rate)
 
         if 'Vectorscope' in answers['tests']:
-            # vectorscope stereo test
+            # Vectorscope stereo test
             vectorscope(data, name, channels, sample_rate)
 
         if 'Visualizer' in answers['tests']:
-            # visualizer stereo plot
+            # Visualizer stereo plot
             visualizer(data, name, channels, sample_rate)

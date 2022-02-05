@@ -14,7 +14,7 @@ def midside(array, channels, code=True):
     Encodes a stereo array of L/R audio data as mid/side data or
     mid/side data as L/R
 
-    sum and difference matrix:
+    Sum and difference matrix:
     mid: (L+R)-3dB or 1/2(L+R)
     side: (L-R)-3dB or 1/2(L-R)
     L: (M+S)-3dB or L = M + S = 1/2(L+R) + 1/2(L-R) = 1/2 * L + 1/2 * L
@@ -28,14 +28,14 @@ def midside(array, channels, code=True):
     returns: given L/R: a 2d array of audio data encoded as mid/side,
         given M/S: a 2d array of audio data encoded as L/R
     """
-    # check for stereo or mid/side array
+    # Check for stereo or mid/side array
     if channels == '1':
-        # treat mono array as stereo array of 2 mono components
-        #(will sum to only mid data no side)
+        # Treat mono array as stereo array of 2 mono components
+        # (Will sum to only mid data no side)
         left, right = array, array
 
     else:
-        # divide array into stereo components
+        # Divide array into stereo components
         left, right = split(array, channels)
 
     if code:

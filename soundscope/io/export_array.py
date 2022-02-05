@@ -17,7 +17,7 @@ def export_array(name, array, sample_rate, subtype, normal=False):
     subtype: subtype of the audio data
     returns: none
     """
-    # if data normalized then set the subtype to 64 bit float
+    # If data normalized then set the subtype to 64 bit float
     if normal == True:
         subtype = 'Double'
 
