@@ -18,7 +18,7 @@ from soundscope.vis.vectorscope import vectorscope
 mpl.use('Qt5Agg')
 
 # ignore divide by 0 error in log
-np.seterr(divide = 'ignore')
+np.seterr(divide='ignore')
 
 
 def visualizer(array, name, channels, sample_rate):
@@ -60,12 +60,12 @@ def visualizer(array, name, channels, sample_rate):
 
         # outer gridspec, hspace separates waveform & spectrogram plots
         # from magnitude & vectorscope
-        outer = gridspec.GridSpec(nrows=2, ncols=1, figure=fig, hspace = 0.2,
-                                  height_ratios = [2, 1])
+        outer = gridspec.GridSpec(nrows=2, ncols=1, figure=fig, hspace=0.2,
+                                  height_ratios=[2, 1])
 
         # nested gridspecs
-        gs1 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec = outer[0])
-        gs2 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec = outer[1])
+        gs1 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec=outer[0])
+        gs2 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=outer[1])
 
         # stereo mag plot with side button
         fig, lrsums, side, lindB, scale, reset_mag, reset_mag_click, \

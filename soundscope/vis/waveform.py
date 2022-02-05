@@ -15,7 +15,7 @@ from soundscope.util.split import split
 mpl.use('Qt5Agg')
 
 # ignore divide by 0 error in log
-np.seterr(divide = 'ignore')
+np.seterr(divide='ignore')
 
 
 def waveform(array, name, channels, sample_rate, fig=None, sub=False,

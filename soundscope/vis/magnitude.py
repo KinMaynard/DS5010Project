@@ -16,7 +16,7 @@ from soundscope.dsp.midside import midside
 mpl.use('Qt5Agg')
 
 # ignore divide by 0 error in log
-np.seterr(divide = 'ignore')
+np.seterr(divide='ignore')
 
 
 def magnitude(

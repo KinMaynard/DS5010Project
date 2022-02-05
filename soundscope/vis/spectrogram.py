@@ -15,7 +15,7 @@ from soundscope.util.split import split
 mpl.use('Qt5Agg')
 
 # ignore divide by 0 error in log
-np.seterr(divide = 'ignore')
+np.seterr(divide='ignore')
 
 
 def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
@@ -71,7 +71,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
             ax.spines[spine].set_color('#F9A438')
 
         # plot spectrogram (only im is used for colorbar)
-        spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma',
+        spec, fq, t, im = ax.specgram(array, Fs=sample_rate, cmap='magma',
                                       vmin=-120, vmax=0)
 
         # make space for colorbar
