@@ -1,6 +1,6 @@
-'''
+"""
 Visual tests requiring user.
-'''
+"""
 
 import unittest
 

@@ -1,6 +1,6 @@
-'''
+"""
 Audio processing & visualization library
-'''
+"""
 
 import numpy as np
 import matplotlib as mpl
@@ -22,14 +22,14 @@ np.seterr(divide = 'ignore')
 
 
 def visualizer(array, name, channels, sample_rate):
-    '''
+    """
     array: numpy array of audio data
     name: file name
     channels: mono (1) or stereo (2) file
     sample_rate: sampling rate of audio file
     
     returns: fasceted subplots of waveform, magnitude, spectrogram & vectorscope
-    '''
+    """
     # initialize figure with dark background and title
     plt.style.use('dark_background')
     fig = plt.figure()

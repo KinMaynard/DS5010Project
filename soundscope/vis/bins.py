@@ -1,20 +1,20 @@
-'''
+"""
 Audio processing & visualization library
 
 Handles downsampling arrays of audio data by the given bin size
-'''
+"""
 
 import numpy as np
 
 
 def bins(array, channels, sample_rate, bin_size=16):
-    '''
+    """
     array: numpy array of audio data
     channels: 1 mono, 2 stereo
     sample_rate: sampling rate of the audio file
     bin_size: [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384], default 32
     returns: downsampled array
-    '''
+    """
     # either of len bin_size if array divisible by bin_size or length of the partial bin
     partial_bin = len(array) % bin_size
     to_fill = bin_size - partial_bin

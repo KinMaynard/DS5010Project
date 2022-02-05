@@ -1,13 +1,13 @@
-'''
+"""
 Audio processing & visualization library
-'''
+"""
 
 import numpy as np
 import soundfile as sf
 
 
 def export_array(name, array, sample_rate, subtype, normal=False):
-    '''
+    """
     Export numpy array as audio file
     
     name: file to write to (truncates & overwrites if file exists) (str, int or file like object)
@@ -15,7 +15,7 @@ def export_array(name, array, sample_rate, subtype, normal=False):
     sample_rate: sample rate of the audio data
     subtype: subtype of the audio data
     returns: none
-    '''
+    """
     # if the data has been normalized then set the subtype to 64 bit float
     if normal == True:
         subtype = 'Double'

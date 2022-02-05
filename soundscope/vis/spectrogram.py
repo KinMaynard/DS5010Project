@@ -1,6 +1,6 @@
-'''
+"""
 Audio processing & visualization library
-'''
+"""
 
 import numpy as np
 import matplotlib as mpl
@@ -19,7 +19,7 @@ np.seterr(divide = 'ignore')
 
 
 def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
-    '''
+    """
     Creates a spectrogram given an array of audio data
     
     array: 1 or 2d numpy array of audio data
@@ -31,7 +31,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, gridspe
     resize_ls: list of text objects to be resized on window resize events when plotting inside visualizer, default None
 
     returns a spectrogram with y: frequency decibel scale logarithmic, x: time (seconds)
-    '''
+    """
     # Font
     mpl.rcParams['font.family'] = 'sans-serif'
     mpl.rcParams['font.sans-serif'] = 'Helvetica'

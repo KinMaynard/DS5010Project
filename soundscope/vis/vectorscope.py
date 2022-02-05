@@ -1,6 +1,6 @@
-'''
+"""
 Audio processing & visualization library
-'''
+"""
 
 import numpy as np
 import matplotlib as mpl
@@ -18,7 +18,7 @@ np.seterr(divide = 'ignore')
 
 
 def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
-    '''
+    """
     A stereo vectorscope plot of audio data in either polar dot per sample or lissajous modes
     Left/Right amplitudes as coordinates on X/Y 180 degree polar plot or coordinate plane lissajous plot
     
@@ -38,7 +38,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, gridspe
     
     returns: a vectorscope polar dot per sample plot of audio data 
         or a lissajouse dot per sample vectorscope plot of the audio array
-    '''
+    """
     # dark background white text
     plt.style.use('dark_background')
 

@@ -1,6 +1,6 @@
-'''
+"""
 Audio processing & visualization library
-'''
+"""
 
 import numpy as np
 import matplotlib as mpl
@@ -20,7 +20,7 @@ np.seterr(divide = 'ignore')
 
 
 def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
-    '''
+    """
     plots the log magnitude spectrum of an audio signal magnitude dB/frequency
     
     array: array of audio data
@@ -37,7 +37,7 @@ def magnitude(array, name, channels, sample_rate, fig=None, sub=False, gridspec=
         Lin: plot with linear or or no scaling, dB: plot with dB scaling: amplitude (20 * log10)
     
     returns: a plot of the log magnitude spectrum of an audio array with radio buttons for signal array & fq scale
-    '''
+    """
     # dictionary of state variables
     state = {'LIN': 'linear', 'dB': 'dB', 'scale': 'linear'}
 

@@ -1,6 +1,6 @@
-'''
+"""
 Audio processing & visualization library
-'''
+"""
 
 import numpy as np
 import matplotlib as mpl
@@ -19,7 +19,7 @@ np.seterr(divide = 'ignore')
 
 
 def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=None, resize_ls=None):
-    '''
+    """
     array: array of audio data
     name: file name
     channels: mono (1) or stereo (2) file
@@ -30,7 +30,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False, gridspec=N
     resize_ls: list of text objects to be resized on window resize events when plotting inside visualizer, default None
 
     returns: waveform plot of intensity/time either alone or as part of provided fig
-    '''
+    """
     # Font
     mpl.rcParams['font.family'] = 'sans-serif'
     mpl.rcParams['font.sans-serif'] = 'Helvetica'

@@ -1,8 +1,8 @@
-'''
+"""
 Audio processing & visualization library
 
 Unit Tests
-'''
+"""
 
 import os
 import unittest
