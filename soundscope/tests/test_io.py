@@ -4,10 +4,12 @@ Audio processing & visualization library
 Unit Tests
 '''
 
-import unittest
-import soundfile as sf
-import numpy as np
 import os
+import unittest
+
+import numpy as np
+import soundfile as sf
+
 from soundscope.io.import_array import import_array
 from soundscope.io.export_array import export_array
 

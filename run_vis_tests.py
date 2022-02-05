@@ -3,9 +3,11 @@ Visual tests requiring user.
 '''
 
 import unittest
+
 import numpy as np
-import inquirer
 import matplotlib as mpl
+import inquirer
+
 from soundscope.io.import_array import import_array
 from soundscope.vis.bins import bins
 from soundscope.vis.waveform import waveform

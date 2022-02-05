@@ -5,7 +5,9 @@ Unit Tests
 '''
 
 import unittest
+
 import numpy as np
+
 from soundscope.util.trim import mask
 from soundscope.util.trim import last_nonzero
 from soundscope.util.trim import first_nonzero

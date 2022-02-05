@@ -7,6 +7,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.widgets import MultiCursor, RadioButtons, Button
 import matplotlib.gridspec as gridspec
+
 from soundscope.util.split import split
 from soundscope.dsp.midside import midside
 

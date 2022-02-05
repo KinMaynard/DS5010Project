@@ -5,8 +5,9 @@ Handles trimming leading & trailing silence from audio arrays along with helper 
 nonzero values in an array
 '''
 
-import numpy as np
 import sys
+
+import numpy as np
 
 def mask(array):
     '''

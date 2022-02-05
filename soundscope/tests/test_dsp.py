@@ -5,7 +5,9 @@ Unit Tests
 '''
 
 import unittest
+
 import numpy as np
+
 from soundscope.dsp.normalize import normalize
 from soundscope.dsp.midside import midside
 
