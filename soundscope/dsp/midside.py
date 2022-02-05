@@ -51,8 +51,10 @@ def midside(array, channels, code=True):
 
     else:
         # Mid/Side decoding
-        newleft = left + right # mid + side
-        newright = left - right # mid - side
+        # mid + side
+        newleft = left + right
+        # mid - side
+        newright = left - right
 
         decoded = np.stack((newleft, newright), axis=-1)
 
