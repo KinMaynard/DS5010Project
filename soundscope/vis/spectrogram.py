@@ -18,7 +18,7 @@ mpl.use('Qt5Agg')
 np.seterr(divide = 'ignore')
 
 
-def spectrogram(array, name, channels, sample_rate, fig=None, sub=False, 
+def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
                 gridspec=None, resize_ls=None):
     """
     Creates a spectrogram given an array of audio data
@@ -27,14 +27,14 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
     channels: 1 mono or 2 stereo, number of channels in audio array
     name: name of the audio file
     fig: external figure to plot onto if provided, default = None
-    sub: boolean, True: plotting as subplot of larger figure, 
+    sub: boolean, True: plotting as subplot of larger figure,
         False: otherwise, default False
     gridspec: gridspec to plot onto if part of a larger figure otherwise
         None, default None
-    resize_ls: list of text objects to be resized on window resize 
+    resize_ls: list of text objects to be resized on window resize
         events when plotting inside visualizer, default None
 
-    returns a spectrogram with y: frequency decibel scale logarithmic, 
+    returns a spectrogram with y: frequency decibel scale logarithmic,
         x: time (seconds)
     """
     # Font
@@ -58,7 +58,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
         if sub:
             title = 'SPECTROGRAM'
         xlabel = ax.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
-        ylabel = ax.set_ylabel('FREQUENCY (KHZ)', color='#F9A438', 
+        ylabel = ax.set_ylabel('FREQUENCY (KHZ)', color='#F9A438',
                                fontsize=7)
         title_mono = ax.set_title(title, color='#F9A438', fontsize=10)
         ax.minorticks_on()
@@ -71,7 +71,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
             ax.spines[spine].set_color('#F9A438')
         
         # plot spectrogram (only im is used for colorbar)
-        spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma', 
+        spec, fq, t, im = ax.specgram(array, Fs= sample_rate, cmap='magma',
                                       vmin=-120, vmax=0)
         
         # make space for colorbar
@@ -84,8 +84,8 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
             cbar_ax = fig.add_axes([0.85, 0.1125, 0.01, 0.768])
         else:
             cbar_ax = fig.add_axes([0.905, 0.53, 0.003, 0.35])
-        fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5), 
-                     cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438', 
+        fig.colorbar(im, ticks=np.arange(-120, 0 + 5, 5),
+                     cax=cbar_ax).set_label('AMPLITUDE (dB)', color='#F9A438',
                                             fontsize=7)
         cbar_ax.tick_params(color='#F9A438', labelsize=5, labelcolor='#F9A438')
 
@@ -117,7 +117,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
                 reset_button_ax = fig.add_axes([0.886, 0.49, 0.0145, 0.01])
 
             # reset button
-            reset_button = Button(reset_button_ax, 'RESET', color='black', 
+            reset_button = Button(reset_button_ax, 'RESET', color='black',
                                   hovercolor='#7E0000')
             
             # small screen, smaller label
@@ -140,7 +140,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
 
         if resize_ls is not None:
             # store text to be resized
-            resize_ls.extend([title_mono, xlabel, ylabel, cbarlabel, 
+            resize_ls.extend([title_mono, xlabel, ylabel, cbarlabel,
                               reset_button.label])
 
         # individual figure or as part of larger figure
@@ -159,7 +159,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
 
         # figure and axes init in case of subplot or singular
         if fig is None:
-            fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex=True, 
+            fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex=True,
                                            sharey=True)
 
         else:
@@ -171,16 +171,16 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
         if sub:
             title = 'SPECTROGRAM'
         xlabel = ax2.set_xlabel('TIME (S)', color='#F9A438', fontsize=7)
-        ylabel_L = ax1.set_ylabel('LEFT FREQUENCY (KHZ)', color='#F9A438', 
+        ylabel_L = ax1.set_ylabel('LEFT FREQUENCY (KHZ)', color='#F9A438',
                                   fontsize=7)
-        ylabel_R = ax2.set_ylabel('RIGHT FREQUENCY (KHZ)', color='#F9A438', 
+        ylabel_R = ax2.set_ylabel('RIGHT FREQUENCY (KHZ)', color='#F9A438',
                                   fontsize=7)
         title_stereo = ax1.set_title(title, color='#F9A438', fontsize=10)
         ax1.minorticks_on()
         ax2.minorticks_on()
-        ax1.tick_params(axis='both', which='both', color='#F9A438', 
+        ax1.tick_params(axis='both', which='both', color='#F9A438',
                         labelsize=6, labelcolor='#F9A438')
-        ax2.tick_params(axis='both', which='both', color='#F9A438', 
+        ax2.tick_params(axis='both', which='both', color='#F9A438',
                         labelsize=6, labelcolor='#F9A438')
 
         # x axis on top
@@ -192,9 +192,9 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
             plt.setp(ax.spines.values(), color='#F9A438')
         
         # plot spectrograms
-        specl, fql, tl, iml = ax1.specgram(left, Fs=sample_rate, cmap='magma', 
+        specl, fql, tl, iml = ax1.specgram(left, Fs=sample_rate, cmap='magma',
                                            vmin=-120, vmax=0)
-        specr, fqr, tr, imr = ax2.specgram(right, Fs=sample_rate, cmap='magma', 
+        specr, fqr, tr, imr = ax2.specgram(right, Fs=sample_rate, cmap='magma',
                                            vmin=-120, vmax=0)
         
         # make space for colorbar & stack plots snug
@@ -208,9 +208,9 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
         else:
             # left, bottom, width, height
             cbar_ax = fig.add_axes([0.905, 0.414, 0.003, 0.466])
-        colorbar = fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5), 
-                                cax=cbar_ax).set_label('AMPLITUDE (dB)', 
-                                                       color='#F9A438', 
+        colorbar = fig.colorbar(iml, ticks=np.arange(-120, 0 + 5, 5),
+                                cax=cbar_ax).set_label('AMPLITUDE (dB)',
+                                                       color='#F9A438',
                                                        fontsize='x-small')
         cbar_ax.tick_params(color='#F9A438', labelsize=6, labelcolor='#F9A438')
         # get colorbar label for resizing
@@ -226,11 +226,11 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
         ax2.yaxis.set_major_formatter(ticks)
 
         # multicursor
-        multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True, 
+        multi = MultiCursor(fig.canvas, (ax1, ax2), horizOn=True,
                             color='blueviolet', lw=0.5)
 
         # state variable dictionary for starting axis limits
-        state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(), 
+        state = {'start_xlim1': ax1.get_xlim(), 'start_ylim1': ax1.get_ylim(),
                  'start_xlim2': ax2.get_xlim(), 'start_ylim2': ax2.get_ylim()}
 
         # zoom reset view button
@@ -248,7 +248,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
                 reset_button_ax = fig.add_axes([0.886, 0.373, 0.0145, 0.01])
             
             # reset button
-            reset_button = Button(reset_button_ax, 'RESET', color='black', 
+            reset_button = Button(reset_button_ax, 'RESET', color='black',
                                   hovercolor='#7E0000')
             
             # small screen, smaller label
@@ -273,7 +273,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
 
         if resize_ls is not None:
             # store text to be resized
-            resize_ls.extend([title_stereo, xlabel, ylabel_L, ylabel_R, 
+            resize_ls.extend([title_stereo, xlabel, ylabel_L, ylabel_R,
                               cbarlabel, reset_button.label])
 
         # individual figure or as part of larger figure

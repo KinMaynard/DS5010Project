@@ -20,7 +20,7 @@ np.seterr(divide = 'ignore')
 
 
 def magnitude(
-    array, name, channels, sample_rate, fig=None, 
+    array, name, channels, sample_rate, fig=None,
     sub=False, gridspec=None, resize_ls=None):
     """
     plots the log magnitude spectrum of an audio signal magnitude 
@@ -73,7 +73,7 @@ def magnitude(
         title = 'MAGNITUDE SPECTRUM'
     title_mag = ax.set_title(title, color='#F9A438', fontsize=10)
     ax.minorticks_on()
-    ax.tick_params(axis='both', which='both', color='#F9A438', 
+    ax.tick_params(axis='both', which='both', color='#F9A438',
                    labelsize=6, labelcolor='#F9A438')
 
     # spine coloring
@@ -113,12 +113,12 @@ def magnitude(
         mid, side = split(msarray, channels)
 
         # initial axis
-        sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate, 
+        sig, fq, line = ax.magnitude_spectrum(left, Fs=sample_rate,
                                               color='#FB636F')
 
         # state variable dictionary to keep track of plot status 
         # for button changes
-        state.update({'L': left, 'R': right, 'SUM': sumsig, 'MID': mid, 
+        state.update({'L': left, 'R': right, 'SUM': sumsig, 'MID': mid,
                       'SIDE': side, 'data': left, 'line': line})
 
         # LRSUM button axis (left, bottom, width, height)
@@ -130,7 +130,7 @@ def magnitude(
                            facecolor=button_face_color, frame_on=False)
 
         # LRSUM button
-        lrsums = RadioButtons(rax, ('L', 'R', 'SUM', 'MID', 'SIDE'), 
+        lrsums = RadioButtons(rax, ('L', 'R', 'SUM', 'MID', 'SIDE'),
                               activecolor='#5C8BC6')
 
         # Side callback function for lrsums buttons
@@ -140,16 +140,16 @@ def magnitude(
             
             # plot
             sig, fq, line = ax.magnitude_spectrum(
-                state[label], Fs=sample_rate, scale=state['scale'], 
+                state[label], Fs=sample_rate, scale=state['scale'],
                 color='#FB636F')
             
             # recompute axis limits
             ax.relim()
 
             # Set Labels
-            xlabel = ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', 
+            xlabel = ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438',
                                    fontsize=7)
-            ylabel = ax.set_ylabel('MAGNITUDE (%s)' % state['scale'], 
+            ylabel = ax.set_ylabel('MAGNITUDE (%s)' % state['scale'],
                                    color='#F9A438', fontsize=7)
             
             # update state variables to new line & data
@@ -182,10 +182,10 @@ def magnitude(
 
     # Linear dB button axis (left, bottom, width, height)
     if not sub:
-        rax = plt.axes([0.08, 0.4, 0.08, 0.15], facecolor=button_face_color, 
+        rax = plt.axes([0.08, 0.4, 0.08, 0.15], facecolor=button_face_color,
                        frame_on=False)
     else:
-        rax = plt.axes([0.06, 0.2, 0.04, 0.05], facecolor=button_face_color, 
+        rax = plt.axes([0.06, 0.2, 0.04, 0.05], facecolor=button_face_color,
                        frame_on=False)
 
     # Linear dB buttons
@@ -194,7 +194,7 @@ def magnitude(
     # state variable dictionary of starting axis limits
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
-    state.update({'lin_xlim': xlim, 'lin_ylim': ylim, 'dB_xlim': xlim, 
+    state.update({'lin_xlim': xlim, 'lin_ylim': ylim, 'dB_xlim': xlim,
                   'dB_ylim': ylim})
 
     # scale callback function for lindB buttons
@@ -214,7 +214,7 @@ def magnitude(
 
         # Set Labels
         xlabel = ax.set_xlabel('FREQUENCY (HZ)', color='#F9A438', fontsize=7)
-        ylabel = ax.set_ylabel('MAGNITUDE (%s)' % label, color='#F9A438', 
+        ylabel = ax.set_ylabel('MAGNITUDE (%s)' % label, color='#F9A438',
                                fontsize=7)
         
         # update state variables to new line & scale
@@ -263,7 +263,7 @@ def magnitude(
             reset_button_ax = fig.add_axes([0.463, 0.07, 0.0145, 0.01])
 
         # zoom reset view button
-        reset_button = Button(reset_button_ax, 'RESET', color='black', 
+        reset_button = Button(reset_button_ax, 'RESET', color='black',
                               hovercolor='#7E0000')
         
         # small screen, smaller label
