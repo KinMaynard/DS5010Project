@@ -14,3 +14,5 @@ utility dsp functions (midside (de/e)coding, peak normalization)
 reversing, polarity inversion, splitting and trimming leading and trailing 0's
 
 process & visualize audio numpy arrays
+
+License MIT 2022 Kin Maynard
