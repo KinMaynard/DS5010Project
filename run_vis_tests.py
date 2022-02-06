@@ -85,17 +85,24 @@ if __name__ == '__main__':
         os.remove('sin.aiff')
 
     if 'Stereo' in answers['tests']:
+        # Create test files
+        sf.write('silence2d.aiff', (2*np.random.default_rng(42).random((4410,
+                 2)) - 1) / 10000, 44100, 'PCM_16')
+        sf.write('white2d.aiff', 2 * np.random.default_rng(42).random((4410,
+                 2)) - 1, 44100, 'PCM_16')
+        sf.write('sin2d.aiff', np.sin(np.linspace([-np.pi, -np.pi], [np.pi,
+                 np.pi], 4410)), 44100, 'PCM_16')
+        sf.write('sin_out_phase.aiff', np.sin(np.linspace([-np.pi, np.pi
+                 ], [np.pi, -np.pi], 4410)), 44100, 'PCM_24')
+
         # Waveform to perform tests on
         questions2 = [inquirer.List('waves', message='Which test wave?',
             choices=[
-            ('Silence', '../binaries/silence_44100_-infdBFS_Stereo.aiff'),
-            ('White Noise', '../binaries/whitenoise_44100_0dBFS_Stereo.aiff'),
-            ('Chirp Stereo', '../binaries/hdchirp_88k_-3dBFS_lin_Stereo.aiff'),
-            ('Sin 440Hz', '../binaries/sin_44100_440Hz_-.8dBFS_Stereo.aiff'),
-            ('Sin Out Phase', '../binaries/Sinoutphase.wav'),
-            ('Lopez Song Stereo', '../binaries/Saija Original Mix.aiff')],
-            default=('White Noise Stereo',
-                     '../binaries/whitenoise_44100_0dBFS_Stereo.aiff')),]
+            ('Silence', 'silence2d.aiff'),
+            ('White Noise', 'white2d.aiff'),
+            ('Sin', 'sin2d.aiff'),
+            ('Sin Out Phase', 'sin_out_phase.aiff')],
+            default=('White Noise', 'white2d.aiff')),]
 
         answers2 = inquirer.prompt(questions2)
 
@@ -131,3 +138,9 @@ if __name__ == '__main__':
         if 'Visualizer' in answers['tests']:
             # Visualizer stereo plot
             visualizer(data, name, channels, sample_rate)
+
+        # Delete Test Files
+        os.remove('silence2d.aiff')
+        os.remove('white2d.aiff')
+        os.remove('sin2d.aiff')
+        os.remove('sin_out_phase.aiff')
