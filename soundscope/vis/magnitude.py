@@ -133,8 +133,9 @@ def magnitude(
         lrsums = RadioButtons(rax, ('L', 'R', 'SUM', 'MID', 'SIDE'),
                               activecolor='#5C8BC6')
 
-        # Side callback function for lrsums buttons
         def side(label):
+            """Side callback function for lrsums buttons."""
+
             # Clear previous data
             state['line'].remove()
 
@@ -197,8 +198,9 @@ def magnitude(
     state.update({'lin_xlim': xlim, 'lin_ylim': ylim, 'dB_xlim': xlim,
                   'dB_ylim': ylim})
 
-    # scale callback function for lindB buttons
     def scale(label):
+        """Scale callback function for lindB buttons."""
+
         # Clear data
         state['line'].remove()
 
@@ -278,8 +280,9 @@ def magnitude(
         for spine in spine_ls:
             reset_button_ax.spines[spine].set_color('#F0191C')
 
-        # Callback function for zoom reset button
         def reset_button_on_clicked(mouse_event):
+            """Callback function for zoom reset button."""
+
             # Recompute axis limits
             ax.relim()
 
