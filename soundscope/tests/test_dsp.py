@@ -16,9 +16,9 @@ encoded = np.array([[0.5, 0.5], [0.5, -0.5]])
 
 
 class TestDsp(unittest.TestCase):
-    """Dsp module tests."""
+    """Test dsp module."""
     def test_midside(self):
-        """Midside module tests."""
+        """Test midside module."""
         coded, ms = midside(np.arange(2), '1')
         self.assertTrue((coded == np.array([[0., 0.], [1., 0.]])).all())
         self.assertEqual(ms, True)
@@ -30,7 +30,7 @@ class TestDsp(unittest.TestCase):
         self.assertEqual(ms3, False)
 
     def test_normalize(self):
-        """Normalize module tests."""
+        """Test normalize module."""
         array, normal = normalize(np.arange(-50, 75, 25))
         self.assertTrue((array == np.array([-1., -0.5, 0., 0.5, 1.])).all())
         self.assertEqual(normal, True)

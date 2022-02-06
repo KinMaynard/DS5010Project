@@ -14,7 +14,7 @@ from soundscope.vis.bins import bins
 class TestBins(unittest.TestCase):
     
     def test_bins(self):
-        """Tests for the bins module."""
+        """Test bins module."""
         # Len divisible by bin
         downsampled, sample_rate = bins(np.arange(128).reshape(-1, 2), '2',
                                         128)
