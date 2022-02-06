@@ -16,10 +16,8 @@ from soundscope.io.export_array import export_array
 
 class TestIO(unittest.TestCase):
     """IO module tests."""
-
     def test_import_array(self):
         """Import_array module tests."""
-
         sf.write('tmp.wav', np.arange(-1, 1, .5).reshape(2, 2), 44100,
                  'PCM_24')
         metadata = ('tmp.wav', '2', np.array([[-1., -0.5], [0., 0.5]]),
@@ -33,7 +31,6 @@ class TestIO(unittest.TestCase):
 
     def test_export_array(self):
         """Export_array module tests."""
-
         export_array('tmp.wav', np.array([[-1. , -0.5], [0., 0.5]]), 48000,
                      'PCM_24')
         name, channels, data, subtype, sample_rate = import_array('tmp.wav')

@@ -135,7 +135,6 @@ def magnitude(
 
         def side(label):
             """Side callback function for lrsums buttons."""
-
             # Clear previous data
             state['line'].remove()
 
@@ -200,7 +199,6 @@ def magnitude(
 
     def scale(label):
         """Scale callback function for lindB buttons."""
-
         # Clear data
         state['line'].remove()
 
@@ -282,7 +280,6 @@ def magnitude(
 
         def reset_button_on_clicked(mouse_event):
             """Callback function for zoom reset button."""
-
             # Recompute axis limits
             ax.relim()
 
