@@ -56,7 +56,9 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     # mpl.rcParams['agg.path.chunksize'] = 20000
 
     # Setting axis limits to data peaks
-    extents = np.min(array), np.max(array), np.min(array), np.max(array)
+    hi_bound = np.max(np.absolute(array))
+    low_bound = np.negative(hi_bound)
+    extents = low_bound, hi_bound, low_bound, hi_bound
 
     # Making floating axes and rotating it 45 degrees
     transform = mpl.transforms.Affine2D().rotate_deg(45)
