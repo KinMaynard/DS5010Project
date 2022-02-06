@@ -26,8 +26,11 @@ dub_n_arr = n_arr.reshape(2, 2)
 
 
 class TestUtil(unittest.TestCase):
+    """Util module tests."""
     
     def test_invert(self):
+        """Invert module tests."""
+
         self.assertTrue((invert(sign_arr) == np.negative(sign_arr)).all())
         self.assertTrue((invert(p_arr) == np.negative(p_arr)).all())
         self.assertTrue((invert(n_arr) == np.negative(n_arr)).all())
@@ -37,6 +40,8 @@ class TestUtil(unittest.TestCase):
         self.assertTrue((invert(dub_n_arr) == np.negative(dub_n_arr)).all())
 
     def test_reverse(self):
+        """Reverse module tests."""
+
         self.assertTrue((reverse(p_arr, channels='1') == p_arr[::-1]).all())
         self.assertTrue((reverse(n_arr, channels='1', subdivision=2)
                         == np.array([-3, -4, -1, -2])).all())
@@ -46,21 +51,31 @@ class TestUtil(unittest.TestCase):
                         == np.array([[4, 5], [2, 3], [0, 1]])).all())
 
     def test_split(self):
+        """Split module tests."""
+
         left, right = split(dub_n_arr, channels='2')
         self.assertTrue((left == np.array([-4, -2])).all())
         self.assertTrue((right == np.array([-3, -1])).all())
 
     def test_mask(self):
+        """Mask module tests."""
+
         self.assertTrue((mask(sign_arr)
                         == np.array([True, False, True])).all())
 
     def test_lastnonzero(self):
+        """Lastnonzero module tests."""
+
         self.assertEqual(last_nonzero(sign_arr, 0, mask(sign_arr)), 2)
 
     def test_firstnonzero(self):
+        """Firstnonzero module tests."""
+
         self.assertEqual(first_nonzero(sign_arr, 0, mask(sign_arr)), 0)
 
     def test_trim(self):
+        """Trim module tests."""
+
         self.assertEqual(trim(np.array([0, 1, 0])), np.array([1]))
         self.assertTrue((trim(np.array([[0, 0], [1, 0]]))
                         == np.array([[1, 0]])).all())
