@@ -31,8 +31,8 @@ def magnitude(
     channels: 1 mono or 2 stereo
     sample_rate: sampling rate of audio file
     fig: external figure to plot onto if provided, default = None
-    sub: boolean, True: plotting as subplot of larger figure,
-    False: otherwise, default False
+    sub: boolean, plotting as subplot of larger figure if True, False
+    otherwise, default False
     gridspec: gridspec to plot onto if part of a larger figure
     otherwise None, default None
     resize_ls: list of text objects to be resized on window resize
@@ -134,7 +134,10 @@ def magnitude(
                               activecolor='#5C8BC6')
 
         def side(label):
-            """On lrsums button click, replot button label data L, R or Sum."""
+            """lrsums button click: replot button label data L/R/Sum.
+
+            label: string of lrsums button label, left, right or sum.
+            """
             # Clear previous data
             state['line'].remove()
 
@@ -198,7 +201,10 @@ def magnitude(
                   'dB_ylim': ylim})
 
     def scale(label):
-        """On lindB button click, replot button data: linear or decibel."""
+        """On lindB button click, replot button data: linear or decibel.
+
+        label: string of scale button label, linear or decibel.
+        """
         # Clear data
         state['line'].remove()
 
@@ -279,7 +285,10 @@ def magnitude(
             reset_button_ax.spines[spine].set_color('#F0191C')
 
         def reset_button_on_clicked(mouse_event):
-            """On reset button click, relimit & scale axes."""
+            """On reset button click, relimit & scale axes.
+
+            mouse_event: a mouse click event on reset button.
+            """
             # Recompute axis limits
             ax.relim()
 

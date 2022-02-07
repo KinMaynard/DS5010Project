@@ -118,7 +118,10 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
                 reset_button_ax.spines[spine].set_color('#F0191C')
 
             def reset_button_on_clicked(mouse_event):
-            """On reset button click, relimit & scale axes."""
+                """On reset button click, relimit & scale axes.
+
+                mouse_event: a mouse click event on reset button.
+                """
                 ax.set_xlim(state['start_xlim'])
                 ax.set_ylim(state['start_ylim'])
             reset_button.on_clicked(reset_button_on_clicked)
@@ -239,7 +242,10 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
                 reset_button_ax.spines[spine].set_color('#F0191C')
 
             def reset_button_on_clicked(mouse_event):
-            """On reset button click, relimit & scale axes."""
+                """On reset button click, relimit & scale axes.
+
+                mouse_event: a mouse click event on reset button.
+                """
                 ax1.set_xlim(state['start_xlim1'])
                 ax2.set_xlim(state['start_xlim2'])
                 ax1.set_ylim(state['start_ylim1'])

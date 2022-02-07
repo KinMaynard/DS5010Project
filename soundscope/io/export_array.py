@@ -15,6 +15,7 @@ def export_array(name, array, sample_rate, subtype, normal=False):
     array: soundfile object, numpy array of audio data as 64 bit float
     sample_rate: sample rate of the audio data
     subtype: subtype of the audio data
+    normal: boolean, True for normalized array, False otherwise
     returns: none
     """
     # If data normalized then set the subtype to 64 bit float

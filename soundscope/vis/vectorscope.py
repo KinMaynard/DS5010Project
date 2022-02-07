@@ -34,6 +34,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
 
     array: array of audio data
     name: audio datafile name
+    channels: 1 mono or 2 stereo, number of channels in audio array
     sample_rate: sampling rate of audio file
     fig: external figure to plot onto if provided, default = None
     sub: boolean, True: plotting as subplot of larger figure, False:
@@ -243,8 +244,11 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     polarlissa = RadioButtons(rax, ('Polar', 'Lissajous'),
                               activecolor='#5C8BC6')
 
-    def chooseplot(label):
-        """On button click, switch between lissajous & polar plots."""
+    def choose_plot(label):
+        """On button click, switch between lissajous & polar plots.
+
+        label: string of choose_plot button label, Polar or Lissajous.
+        """
         if label == 'Lissajous':
             pol_ax.set_visible(False)
             float_ax.set_visible(True)
@@ -256,7 +260,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
 
     # Connect button click event to callback function
     # to switch between plots
-    polarlissa.on_clicked(chooseplot)
+    polarlissa.on_clicked(choose_plot)
 
     # Labelsize & color for polarlissa buttons
     for label in polarlissa.labels:
@@ -286,6 +290,6 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
 
     # Individual figure or as part of larger figure
     if sub:
-        return fig, resize_ls, polarlissa, chooseplot
+        return fig, resize_ls, polarlissa, choose_plot
     else:
         return plt.show()

@@ -24,8 +24,9 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
     Creates a spectrogram given an array of audio data
 
     array: 1 or 2d numpy array of audio data
-    channels: 1 mono or 2 stereo, number of channels in audio array
     name: name of the audio file
+    channels: 1 mono or 2 stereo, number of channels in audio array
+    sample_rate: sampling rate of array
     fig: external figure to plot onto if provided, default = None
     sub: boolean, True: plotting as subplot of larger figure, False:
     otherwise, default False
@@ -133,7 +134,10 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
                 reset_button_ax.spines[spine].set_color('#F0191C')
 
             def reset_button_on_clicked(mouse_event):
-            """On reset button click, relimit & scale axes."""
+                """On reset button click, relimit & scale axes.
+
+                mouse_event: a mouse click event on reset button.
+                """
                 ax.set_xlim(state['start_xlim'])
                 ax.set_ylim(state['start_ylim'])
             reset_button.on_clicked(reset_button_on_clicked)
@@ -264,7 +268,10 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
                 reset_button_ax.spines[spine].set_color('#F0191C')
 
             def reset_button_on_clicked(mouse_event):
-            """On reset button click, relimit & scale axes."""
+                """On reset button click, relimit & scale axes.
+
+                mouse_event: a mouse click event on reset button.
+                """
                 ax1.set_xlim(state['start_xlim1'])
                 ax2.set_xlim(state['start_xlim2'])
                 ax1.set_ylim(state['start_ylim1'])

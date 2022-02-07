@@ -88,7 +88,7 @@ def visualizer(array, name, channels, sample_rate):
     fig, reset_spec, reset_spec_click, resize_ls = spectrogram(
         array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs1,
         resize_ls=resize_ls)
-    fig, resize_ls, polarlissa, chooseplot = vectorscope(
+    fig, resize_ls, polarlissa, choose_plot = vectorscope(
         array, name, channels, sample_rate, fig=fig, sub=True, gridspec=gs2,
         resize_ls=resize_ls)
 
@@ -96,7 +96,7 @@ def visualizer(array, name, channels, sample_rate):
     lindB.on_clicked(scale)
 
     # Enabling vectorscope buttons
-    polarlissa.on_clicked(chooseplot)
+    polarlissa.on_clicked(choose_plot)
 
     # Enabling view reset buttons
     reset_wav.on_clicked(reset_wav_click)
