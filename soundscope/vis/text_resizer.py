@@ -13,6 +13,7 @@ class TextResizer():
     fontsizes once the figure is resized, scaled by the new figure
     height divided by the initial height.
     """
+
     def __init__(self, texts, fig=None, minimal=4):
         """
         texts: list of text objects in figure being resized by this
@@ -20,6 +21,7 @@ class TextResizer():
         fig: matplotlib figure object, the figure being resized
         minimal: minimal fontsize resize threshold
         """
+
         # Sanity check & for minimal testing examples
         if not fig: 
             fig = plt.gcf()
@@ -41,6 +43,7 @@ class TextResizer():
         fontsizes of text objects in the texts list by the scale of the
         current figure height from the initial figure height.
         """
+
         # Scale of current figure height by initial figure height
         # Halving height lets size enlarge again
         scale = event.height / (self.windowheight/2)
