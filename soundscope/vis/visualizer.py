@@ -28,8 +28,8 @@ def visualizer(array, name, channels, sample_rate):
     channels: mono (1) or stereo (2) file
     sample_rate: sampling rate of audio file
 
-    returns: fasceted subplots of waveform, magnitude,
-        spectrogram & vectorscope
+    returns: fasceted subplots of waveform, magnitude, spectrogram & 
+    vectorscope
     """
     # Initialize figure with dark background and title
     plt.style.use('dark_background')

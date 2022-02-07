@@ -24,9 +24,9 @@ def midside(array, channels, code=True):
     array: 2d numpy array of audio data (L/R, or M/S)
     channels: # of channels in audio signal (must be 2)
     code: True when encoding Mid/Side, False when decoding Mid/Side
-        (default True)
+    (default True)
     returns: given L/R: a 2d array of audio data encoded as mid/side,
-        given M/S: a 2d array of audio data encoded as L/R
+    given M/S: a 2d array of audio data encoded as L/R
     """
     # Check for stereo or mid/side array
     if channels == '1':

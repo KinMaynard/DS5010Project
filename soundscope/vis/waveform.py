@@ -26,12 +26,12 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
     channels: mono (1) or stereo (2) file
     sample_rate: sampling rate of audio file
     fig: external figure to plot onto if provided, default = None
-    sub: boolean, True: plotting as subplot of larger figure,
-        False: otherwise, default False
+    sub: boolean, True: plotting as subplot of larger figure, False:
+    otherwise, default False
     gridspec: gridspec to plot onto if part of a larger figure
-        otherwise None, default None
+    otherwise None, default None
     resize_ls: list of text objects to be resized on window resize
-        events when plotting inside visualizer, default None
+    events when plotting inside visualizer, default None
 
     returns: waveform plot of intensity/time either alone
         or as part of provided fig

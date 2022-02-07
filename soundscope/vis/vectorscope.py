@@ -36,16 +36,15 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     name: audio datafile name
     sample_rate: sampling rate of audio file
     fig: external figure to plot onto if provided, default = None
-    sub: boolean, True: plotting as subplot of larger figure,
-        False: otherwise, default False
+    sub: boolean, True: plotting as subplot of larger figure, False:
+    otherwise, default False
     gridspec: gridspec to plot onto if part of a larger figure
-        otherwise None, default None
+    otherwise None, default None
     resize_ls: list of text objects to be resized on window resize
         events when plotting inside visualizer, default None
 
     returns: a vectorscope polar dot per sample plot of audio data
-        or a lissajouse dot per sample vectorscope plot of the audio
-        array
+    or a lissajouse dot per sample vectorscope plot of the audio array
     """
     # Dark background white text
     plt.style.use('dark_background')

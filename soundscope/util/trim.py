@@ -18,7 +18,7 @@ def mask(array):
 
     array: numpy array of audio data
     returns: boolean mask of nonzeros (values greater than epsilon)
-        in array
+    in array
     """
     epsilon = sys.float_info.epsilon
     mask = abs(array) > epsilon
@@ -57,7 +57,7 @@ def last_nonzero(array, axis, mask, invalid_val=-1):
     axis: generic axis specifier axis along which to access elements
     mask: boolean array of non zeros (non epsilon) values in array
     invalid_value: marker for dimensions of only zeros,
-        default argument is -1
+    default argument is -1
     returns: index of last non zero value in array
 
     Similar behavior to first_nonzero however we flip along the axis
@@ -84,7 +84,7 @@ def trim(array):
     any channel from last non zero to avoid 2 different sized channels
 
     Future features: definable noise floor to choose what to truncate
-        as silence
+    as silence
     """
     # Mask of absolute value of values > epsilon
     mask1 = mask(array)

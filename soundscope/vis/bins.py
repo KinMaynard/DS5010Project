@@ -13,7 +13,7 @@ def bins(array, channels, sample_rate, bin_size=16):
     channels: 1 mono, 2 stereo
     sample_rate: sampling rate of the audio file
     bin_size: [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384],
-        default 32
+    default 32
     returns: downsampled array
     """
     # Either of len bin_size if array divisible by bin_size or length
