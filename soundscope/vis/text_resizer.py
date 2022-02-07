@@ -8,18 +8,17 @@ class TextResizer():
     Resize plot text by a factor of the scale of a window resize event.
 
     Whenever the window is resized, the text in the plots is resized
-    proportionally.
-    Stores the initial figure height and fontsizes, updating the
-    fontsizes once the figure is resized, scaled by the new figure
-    height divided by the initial height.
+    proportionally. Store the initial figure height and fontsizes,
+    update the fontsizes once the figure is resized, scaled by the new
+    figure height divided by the initial height.
     """
 
     def __init__(self, texts, fig=None, minimal=4):
         """
         texts: list of text objects in figure being resized by this
-        class
-        fig: matplotlib figure object, the figure being resized
-        minimal: minimal fontsize resize threshold
+        class.
+        fig: matplotlib figure object, the figure being resized.
+        minimal: minimal fontsize resize threshold.
         """
 
         # Sanity check & for minimal testing examples
@@ -55,7 +54,7 @@ class TextResizer():
             """
             Factors each fontsize in the texts list by the scale bottom
             bounded by minimal and sets the fontsize of the text object
-            in the text list to this new scaled fontsize
+            in the text list to this new scaled fontsize.
             """
             newsize = np.max([int(self.fontsizes[i] * scale), self.minimal])
             self.texts[i].set_fontsize(newsize)
