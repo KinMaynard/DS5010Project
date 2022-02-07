@@ -245,7 +245,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
                               activecolor='#5C8BC6')
 
     def chooseplot(label):
-        """Chooseplot callback function for polarlissa buttons."""
+        """On button click, switch between lissajous & polar plots."""
         if label == 'Lissajous':
             pol_ax.set_visible(False)
             float_ax.set_visible(True)

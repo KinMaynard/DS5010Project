@@ -134,7 +134,7 @@ def magnitude(
                               activecolor='#5C8BC6')
 
         def side(label):
-            """Side callback function for lrsums buttons."""
+            """On lrsums button click, replot button label data L, R or Sum."""
             # Clear previous data
             state['line'].remove()
 
@@ -198,7 +198,7 @@ def magnitude(
                   'dB_ylim': ylim})
 
     def scale(label):
-        """Scale callback function for lindB buttons."""
+        """On lindB button click, replot button data: linear or decibel."""
         # Clear data
         state['line'].remove()
 
@@ -279,7 +279,7 @@ def magnitude(
             reset_button_ax.spines[spine].set_color('#F0191C')
 
         def reset_button_on_clicked(mouse_event):
-            """Callback function for zoom reset button."""
+            """On reset button click, relimit & scale axes."""
             # Recompute axis limits
             ax.relim()
 
