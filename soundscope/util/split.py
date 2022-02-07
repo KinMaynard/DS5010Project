@@ -9,7 +9,7 @@ import numpy as np
 
 def split(array, channels):
     """
-    splits 2d array of audio data into Left and Right or Mid and Side 
+    splits 2d array of audio data into Left and Right or Mid and Side
     channels
     array: 2d numpy array of audio data
     channels: # of channels in signal, must be 2
