@@ -8,7 +8,7 @@ import soundfile as sf
 
 def export_array(name, array, sample_rate, subtype, normal=False):
     """
-    Export numpy array as audio file
+    Export numpy array as audio file.
     
     name: file to write to (truncates & overwrites if file exists)
     (str, int or file like object)

@@ -11,8 +11,7 @@ from soundscope.util.split import split
 
 def midside(array, channels, code=True):
     """
-    Encodes a stereo array of L/R audio data as mid/side data or
-    mid/side data as L/R
+    Encode stereo array as midside or decode midside array to stereo.
 
     Sum and difference matrix:
     mid: (L+R)-3dB or 1/2(L+R)

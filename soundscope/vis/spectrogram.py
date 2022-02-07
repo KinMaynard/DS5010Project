@@ -21,7 +21,7 @@ np.seterr(divide='ignore')
 def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
                 gridspec=None, resize_ls=None):
     """
-    Creates a spectrogram given an array of audio data
+    Plot a spectrogram of an array of audio data.
 
     array: 1 or 2d numpy array of audio data
     name: name of the audio file

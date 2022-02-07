@@ -9,6 +9,8 @@ import numpy as np
 
 def bins(array, channels, sample_rate, bin_size=16):
     """
+    Downsample array by averaging bins of bin_size into new array.
+
     array: numpy array of audio data
     channels: 1 mono, 2 stereo
     sample_rate: sampling rate of the audio file

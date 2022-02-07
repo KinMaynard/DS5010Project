@@ -3,7 +3,8 @@ import numpy as np
 
 def reverse(array, channels, subdivision=1):
     """
-    Reverses subdivisions of an array of audio data
+    Reverses subdivisions of an array of audio data.
+
     array: a numpy array of audio data, numbers not empty
     channels: mono (1) or stereo (2) file
     subdivision: int, amount of subarrays to create default: 1

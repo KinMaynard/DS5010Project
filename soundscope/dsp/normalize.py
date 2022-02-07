@@ -9,7 +9,7 @@ import numpy as np
 
 def normalize(array):
     """
-    Performs peak normalization on array of audio data
+    Peak normalize audio data array.
 
     array: array of audio data 64 bit floating point
 

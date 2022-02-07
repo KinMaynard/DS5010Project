@@ -23,8 +23,7 @@ def magnitude(
     array, name, channels, sample_rate, fig=None,
     sub=False, gridspec=None, resize_ls=None):
     """
-    Plots the log magnitude spectrum of an audio signal magnitude
-    dB/frequency
+    Plot log magnitude spectrum of audio signal magnitude dB/frequency.
 
     array: array of audio data
     name: audio file name

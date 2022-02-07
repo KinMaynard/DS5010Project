@@ -20,9 +20,11 @@ np.seterr(divide='ignore')
 def vectorscope(array, name, channels, sample_rate, fig=None, sub=False, 
                 gridspec=None, resize_ls=None):
     """
-    A stereo vectorscope plot of audio data in either polar dot per
-    sample or lissajous modes Left/Right amplitudes as coordinates on
-    X/Y 180 degree polar plot or coordinate plane lissajous plot
+    A stereo vectorscope plot of audio data.
+
+    Plot in either polar dot per sample or lissajous modes Left/Right
+    amplitudes as coordinates on X/Y 180 degree polar plot or coordinate
+    plane lissajous plot.
 
     Lissajous vectorscope dot per sample plotting stereo width of the
     audio signal.

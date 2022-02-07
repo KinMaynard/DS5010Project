@@ -13,8 +13,7 @@ import numpy as np
 
 def mask(array):
     """
-    Calculates a boolean mask of non zeros (values greater than positive
-    epsilon smaller than negative epsilon)
+    Calculate boolean mask of non-zeros: -epsilon > non0's > epsilon.
 
     array: numpy array of audio data
     returns: boolean mask of nonzeros (values greater than epsilon)

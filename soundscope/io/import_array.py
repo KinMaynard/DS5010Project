@@ -10,7 +10,8 @@ import soundfile as sf
 
 def import_array(file):
     """
-    Import audio file as 64 bit float array
+    Import audio file as 64 bit float array.
+
     file: audio file
     returns: a filename, number of channels,
     data (a 64 bit float numpy array of audio data),

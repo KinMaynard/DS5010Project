@@ -7,6 +7,7 @@ class TextResizer():
     """
     Handles resizing text in plots by a factor of the scale of a
     window resize event.
+
     Whenever the window is resized, the text in the plots is resized
     proportionally.
     Stores the initial figure height and fontsizes, updating the

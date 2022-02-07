@@ -21,6 +21,8 @@ np.seterr(divide='ignore')
 def waveform(array, name, channels, sample_rate, fig=None, sub=False,
     gridspec=None, resize_ls=None):
     """
+    Plot waveform (amplitude over time) of array of audio data.
+
     array: array of audio data
     name: file name
     channels: mono (1) or stereo (2) file
