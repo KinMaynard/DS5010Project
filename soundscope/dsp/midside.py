@@ -1,9 +1,3 @@
-"""
-Audio processing & visualization library
-
-Encodes a L/R audio array as Midside or decodes a midside array as L/R
-"""
-
 import numpy as np
 
 from soundscope.util.split import split

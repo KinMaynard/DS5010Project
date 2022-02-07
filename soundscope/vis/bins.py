@@ -1,9 +1,3 @@
-"""
-Audio processing & visualization library
-
-Handles downsampling arrays of audio data by the given bin size
-"""
-
 import numpy as np
 
 

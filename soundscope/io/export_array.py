@@ -1,7 +1,3 @@
-"""
-Audio processing & visualization library
-"""
-
 import numpy as np
 import soundfile as sf
 

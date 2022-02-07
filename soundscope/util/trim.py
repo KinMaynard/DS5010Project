@@ -1,11 +1,3 @@
-"""
-Audio processing & visualization library
-
-Handles trimming leading & trailing silence from audio arrays along
-    with helper functions to calculate the first and last
-nonzero values in an array
-"""
-
 import sys
 
 import numpy as np

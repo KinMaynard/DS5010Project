@@ -1,9 +1,3 @@
-"""
-Audio processing & visualization library
-
-normalizes audio files
-"""
-
 import numpy as np
 
 

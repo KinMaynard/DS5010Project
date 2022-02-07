@@ -1,10 +1,3 @@
-"""
-Audio processing & visualization library
-
-Handles the importing of audio files to numpy arrays
-via the soundfile dependancy
-"""
-
 import soundfile as sf
 
 

@@ -1,7 +1,3 @@
-"""
-Visual tests requiring user.
-"""
-
 import os
 import unittest
 

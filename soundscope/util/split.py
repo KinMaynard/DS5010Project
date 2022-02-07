@@ -1,9 +1,3 @@
-"""
-Audio processing & visualization library
-
-Splits stereo audio arrays into 2 mono arrays
-"""
-
 import numpy as np
 
 

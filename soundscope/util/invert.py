@@ -1,9 +1,3 @@
-"""
-Audio processing & visualization library
-
-Inverts the polarity of an audio array (phase)
-"""
-
 import numpy as np
 
 
