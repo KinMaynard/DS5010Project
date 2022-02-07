@@ -26,8 +26,7 @@ def mask(array):
 
 def first_nonzero(array, axis, mask, invalid_val=-1):
     """
-    Helper function for trim function that gets the index of the first
-    non_zero element in an array
+    Get index of the first non_zero element in an array.
 
     array: 1d or 2d numpy array of audio data
     axis: generic axis specifier along which to access elements
@@ -49,8 +48,7 @@ def first_nonzero(array, axis, mask, invalid_val=-1):
 
 def last_nonzero(array, axis, mask, invalid_val=-1):
     """
-    Helper function for trim function that gets the index of the last
-    non_zero element in an array
+    Get index of the last non_zero element in an array.
 
     array: 1d or 2d numpy array of audio data
     axis: generic axis specifier axis along which to access elements
@@ -75,7 +73,8 @@ def last_nonzero(array, axis, mask, invalid_val=-1):
 
 def trim(array):
     """
-    Truncates leading and trailing silence (0's) from audio array
+    Truncates leading and trailing silence (0's) from array.
+
     array: numpy array created from an audio file
     returns: array without leading and trailing silence
 

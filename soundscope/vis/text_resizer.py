@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 
 class TextResizer():
     """
-    Handles resizing text in plots by a factor of the scale of a
-    window resize event.
+    Resize plot text by a factor of the scale of a window resize event.
 
     Whenever the window is resized, the text in the plots is resized
     proportionally.
@@ -40,9 +39,11 @@ class TextResizer():
 
     def __call__(self, event=None):
         """
-        Callback function for figure resize events. Factors the
-        fontsizes of text objects in the texts list by the scale of the
-        current figure height from the initial figure height.
+        Callback function for figure resize events. 
+
+        Factors the fontsizes of text objects in the texts list by the
+        scale of the current figure height from the initial figure
+        height.
         """
 
         # Scale of current figure height by initial figure height
