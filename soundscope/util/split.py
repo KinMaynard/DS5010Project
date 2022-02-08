@@ -5,9 +5,9 @@ def split(array, channels):
     """
     Splits 2d array of audio data into 2 1d arrays.
 
-    array: 2d numpy array of audio data
-    channels: # of channels in signal, must be 2
-    returns: Left and Right channels (or M/S)
+    array: 2d numpy array of audio data.
+    channels: number of channels in signal, must be 2.
+    returns: Left and Right channels (or mid and side).
     """
 
     # Divide array into stereo components
