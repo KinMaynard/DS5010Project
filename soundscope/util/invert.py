@@ -8,5 +8,6 @@ def invert(array):
     array: a numpy array of audio data (numbers), not empty
     returns: a version of array with the polarity inverted
     """
+
     # Inverts polarity of audio data
     return array * -1

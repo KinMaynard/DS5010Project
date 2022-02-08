@@ -45,6 +45,7 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
     returns: a vectorscope polar dot per sample plot of audio data
     or a lissajouse dot per sample vectorscope plot of the audio array
     """
+
     # Dark background white text
     plt.style.use('dark_background')
 

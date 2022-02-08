@@ -21,6 +21,7 @@ def midside(array, channels, code=True):
     returns: given L/R: a 2d array of audio data encoded as mid/side,
     given M/S: a 2d array of audio data encoded as L/R
     """
+
     # Check for stereo or mid/side array
     if channels == '1':
         # Treat mono array as stereo array of 2 mono components

@@ -10,6 +10,7 @@ def reverse(array, channels, subdivision=1):
     subdivision: int, amount of subarrays to create default: 1
     returns: a reversed version of array by subdivision
     """
+
     # Check if array.shape divisible by subdivision
     # if not error
     if len(array) % subdivision != 0:

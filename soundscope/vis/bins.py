@@ -12,6 +12,7 @@ def bins(array, channels, sample_rate, bin_size=16):
     default 32
     returns: downsampled array
     """
+
     # Either of len bin_size if array divisible by bin_size or length
     # of the partial bin
     partial_bin = len(array) % bin_size

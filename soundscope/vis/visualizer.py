@@ -29,6 +29,7 @@ def visualizer(array, name, channels, sample_rate):
     returns: fasceted subplots of waveform, magnitude, spectrogram &
     vectorscope
     """
+
     # Initialize figure with dark background and title
     plt.style.use('dark_background')
     fig = plt.figure()

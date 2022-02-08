@@ -34,6 +34,7 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
     returns a spectrogram with y: frequency decibel scale logarithmic,
         x: time (seconds)
     """
+
     # Font
     mpl.rcParams['font.family'] = 'sans-serif'
     mpl.rcParams['font.sans-serif'] = 'Helvetica'

@@ -10,6 +10,7 @@ def import_array(file):
     data (a 64 bit float numpy array of audio data),
     the files subtype and sample rate of the file.
     """
+
     # Extracting the filename and subtype from soundfile's info object
     info = str(sf.info(file))
 

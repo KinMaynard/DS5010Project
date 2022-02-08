@@ -9,6 +9,7 @@ def normalize(array):
 
     returns: normalized version of array
     """
+
     # Normalize data between -1 and 1
     array = 2 * ((array-np.min(array)) / (np.max(array)-np.min(array))) - 1
     return array, True

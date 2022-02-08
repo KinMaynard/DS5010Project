@@ -42,6 +42,7 @@ def magnitude(
     returns: a plot of the log magnitude spectrum of an audio array
     with radio buttons for signal array & fq scale
     """
+
     # Dictionary of state variables
     state = {'LIN': 'linear', 'dB': 'dB', 'scale': 'linear'}
 

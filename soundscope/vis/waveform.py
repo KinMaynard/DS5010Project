@@ -34,6 +34,7 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
     returns: waveform plot of intensity/time either alone
         or as part of provided fig
     """
+
     # Font
     mpl.rcParams['font.family'] = 'sans-serif'
     mpl.rcParams['font.sans-serif'] = 'Helvetica'

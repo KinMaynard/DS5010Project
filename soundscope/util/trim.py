@@ -11,6 +11,7 @@ def mask(array):
     returns: boolean mask of nonzeros (values greater than epsilon)
     in array
     """
+
     epsilon = sys.float_info.epsilon
     mask = abs(array) > epsilon
     return mask
@@ -33,6 +34,7 @@ def first_nonzero(array, axis, mask, invalid_val=-1):
 
     Column major order access.
     """
+
     # Boolean array of True where element of original array is nonzero
     # false otherwise (if zero)
     return np.where(mask.any(axis=axis), mask.argmax(axis=axis), invalid_val)
@@ -56,6 +58,7 @@ def last_nonzero(array, axis, mask, invalid_val=-1):
 
     Accessing the array here in column major order.
     """
+
     # Boolean array of True where element of original array is nonzero
     # false otherwise (if zero)
     dex_last_occur = array.shape[axis] - np.flip(
@@ -76,6 +79,7 @@ def trim(array):
     Future features: definable noise floor to choose what to truncate
     as silence
     """
+
     # Mask of absolute value of values > epsilon
     mask1 = mask(array)
     # Return a copy of array sliced from first nonzero element to

@@ -14,6 +14,7 @@ def export_array(name, array, sample_rate, subtype, normal=False):
     normal: boolean, True for normalized array, False otherwise
     returns: none
     """
+
     # If data normalized then set the subtype to 64 bit float
     if normal:
         subtype = 'Double'
