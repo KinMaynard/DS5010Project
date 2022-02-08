@@ -11,6 +11,11 @@ class TextResizer():
     proportionally. Store the initial figure height and fontsizes,
     update the fontsizes once the figure is resized, scaled by the new
     figure height divided by the initial height.
+
+    Instance variables:
+    texts: list of figure text to resize.
+    fig: matplotlib figure changing size.
+    minimal: minimum fontsize.
     """
 
     def __init__(self, texts, fig=None, minimal=4):
