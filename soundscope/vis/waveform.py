@@ -75,9 +75,6 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
         # Plot signal amplitude/time
         # Seconds in file
         time = array.size / sample_rate
-        # line = np.stack((np.linspace(0.0, time, array.size), array), axis=-1)
-        # col = mpl.collections.LineCollection([line], color='#16F9DA')
-        # ax.add_collection(col, autolim=True)
         ax.plot(np.linspace(0.0, time, array.size), array, color='#16F9DA')
 
         ax.margins(0.001)
@@ -190,12 +187,6 @@ def waveform(array, name, channels, sample_rate, fig=None, sub=False,
         # Plot signal amplitude/time
         # Only left size otherwise will be double the amount of time
         time = left.size / sample_rate
-        # line1 = np.stack((np.linspace(0.0, time, left.size), left), axis=-1)
-        # line2 = np.stack((np.linspace(0.0, time, left.size), right), axis=-1)
-        # col1 = mpl.collections.LineCollection([line1], color='#16F9DA')
-        # col2 = mpl.collections.LineCollection([line2], color='#16F9DA')
-        # ax1.add_collection(col1, autolim=True)
-        # ax2.add_collection(col2, autolim=True)
         ax1.plot(np.linspace(0.0, time, left.size), left, color='#16F9DA')
         ax2.plot(np.linspace(0.0, time, right.size), right, color='#16F9DA')
 

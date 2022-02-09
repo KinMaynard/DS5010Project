@@ -1,3 +1,5 @@
+"""Visual tests requiring user interaction and viewing."""
+
 import os
 import unittest
 
