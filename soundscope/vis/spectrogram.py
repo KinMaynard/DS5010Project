@@ -19,20 +19,20 @@ def spectrogram(array, name, channels, sample_rate, fig=None, sub=False,
     """
     Plot a spectrogram of an array of audio data.
 
-    array: 1 or 2d numpy array of audio data
-    name: name of the audio file
-    channels: 1 mono or 2 stereo, number of channels in audio array
-    sample_rate: sampling rate of array
-    fig: external figure to plot onto if provided, default = None
+    array: 1 or 2d numpy array of audio data.
+    name: name of the audio file.
+    channels: 1 mono or 2 stereo, number of channels in audio array.
+    sample_rate: sampling rate of array.
+    fig: external figure to plot onto if provided, default = None.
     sub: boolean, True: plotting as subplot of larger figure, False:
-    otherwise, default False
+    otherwise, default False.
     gridspec: gridspec to plot onto if part of a larger figure otherwise
-    None, default None
+    None, default None.
     resize_ls: list of text objects to be resized on window resize
-    events when plotting inside visualizer, default None
+    events when plotting inside visualizer, default None.
 
     returns a spectrogram with y: frequency decibel scale logarithmic,
-        x: time (seconds)
+    x: time (seconds).
     """
 
     # Font

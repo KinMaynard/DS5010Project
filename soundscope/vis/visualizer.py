@@ -21,6 +21,8 @@ def visualizer(array, name, channels, sample_rate):
     """
     Plot waveform, magnitude, spectrogram & vectorscope of array.
 
+    Combined plot of waveform, magnitude, spectrogram & vectorscope.
+
     array: numpy array of audio data
     name: file name
     channels: mono (1) or stereo (2) file

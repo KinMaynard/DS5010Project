@@ -5,10 +5,9 @@ def import_array(file):
     """
     Import audio file as 64 bit float array.
 
-    file: audio file
-    returns: a filename, number of channels,
-    data (a 64 bit float numpy array of audio data),
-    the files subtype and sample rate of the file.
+    file: audio file.
+    returns: a filename, number of channels, data (a 64 bit float numpy
+    array of audio data), the files subtype and sample rate of the file.
     """
 
     # Extracting the filename and subtype from soundfile's info object

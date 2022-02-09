@@ -5,7 +5,10 @@ def reverse(array, channels, subdivision=1):
     """
     Reverses subdivisions of an array of audio data.
 
-    Reverses every nth subdivision of an array in place.
+    Reverses every nth subdivision of an array in place. The default
+    subdivision argument reverses the whole array. Any greater number
+    will reverse a subdivision of the array (eg. 2 will halve array,
+    reverse the halves and combine them).
 
     array: a numpy array of audio data, numbers not empty
     channels: mono (1) or stereo (2) file

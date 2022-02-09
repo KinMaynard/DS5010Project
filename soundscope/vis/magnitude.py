@@ -21,26 +21,26 @@ def magnitude(
     """
     Plot log magnitude spectrum of audio signal magnitude dB/frequency.
 
-    array: array of audio data
-    name: audio file name
-    channels: 1 mono or 2 stereo
-    sample_rate: sampling rate of audio file
-    fig: external figure to plot onto if provided, default = None
+    array: array of audio data.
+    name: audio file name.
+    channels: 1 mono or 2 stereo.
+    sample_rate: sampling rate of audio file.
+    fig: external figure to plot onto if provided, default = None.
     sub: boolean, plotting as subplot of larger figure if True, False
-    otherwise, default False
+    otherwise, default False.
     gridspec: gridspec to plot onto if part of a larger figure
-    otherwise None, default None
+    otherwise None, default None.
     resize_ls: list of text objects to be resized on window resize
-    events when plotting inside visualizer, default None
+    events when plotting inside visualizer, default None.
 
     Radio buttons:
-    L: plots left channel, R: plots right channel, Sum: plots L+R,
-    Mid: plots mid channel, Side: plots side channel
+    L: plots left channel, R: plots right channel, Sum: plots L+R
+    Mid: plots mid channel, Side: plots side channel.
     Lin: plot with linear or or no scaling,
-    dB: plot with dB scaling: amplitude (20 * log10)
+    dB: plot with dB scaling: amplitude (20 * log10).
 
     returns: a plot of the log magnitude spectrum of an audio array
-    with radio buttons for signal array & fq scale
+    with radio buttons for signal array & fq scale.
     """
 
     # Dictionary of state variables

@@ -20,15 +20,17 @@ def vectorscope(array, name, channels, sample_rate, fig=None, sub=False,
 
     Plot in either polar dot per sample or lissajous modes Left/Right
     amplitudes as coordinates on X/Y 180 degree polar plot or coordinate
-    plane lissajous plot.
+    plane lissajous plot. Currently only lissajous mode active.
 
     Lissajous vectorscope dot per sample plotting stereo width of the
     audio signal.
     Mono signals show as straight lines down the center, stereo
     information is show with horizontal deflection of the data.
-    Phase issues show as INSERT PHASE EXPLANATION HERE.
+    Phase issues show as extreme horizontal deflection with full out of
+    phase signals showing as horizontal line.
 
-    The Polar/Lissajous radio button chooses which plot to show
+    The Polar/Lissajous radio button chooses which plot to show.
+    Polar plot currently unavailable.
 
     array: array of audio data
     name: audio datafile name

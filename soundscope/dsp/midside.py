@@ -7,19 +7,18 @@ def midside(array, channels, code=True):
     """
     Encode stereo array as midside or decode midside array to stereo.
 
-    Sum and difference matrix:
-    mid: (L+R)-3dB or 1/2(L+R)
-    side: (L-R)-3dB or 1/2(L-R)
-    L: (M+S)-3dB or L = M + S = 1/2(L+R) + 1/2(L-R) = 1/2 * L + 1/2 * L
-    R: (M-S)-3dB or R = M - S = 1/2(L+R) - 1/2(L-R) = 1/2 * R + 1/2 * R
-    -3db accounts for the +6dB change to the output of a double encoding
+    In a stereo signal with left and right channels, there
+    are components in both channels that are shared and those that are
+    different between the sides. Midside encoding separates a stereo
+    signal's sum and differences into separate channels. The mid channel
+    contains what is common between the left and right channels and the
+    side channel contains the differences.
 
-    array: 2d numpy array of audio data (L/R, or M/S)
-    channels: # of channels in audio signal (must be 2)
-    code: True when encoding Mid/Side, False when decoding Mid/Side
-    (default True)
+    array: 2d numpy array of audio data (L/R, or M/S).
+    channels: 1 for mono, 2 stereo signal.
+    code: True encodes Mid/Side, False decodes Mid/Side (default True).
     returns: given L/R: a 2d array of audio data encoded as mid/side,
-    given M/S: a 2d array of audio data encoded as L/R
+    given M/S: a 2d array of audio data encoded as L/R.
     """
 
     # Check for stereo or mid/side array
